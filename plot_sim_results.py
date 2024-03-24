@@ -148,7 +148,7 @@ def dynamic_deviation_threshold_multi_logic(hmm_arrays, rmm_arrays, update_logic
         # Calculate dynamic deviation threshold as the mean deviation across all arrays
         dynamic_threshold_pos = max([max(x, 0.01) for x in pos_deviation])
         dynamic_threshold_time = max(time_deviation, 0.1)
-        dynamic_threshold_mission_time = 3
+        dynamic_threshold_mission_time = 5
 
         # Bayesian Probabilistic Update for the entire array
         updated_hmm_array = []

@@ -34,6 +34,7 @@ def visualize_grid(robot_pos, obstacles, path, ax):
     ax.set_aspect('equal', 'box')
     ax.set_xlim(0, dim)
     ax.set_ylim(0, dim)
+    plt.tight_layout()
 
 def heuristic_cost_estimate(current, goal):
     return abs(current[0] - goal[0]) + abs(current[1] - goal[1])
