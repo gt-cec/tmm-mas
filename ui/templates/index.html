@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TMM-MAS</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+</head>
+<body>
+    <!-- HTML elements -->
+    <p id="status">The sim_stream socket has not been emitted to yet.</p>
+    <img id="simulation-camera" style="border: 1px solid lightblue; width:80vh; height:80vh;">
+
+    <!-- script -->
+    <script>
+        const socket = io();  // init socketIO
+
+        // when the socket receives the 'sim_stream' channel, get the image (base64 encoded) and display it
+        socket.on('sim_stream', function(data) {
+            if (data.image) {  // check that the 'image' field is there
+                document.getElementById("simulation-camera").src = "data:image/png;base64," + data.image;  // set the cam image
+                document.getElementById('status').innerText = "Image received and displayed.";  // set the status text
+            } else {
+                document.getElementById('status').innerText = "No image received in payload.";  // set the status text
+            }
+        });
+    </script>
+</body>
+</html>
