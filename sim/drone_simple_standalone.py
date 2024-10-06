@@ -45,6 +45,10 @@ quad_path = "/World/quadx" #Path to the drone in the environment USD
 
 bumps = [(3,1),(4,1),(5,2),(5,3),(2,4),(3,4)] #Difficult terrain points as list of ordered pairs: (y,x)
 
+# Enable Trace
+
+trace_enable = True
+
 ####################################################################################################
 
 ## Initialize World
@@ -319,28 +323,30 @@ while True:
             
             dist = np.sqrt((xpose-xpose_prev)**2 + (ypose-ypose_prev)**2 + (zpose-zpose_prev)**2)
             # print(dist)
-            if trace_iter == 0:
-                trace_iter += 1
-            elif dist >= 0.3:
-                sphere = UsdGeom.Sphere.Define(stage, f'/World/trace/sphere{trace_iter}')
-                sphere.CreateRadiusAttr(trace_width)
-                sphere_x = float(global_pose[0])
-                sphere_y = float(global_pose[1])
-                sphere_z = float(global_pose[2])
-                sphere.AddTranslateOp().Set(Gf.Vec3f(sphere_x,sphere_y,sphere_z))
-                sphere.AddScaleOp().Set(Gf.Vec3f(1.0))
-                sphere.GetDisplayColorAttr().Set([trace_color])
+            if trace_enable:
+                if trace_iter == 0:
+                    trace_iter += 1
+                elif dist >= 0.3:
+                    sphere = UsdGeom.Sphere.Define(stage, f'/World/trace/sphere{trace_iter}')
+                    sphere.CreateRadiusAttr(trace_width)
+                    sphere_x = float(global_pose[0])
+                    sphere_y = float(global_pose[1])
+                    sphere_z = float(global_pose[2])
+                    sphere.AddTranslateOp().Set(Gf.Vec3f(sphere_x,sphere_y,sphere_z))
+                    sphere.AddScaleOp().Set(Gf.Vec3f(1.0))
+                    sphere.GetDisplayColorAttr().Set([trace_color])
 
-                # primvarsapi = UsdGeom.PrimvarsAPI(sphere)
-                # sphere_shadow = primvarsapi.CreatePrimvar('doNotCastShadows', Sdf.ValueTypeNames.Bool)
-                # # sphere_shadow = sphere.CreateAttribute('primvars:doNotCastShadows', bool)
-                # # sphere_shadow.Set(False)
-                # sphere_shadow.Set(False)
+                    # primvarsapi = UsdGeom.PrimvarsAPI(sphere)
+                    # sphere_shadow = primvarsapi.CreatePrimvar('doNotCastShadows', Sdf.ValueTypeNames.Bool)
+                    # # sphere_shadow = sphere.CreateAttribute('primvars:doNotCastShadows', bool)
+                    # # sphere_shadow.Set(False)
+                    # sphere_shadow.Set(False)
 
-                trace.append(sphere)
-                
-                # print(sphere.GetSchemaAttributeNames())
-                trace_iter += 1
+                    trace.append(sphere)
+                    
+                    # print(sphere.GetSchemaAttributeNames())
+                    trace_iter += 1
+                print(f'Trace Color: {trace_color}')
 
 
             kp_mod = kp
@@ -358,7 +364,8 @@ while True:
                 # vy = 0
                 # vz = 0
                 dind +=1
-                iterate_color(False,len(dz))
+                if trace_enable:
+                    iterate_color(False,len(dz))
             vel = Gf.Vec3f(vx,vy,vz)
             rigid_body_api.GetVelocityAttr().Set(vel)
             # rigid_body_api.GetAngularVelocityAttr().Set(vel)
@@ -370,7 +377,7 @@ while True:
             delx_prev = delx
             dely_prev = dely
             delz_prev = delz
-            print(f'Trace Color: {trace_color}')
+            
             print_state(global_pose,d_curr,dind,v_curr,goal_reached)
             if dind > len(dz):
                 start = not start
