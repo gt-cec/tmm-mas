@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Client</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #data {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        button, input[type="range"] {
+            margin-right: 10px;
+            padding: 10px 15px;
+            font-size: 16px;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .slider-labels {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Slider styling */
+        .slider-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        input[type="range"] {
+            width: 80%; 
+            margin: 0 auto; 
+            -webkit-appearance: none; 
+            appearance: none; 
+            height: 10px; 
+            background: #d3d3d3; 
+            border-radius: 5px; 
+            transition: background 0.3s;
+        }
+        input[type="range"]:active {
+            background: #007BFF;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; 
+            appearance: none; 
+            width: 20px;
+            height: 20px;
+            background: #ffffff;
+            border: 2px solid #00ffae;
+            border-radius: 50%; 
+            cursor: pointer;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #ffffff;
+            border: 2px solid #007BFF;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* Message box styling */
+        .message-box {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            color: #fff;
+        }
+        .message-low {
+            background-color: #ffa07a; /* light orange */
+        }
+        .message-medium {
+            background-color: #90ee90; /* light green */
+        }
+        .message-high {
+            background-color: #dda0dd; /* light violet */
+        }
+        .blinking-text {
+            font-weight: bold;
+            font-size: 16px;
+            animation: blink-animation 1s steps(5, start) infinite;
+            color: #555;
+        }
+        @keyframes blink-animation {
+            to {
+                visibility: hidden;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Client</h1>
+    <button id="playStopButton">Play</button>
+
+    <div class="slider-container">
+        <label for="disparitySlider">MM Disparity:</label>
+        <input type="range" id="disparitySlider" min="0" max="2" step="1" value="0"> <!-- Set default to low -->
+        <div class="slider-labels">
+            <span>Low</span>
+            <span>Medium</span>
+            <span>High</span>
+        </div>
+    </div>
+
+    <div id="data">
+        <div id="statusMessage" class="blinking-text">Communication framework running</div>
+    </div>
+
+    <script>
+        const dataDiv = document.getElementById('data');
+        const statusMessage = document.getElementById('statusMessage');
+        const playStopButton = document.getElementById('playStopButton');
+        const disparitySlider = document.getElementById('disparitySlider');
+
+        let socket = null;
+        let isPlaying = false;
+
+        function connectWebSocket() {
+            socket = new WebSocket('ws://localhost:7000');
+
+            socket.onopen = () => {
+                console.log('Connected to the WebSocket server');
+                isPlaying = true;
+                playStopButton.textContent = 'Stop';
+            };
+
+            socket.onmessage = (event) => {
+                const data = event.data;
+
+                // Only process if data is not empty
+                if (data) {
+                    console.log('Received:', data);
+
+                    const sliderValue = disparitySlider.value;
+                    let dynamicThreshold;
+
+                    switch (sliderValue) {
+                        case '0':
+                            dynamicThreshold = 'low';
+                            break;
+                        case '1':
+                            dynamicThreshold = 'medium';
+                            break;
+                        case '2':
+                            dynamicThreshold = 'high';
+                            break;
+                        default:
+                            dynamicThreshold = 'low';
+                    }
+
+                    fetch('http://localhost:5000/process', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            data: data,
+                            dynamic_threshold: dynamicThreshold
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.result) {
+                            displayMessage(result.result, dynamicThreshold);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
+            };
+
+            socket.onclose = () => {
+                console.log('Disconnected from the WebSocket server');
+                isPlaying = false;
+                playStopButton.textContent = 'Play';
+            };
+
+            socket.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+        }
+
+        function disconnectWebSocket() {
+            if (socket) {
+                socket.close();
+                socket = null;
+            }
+        }
+
+        function displayMessage(message, threshold) {
+            statusMessage.style.display = 'none';  // Hide blinking message
+
+            const messageBox = document.createElement('div');
+            messageBox.classList.add('message-box');
+
+            // Assign color class based on threshold level
+            if (threshold === 'low') {
+                messageBox.classList.add('message-low');
+            } else if (threshold === 'medium') {
+                messageBox.classList.add('message-medium');
+            } else if (threshold === 'high') {
+                messageBox.classList.add('message-high');
+            }
+
+            messageBox.textContent = `Communication Message: ${message}`;
+            dataDiv.appendChild(messageBox);
+            dataDiv.scrollTop = dataDiv.scrollHeight;
+        }
+
+        playStopButton.onclick = () => {
+            if (isPlaying) {
+                disconnectWebSocket();
+                playStopButton.textContent = 'Play';
+                dataDiv.innerHTML = '<div id="statusMessage" class="blinking-text">Communication framework running</div>';
+            } else {
+                connectWebSocket();
+            }
+        };
+    </script>
+</body>
+</html>
