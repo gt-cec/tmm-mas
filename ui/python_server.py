@@ -55,12 +55,11 @@ async def websocket_server(websocket, path):
     except websockets.exceptions.ConnectionClosed:
         print("Connection closed")
 
-# Start the WebSocket server on port 7000
-start_server = websockets.serve(websocket_server, "localhost", 7000)
+async def main():
+    # Start the WebSocket server on port 7000
+    async with websockets.serve(websocket_server, "localhost", 7000):
+        print("WebSocket server running on ws://localhost:7000")
+        await asyncio.Future()
 
-print("WebSocket server running on ws://localhost:7000")
-
-# Await the server to start
-asyncio.get_event_loop().run_until_complete(start_server)
-asyncio.get_event_loop().run_forever()
-
+if __name__ == "__main__":
+    asyncio.run(main())
