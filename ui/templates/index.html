@@ -14,31 +14,34 @@
 
 <body>
     <div class="left-section">
-        <h2 class="title">Simulation Visualization</h2>
-        <canvas id="simulationCanvas" width="700" height="700"></canvas>
+        <div class="title">Simulation Visualization</div>
+        <div class="map-container">
+            <canvas id="simulationCanvas" width="700" height="700"></canvas>
+        </div>
     </div>
 
     <div class="right-section">
-        <h1>Communication Box</h1>
-        <div id="robot-buttons-container" class="robot-buttons-container"></div>
-        <button id="playStopButton">Play</button>
-        <div id="data">
-            <div id="statusMessage" class="blinking-text">Communication framework running</div>
-        </div>
-
-        <div class="slider-container">
-            <label for="disparitySlider">MM Disparity:</label>
-            <input type="range" id="disparitySlider" min="0" max="2" step="1" value="0">
-            <div class="slider-labels">
-                <span>Low</span>
-                <span>Medium</span>
-                <span>High</span>
+        <div class="title">Communication Box</div>
+        <div class="communication-container">
+            <div id="robot-buttons-container" class="robot-buttons-container"></div>
+            <button id="playStopButton">Play</button>
+            <div id="data">
+                <div id="statusMessage" class="blinking-text">Communication framework running</div>
             </div>
-        </div>
-        
-        <div class="input-box">
-            <input class="input-box-text" type="text" placeholder="Send a message...">
-            <button class="input-box-button" type="submit">Submit</button>
+            <div class="slider-container">
+                <label for="disparitySlider">MM Disparity:</label>
+                <input type="range" id="disparitySlider" min="0" max="2" step="1" value="0">
+                <div class="slider-labels">
+                    <span>Low</span>
+                    <span>Medium</span>
+                    <span>High</span>
+                </div>
+            </div>
+            
+            <div class="input-box">
+                <input class="input-box-text" type="text" placeholder="Send a message...">
+                <button class="input-box-button" type="submit">Submit</button>
+            </div>
         </div>
     </div>
 
