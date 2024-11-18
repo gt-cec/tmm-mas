@@ -16,6 +16,9 @@ function setRobotFilter() {
             element.style.display = "none"
         }
     })
+
+    // redraw the simulation map canvas
+    drawSimulationMap()
 }
 
 function isRobotIdVisible(robotId) {
@@ -28,19 +31,17 @@ function clickedRobotButton(robotId, numRobots) {
         // not the correct robot? Make sure the filter is removed
         if ((i+1) != robotId) {
             button.classList.remove("robot-button-selected")
-            robotFilterId = robotId
         }
         // correct robot and not already selected? Add the filter and select it
         else if (!button.classList.contains("robot-button-selected")) {
             button.classList.add("robot-button-selected")
-            robotFilterId = robotId
         }
         // correct robot and already selected? Remove the filter and deselect
         else {
             button.classList.remove("robot-button-selected")
-            robotFilterId = -1
         }
     }
+    robotFilterId = robotId == robotFilterId ? -1 : robotId
     setRobotFilter()
 }
 

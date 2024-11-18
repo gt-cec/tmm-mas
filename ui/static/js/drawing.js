@@ -1,11 +1,22 @@
 // drawing.js: functions for drawing on the simulation canvas (map)
 
+// saves the robot data and redraws the simulation map canvas
 function updateSimulation(data) {
+    savedRobotData = data
+    drawSimulationMap()
+}
+
+// (re)draws the simulation map canvas, runs only once and uses the saved robot data
+function drawSimulationMap() {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     drawGrid()
 
-    Object.keys(data.robots).forEach((robotId) => {
-        let element = data.robots[robotId]
+    Object.keys(savedRobotData.robots).forEach((robotId) => {
+        // if the robot ID is not visible, ignore
+        if (!isRobotIdVisible(robotId)) {
+            return
+        }
+        let element = savedRobotData.robots[robotId]
         robotPath.push([element.x, element.y])
         drawPath(element.robotPath, element.colorPath)
         drawPath(element.plan, element.colorPlan)
