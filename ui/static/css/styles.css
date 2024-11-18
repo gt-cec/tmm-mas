@@ -73,6 +73,42 @@ button.input-box-button:active {
     background-color: rgb(35, 93, 73);
 }
 
+/* container for the robot buttons */
+div.robot-buttons-container {
+    background-color: #e9ecef;
+    padding: .5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    vertical-align: center;
+    border-radius: .25rem;
+}
+
+/* robot button itself */
+div.robot-button {
+    display: flex;
+    margin: .5rem;
+    padding: 0 1rem 0 1rem;
+    height: 100%;
+    border: .1rem solid blue;
+    border-radius: .5rem;
+    align-items: center;
+    justify-content: center;
+}
+div.robot-button:hover {
+    background-color: paleturquoise;
+}
+
+div.robot-button:active {
+    background-color: grey;
+}
+
+div.robot-button-selected {
+    background-color: green;
+}
+
 #data {
     padding: 15px;
     background-color: #e9ecef;

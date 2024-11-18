@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Communication Box</title>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/robotButton.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 
@@ -17,6 +18,7 @@
 
     <div class="right-section">
         <h1>Communication Box</h1>
+        <div id="robot-buttons-container" class="robot-buttons-container"></div>
         <button id="playStopButton">Play</button>
         <div id="data">
             <div id="statusMessage" class="blinking-text">Communication framework running</div>
@@ -48,9 +50,14 @@
         const gridSize = 10
         const cellSize = canvas.width / gridSize
 
+        var robotFilterId = -1  // which robot ID to filter
+
         let socket = io(location.host)
         let isPlaying = false
         let robotPath = []
+
+        // set up the robot buttons
+        createRobotButtons(2)
 
         socket.on("connect", () => {
             console.log("Connected to socket server")
@@ -188,6 +195,11 @@
             }
 
             messageBox.innerText = message
+            messageBox.robotId = 1  // !! REPLACE THIS WITH THE ROBOT ID THAT GENERATED THE MESSAGE!!!
+            // if the robot ID is currently filtered out, set display to none
+            if (!isRobotIdVisible(messageBox.robotId)) {
+                messageBox.style.display = "none"
+            }
             dataDiv.prepend(messageBox) // Prepend for latest messages at the top
         }
 
