@@ -51,7 +51,6 @@ def play_recorded(data):
 
         # After sending all rows, stop further communication
         print("Finished sending all data to client")
-
     return
 
 @app.route('/process', methods=['POST'])
@@ -122,14 +121,6 @@ def reset():
 @app.route('/')
 def index():
     return render_template('index.html')
-
-# get an image via SocketIO, this could be from another process (the sim) or replaced by the feed from the sim
-# run python send_image.py to send an email (the CEC logo)
-@socketio.on('cam')
-def handle_image(data):
-    # send to all clients
-    emit("sim_stream", {"image": data["image"]}, broadcast=True)  # data["image"] is a Base64 encoded image
-    return
 
 # start the server
 if __name__ == '__main__':
