@@ -7,6 +7,8 @@
     <title>Communication Box</title>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
     <script src="{{ url_for('static', filename='js/robotButton.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/drawing.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/sockets.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 
@@ -52,131 +54,11 @@
 
         var robotFilterId = -1  // which robot ID to filter
 
-        let socket = io(location.host)
+        let socket = createSocket()
         let isPlaying = false
         let robotPath = []
 
-        // set up the robot buttons
-        createRobotButtons(2)
-
-        socket.on("connect", () => {
-            console.log("Connected to socket server")
-        })
-
-        socket.on("message", (msg) => {
-            console.log(`Message from server: ${msg}`)
-            const data = msg
-            if (data) {
-                console.log('Received:', data)
-
-                const sliderValue = disparitySlider.value
-                let dynamicThreshold
-
-                switch (sliderValue) {
-                    case '0':
-                        dynamicThreshold = 'low'
-                        break
-                    case '1':
-                        dynamicThreshold = 'medium'
-                        break
-                    case '2':
-                        dynamicThreshold = 'high'
-                        break
-                    default:
-                        dynamicThreshold = 'low'
-                }
-
-                fetch('/process', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        data: data,
-                        dynamic_threshold: dynamicThreshold
-                    }),
-                })
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.result) {
-                            displayMessage(result.result, dynamicThreshold)
-                        }
-                        if (result.x !== undefined && result.y !== undefined) {
-                            updateSimulation(result.x, result.y)
-                        }
-                    })
-                    .catch(error => console.error('Error:', error))
-            }
-        })
-
-        socket.on("disconnect", () => {
-            console.log("Disconnected from socket server")
-            isPlaying = false
-            playStopButton.textContent = 'Play'
-        })
-
-        function drawGrid() {
-            ctx.strokeStyle = 'rgba(204, 204, 204, 0.35)'
-            ctx.lineWidth = 1
-
-            for (let i = 0; i <= gridSize; i++) {
-                const pos = i * cellSize
-
-                ctx.beginPath()
-                ctx.moveTo(pos, 0)
-                ctx.lineTo(pos, canvas.height)
-                ctx.stroke()
-
-                ctx.beginPath()
-                ctx.moveTo(0, pos)
-                ctx.lineTo(canvas.width, pos)
-                ctx.stroke()
-
-                if (i > 0 && i < gridSize) {
-                    ctx.fillStyle = 'black'
-                    ctx.font = '12px Arial'
-                    ctx.fillText(i.toString(), 5, canvas.height - pos + 15)
-                    ctx.fillText(i.toString(), pos - 5, canvas.height - 5)
-                }
-            }
-        }
-
-        function plotPoint(x, y, isRobot = false) {
-            const canvasX = x * cellSize
-            const canvasY = canvas.height - (y * cellSize)
-
-            ctx.beginPath()
-            ctx.arc(canvasX, canvasY, isRobot ? 6 : 3, 0, 2 * Math.PI)
-            ctx.fillStyle = isRobot ? 'red' : 'blue'
-            ctx.fill()
-        }
-
-        function drawPath() {
-            if (robotPath.length < 2) return
-
-            ctx.beginPath()
-            ctx.moveTo(robotPath[0].x * cellSize, canvas.height - (robotPath[0].y * cellSize))
-
-            for (let i = 1; i < robotPath.length; i++) {
-                ctx.lineTo(robotPath[i].x * cellSize, canvas.height - (robotPath[i].y * cellSize))
-            }
-
-            ctx.strokeStyle = 'blue'
-            ctx.lineWidth = 2
-            ctx.stroke()
-        }
-
-        function updateSimulation(x, y) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height)
-            drawGrid()
-
-            robotPath.push({ x, y })
-            drawPath()
-
-            robotPath.forEach((point, index) => {
-                plotPoint(point.x, point.y, index === robotPath.length - 1)
-            })
-        }
+        var numRobots = -1
 
         function displayMessage(message, dynamicThreshold) {
             const messageBox = document.createElement('div')
