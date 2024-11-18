@@ -23,8 +23,6 @@ def generate_rmm_array_for_row(shmm_row, index):
     return rmm_array
 
 
-
-
 def generate_hmm_arrays(input_file_path):
     # Read the input CSV file
     df = pd.read_csv(input_file_path, header=None)
@@ -89,8 +87,6 @@ def select_hmm_array(hmm_arrays, timestep):
     else:
         return None  # Return None if the index is out of bounds
 
-
-
 def calculate_l1_norm(array1, array2):
     norm = np.abs(np.array(array2) - np.array(array1))
     return norm
@@ -99,87 +95,6 @@ def bayesian_probabilistic_update_general(original_value, deviation, threshold, 
     expected_value = original_value + deviation
     updated_value = expected_value if abs(deviation) > threshold else original_value
     return updated_value
-
-
-# # Function to generate delay message based on scenario
-# def generate_delay_message(robot_number, X, Y, A, B, scenario=None):
-#     if scenario == "emergency_stop":
-#         message_template = (
-#             f"Commander, Robot {robot_number} has encountered an emergency situation "
-#             f"and has stopped abruptly at position {A}. Further assessment is required.\n"
-#             f"**************************************************\n"
-#         )
-#     elif scenario == "obstacle_detected":
-#         message_template = (
-#             f"Commander, Robot {robot_number} has detected an obstacle in its path and is navigating around it. "
-#             f"Current position: {A}.\n"
-#             f"**************************************************\n"
-#         )
-#     elif scenario == "low_battery":
-#         message_template = (
-#             f"Commander, Robot {robot_number}'s battery level is critically low. "
-#             f"It will pause its mission and return to base for recharging. Current position: {A}.\n"
-#             f"**************************************************\n"
-#         )
-#     elif scenario == "communication_failure":
-#         message_template = (
-#             f"Commander, Communication with Robot {robot_number} has been lost. "
-#             f"Please investigate the issue. Last known position: {A}.\n"
-#             f"**************************************************\n"
-#         )
-#     elif scenario == "sensor_malfunction":
-#         message_template = (
-#             f"Commander, Robot {robot_number} has experienced a sensor malfunction, affecting its navigation accuracy. "
-#             f"Current position: {A}.\n"
-#             f"**************************************************\n"
-#         )
-#     else:
-#         time_difference = Y - X
-#         position_difference = (B[0] - A[0], B[1] - A[1])
-
-#         # message_template = "-" * 50 + f"\nCommander,\n\nRobot {robot_number}'s mission status update:\n"
-#         message_template =  f"\nCommander,\n\nRobot {robot_number}'s mission status update:\n"
-
-#         # Time-related message
-#         if time_difference > 0:
-#             time_message = (
-#                 f"- Estimated Time of Completion: {X} seconds\n"
-#                 f"- Actual Time of Completion: {Y} seconds\n"
-#                 f"- Expected Coordinates: {A}\n"
-#                 f"- Actual Coordinates: {B}\n\n"
-#                 f"The robot is currently experiencing a delay of {time_difference} seconds. \n"
-#             )
-#         elif time_difference < 0:
-#             time_message = (
-#                 f"- Estimated Time of Completion: {X} seconds\n"
-#                 f"- Actual Time of Completion: {Y} seconds\n"
-#                 f"- Expected Coordinates: {A}\n"
-#                 f"- Actual Coordinates: {B}\n\n"
-#                 f"The robot is ahead of schedule by {abs(time_difference)} seconds. \n"
-#             )
-#         else:
-#             time_message = (
-#                 f"- Estimated Time of Completion: {X} seconds\n"
-#                 f"- Actual Time of Completion: {Y} seconds\n"
-#                 f"- Expected Coordinates: {A}\n"
-#                 f"- Actual Coordinates: {B}\n\n"
-#                 f"The robot is on schedule. \n"
-#             )
-
-#         # Position-related message
-#         position_message = f"It is now located at position {B}."
-#         if any(position_difference):
-#             position_message += f" It has moved {abs(position_difference[0])} units " \
-#                                f"to the {'right' if position_difference[0] > 0 else 'left'}"
-#             position_message += f" and {abs(position_difference[1])} units " \
-#                                f"{'upward' if position_difference[1] > 0 else 'downward'}" \
-#                                f" from the expected position ({A})."
-
-#         # message_template += time_message + position_message + "\n\n" + "-" * 50
-#         message_template += time_message + position_message + "\n\n" 
-
-#     return message_template
-
 
 # Function to generate delay message based on scenario
 def generate_delay_message(robot_number, X, Y, A, B, scenario=None):
@@ -212,15 +127,13 @@ def generate_delay_message(robot_number, X, Y, A, B, scenario=None):
         time_difference = Y - X
         position_difference = (B[0] - A[0], B[1] - A[1])
 
-        message_template = f"\nCommander,\n\nRobot {robot_number}'s mission status update:\n"
+        message_template = f"Robot {robot_number}'s mission status update:\n"
 
         # Time-related message
         if time_difference > 0:
             time_message = (
-                f"- Estimated Time of Completion: {X} seconds\n"
-                f"- Actual Time of Completion: {Y} seconds\n"
-                f"- Expected Coordinates: {A}\n"
-                f"- Actual Coordinates: {B}\n\n"
+                f"- Time Remaining: Estimated {X} seconds, Actual {Y} seconds\n"
+                f"- Coordinates: Estimated {A}, Actual {B}\n"
                 f"The robot is currently experiencing a delay of {time_difference} seconds. \n"
             )
         elif time_difference < 0:
@@ -233,10 +146,8 @@ def generate_delay_message(robot_number, X, Y, A, B, scenario=None):
             )
         else:
             time_message = (
-                f"- Estimated Time of Completion: {X} seconds\n"
-                f"- Actual Time of Completion: {Y} seconds\n"
-                f"- Expected Coordinates: {A}\n"
-                f"- Actual Coordinates: {B}\n\n"
+                f"- Time Remaining: Estimated {X} seconds, Actual {Y} seconds\n"
+                f"- Coordinates: Estimated {A}, Actual {B}\n"
                 f"The robot is on schedule. \n"
             )
 
@@ -249,7 +160,7 @@ def generate_delay_message(robot_number, X, Y, A, B, scenario=None):
                                f"{'upward' if position_difference[1] > 0 else 'downward'}" \
                                f" from the expected position ({A})."
 
-        message_template += time_message + position_message + "\n\n" 
+        message_template += time_message + position_message 
 
     return message_template
 
@@ -267,38 +178,6 @@ def generate_communication_message(deviation, threshold, hmm_pos1, hmm_pos2, rmm
         messages.append(delay_message)  # Append formatted delay message to messages list
         # print(messages)
     return messages
-
-
-
-# def dynamic_deviation_threshold_multi_logic(hmm_arrays, rmm_arrays, update_logic_functions, uncertainty_factor_pos,
-#                                             uncertainty_factor_time, dynamic_threshold_mission_time):
-#     updated_hmm_array = []
-#     current_hmm_mission_time = hmm_arrays[0][4]
-
-#     updated_pos1 = rmm_arrays[0][1]
-#     updated_pos2 = rmm_arrays[0][2]
-
-#     mission_time_deviation = calculate_l1_norm([current_hmm_mission_time], [rmm_arrays[0][4]])
-#     mission_time_deviation_value = mission_time_deviation[0]
-#     # dynamic_threshold_mission_time = 2
-
-#     hmm_pos1 = hmm_arrays[0][1]
-#     hmm_pos2 = hmm_arrays[0][2]
-#     rmm_pos1 = rmm_arrays[0][1]
-#     rmm_pos2 = rmm_arrays[0][2]
-#     hmm_time = hmm_arrays[0][3]
-#     rmm_time = rmm_arrays[0][3]
-
-#     message = generate_communication_message(mission_time_deviation_value, dynamic_threshold_mission_time, hmm_pos1, hmm_pos2, rmm_pos1, rmm_pos2, hmm_time, rmm_time)
-#     formatted_message = "\n".join(message)
-
-#     updated_mission_time = update_logic_functions[0](current_hmm_mission_time, mission_time_deviation_value, dynamic_threshold_mission_time, uncertainty_factor_time)
-
-#     updated_hmm_array.append([0, int(round(updated_pos1, 0)), int(round(updated_pos2, 0)), None, updated_mission_time])
-
-#     return updated_hmm_array, formatted_message
-
-
 
 
 def dynamic_deviation_threshold_multi_logic(hmm_arrays, rmm_arrays, update_logic_functions, uncertainty_factor_pos,
