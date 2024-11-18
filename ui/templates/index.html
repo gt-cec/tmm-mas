@@ -58,7 +58,8 @@
         let isPlaying = false
         let robotPath = []
 
-        var numRobots = -1
+        var numRobots = -1  // number of robots in the simulation
+        var savedRobotData = {}  // last copy of all the robot data, for re-draws
 
         function displayMessage(message, dynamicThreshold) {
             const messageBox = document.createElement('div')
