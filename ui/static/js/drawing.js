@@ -6,9 +6,26 @@ function updateSimulation(data) {
     drawSimulationMap()
 }
 
+function loadCanvasMapImage() {
+    canvasMapImage.src = '/static/img/map.jpeg';
+    canvasMapImage.onload = () => {
+        ctx.drawImage(canvasMapImage, 0, 0, canvas.width, canvas.height);
+    };
+}
+
 // (re)draws the simulation map canvas, runs only once and uses the saved robot data
 function drawSimulationMap() {
+    // clear the map
     ctx.clearRect(0, 0, canvas.width, canvas.height)
+    
+    // draw the background
+    if (canvasMapImage.complete) {
+        ctx.globalAlpha = 0.5;
+        ctx.drawImage(canvasMapImage, 0, 0, canvas.width, canvas.height);
+        ctx.globalAlpha = 1.0;
+    };
+
+    // draw the grid
     drawGrid()
 
     Object.keys(savedRobotData.robots).forEach((robotId) => {

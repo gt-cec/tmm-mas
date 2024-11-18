@@ -49,6 +49,8 @@
         const disparitySlider = document.getElementById('disparitySlider')
         const canvas = document.getElementById('simulationCanvas')
         const ctx = canvas.getContext('2d')
+        const canvasMapImage = new Image()
+        loadCanvasMapImage()
         const gridSize = 10
         const cellSize = canvas.width / gridSize
 
