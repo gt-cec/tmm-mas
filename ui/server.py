@@ -7,6 +7,7 @@ from operation_functions import (
     select_hmm_array, 
     generate_hmm_arrays
 )
+import random
 import pandas as pd
 
 app = Flask(__name__)
@@ -32,37 +33,37 @@ def play_recorded(data):
             position_y = pos[1]
             time_taken = float(row[1])
             steps_remaining = int(row[2])
+            plan = [[position_x, position_y]]
+
+            last_loc = [position_x, position_y]
+            for i in range(steps_remaining):
+                new_loc = [last_loc[0] + random.randint(-1, 1), last_loc[1] + random.randint(-1, 1)]
+                last_loc = new_loc
+                plan.append(new_loc)
             
             # Prepare the processed data as a list of strings
-            processed_data = [
-                str(index),
-                str(position_x),
-                str(position_y),
-                str(time_taken),
-                str(steps_remaining)
+            result = [
+                index,
+                position_x,
+                position_y,
+                time_taken,
+                steps_remaining,
+                plan
             ]
             
             # Send the processed data to the client as a string
-            socketio.send(str(processed_data))
-            print(f"Sent row {index} to client: {processed_data}")
-
+            socketio.send(process(result))
             # Add a small delay to allow client to process data
-            socketio.sleep(0.4)  # Wait for 0.5 seconds before sending the next message
+            socketio.sleep(1)  # Wait for 0.5 seconds before sending the next message
 
         # After sending all rows, stop further communication
         print("Finished sending all data to client")
     return
 
-@app.route('/process', methods=['POST'])
-def process():
+def process(data):
     global last_mission_time  # Use the global variable
 
-    # Get data from the JSON body
-    data_string = request.json.get('data')
-    dynamic_threshold = request.json.get('dynamic_threshold')  # Get slider position
-    
-    print("Received data string:", data_string)
-    print("Received slider position:", dynamic_threshold)
+    dynamic_threshold = "low"
 
     # Define thresholds based on slider input
     low_dynamic_threshold_mission_time = 10 
@@ -77,17 +78,16 @@ def process():
         dynamic_threshold_mission_time = high_dynamic_threshold_mission_time
 
     # Continue with processing
-    numbers = [float(num.strip().strip("'")) if '.' in num else int(num.strip().strip("'")) 
-               for num in data_string[1:-1].split(',')]
-    timestep = numbers[0] 
-    first_state = numbers[1]
-    second_state = numbers[2]
-    time_elapsed = numbers[3]
-    steps_remaining = numbers[4]
+    timestep = data[0] 
+    x = data[1]
+    y = data[2]
+    time_elapsed = data[3]
+    steps_remaining = data[4]
+    plan = data[5]
     
     hmm_array_data = select_hmm_array(hmm_arrays, timestep)
     hmm_array = [hmm_array_data[0], hmm_array_data[1], hmm_array_data[2], round(hmm_array_data[3], 2), last_mission_time]     
-    rmm_array = [timestep - 1, first_state, second_state, round(time_elapsed, 2), steps_remaining]
+    rmm_array = [timestep - 1, x, y, round(time_elapsed, 2), steps_remaining]
     
     print("HMM Array:", hmm_array)
     print("RMM Array:", rmm_array)
@@ -108,7 +108,29 @@ def process():
 
     print("Updated HMM Array:", updated_hmm_array)
     print("Message:", message)
-    return jsonify(result=message, rmm_array=rmm_array, x=first_state, y=second_state)
+    return {
+        "result": message,
+        "robots": {
+            "1": {
+                "rmm_array": rmm_array,
+                "x": x,
+                "y": y,
+                "robotPath": [[1,0], [0,0], [y,x]],
+                "plan": plan,
+                "colorPath": "red",
+                "colorPlan": "darkred"
+            },
+            "2": {
+                "rmm_array": rmm_array,
+                "x": y,
+                "y": x,
+                "robotPath": [[0,0], [0,1], [x,y]],
+                "plan": plan,
+                "colorPath": "blue",
+                "colorPlan": "darkblue"
+            }
+        }
+    }
 
 @app.route('/reset', methods=['POST'])
 def reset():

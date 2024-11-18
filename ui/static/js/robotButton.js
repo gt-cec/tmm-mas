@@ -44,7 +44,8 @@ function clickedRobotButton(robotId, numRobots) {
     setRobotFilter()
 }
 
-function createRobotButtons(numRobots) {
+function createRobotButtons(newNumRobots) {
+    numRobots = newNumRobots
     let robotButtonContainer = document.getElementById("robot-buttons-container")
     for (let i = 0; i < numRobots; i++) {
         let button = document.createElement("div")
