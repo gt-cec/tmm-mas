@@ -45,6 +45,7 @@ function clickedRobotButton(robotId, numRobots) {
     }
     robotFilterId = robotId == robotFilterId ? -1 : robotId
     setRobotFilter()
+    displayPlan()
 }
 
 function createRobotButtons(newNumRobots) {

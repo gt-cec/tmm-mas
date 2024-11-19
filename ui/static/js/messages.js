@@ -21,5 +21,5 @@ function displayMessage(message, dynamicThreshold) {
     if (!isRobotIdVisible(messageBox.robotId)) {
         messageBox.style.display = "none"
     }
-    dataDiv.prepend(messageBox) // Prepend for latest messages at the top
+    document.getElementById('data').prepend(messageBox) // Prepend for latest messages at the top
 }
