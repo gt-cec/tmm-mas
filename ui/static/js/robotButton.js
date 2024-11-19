@@ -27,19 +27,21 @@ function isRobotIdVisible(robotId) {
 
 function clickedRobotButton(robotId, numRobots) {
     for (let i = 0; i < numRobots; i++) {
-        let button = document.getElementById("robot-button-" + (i+1))
-        // not the correct robot? Make sure the filter is removed
-        if ((i+1) != robotId) {
-            button.classList.remove("robot-button-selected")
-        }
-        // correct robot and not already selected? Add the filter and select it
-        else if (!button.classList.contains("robot-button-selected")) {
-            button.classList.add("robot-button-selected")
-        }
-        // correct robot and already selected? Remove the filter and deselect
-        else {
-            button.classList.remove("robot-button-selected")
-        }
+        ["left", "right"].forEach((direction) => {
+            let button = document.getElementById("robot-button-" + (i+1) + "-" + direction)
+            // not the correct robot? Make sure the filter is removed
+            if ((i+1) != robotId) {
+                button.classList.remove("robot-button-selected")
+            }
+            // correct robot and not already selected? Add the filter and select it
+            else if (!button.classList.contains("robot-button-selected")) {
+                button.classList.add("robot-button-selected")
+            }
+            // correct robot and already selected? Remove the filter and deselect
+            else {
+                button.classList.remove("robot-button-selected")
+            }
+        })
     }
     robotFilterId = robotId == robotFilterId ? -1 : robotId
     setRobotFilter()
@@ -47,13 +49,15 @@ function clickedRobotButton(robotId, numRobots) {
 
 function createRobotButtons(newNumRobots) {
     numRobots = newNumRobots
-    let robotButtonContainer = document.getElementById("robot-buttons-container")
     for (let i = 0; i < numRobots; i++) {
-        let button = document.createElement("div")
-        button.classList = ["robot-button"]
-        button.id = "robot-button-" + (i+1)
-        button.innerHTML = "Robot " + (i+1)
-        button.setAttribute("onclick", "clickedRobotButton(" + (i+1) + ", " + numRobots + ")")
-        robotButtonContainer.appendChild(button)
+        ["left", "right"].forEach((direction) => {
+            let container = document.getElementById("robot-buttons-container-" + direction)
+            let button = document.createElement("div")
+            button.classList = ["robot-button"]
+            button.id = "robot-button-" + (i+1) + "-" + direction
+            button.innerHTML = "Robot " + (i+1)
+            button.setAttribute("onclick", "clickedRobotButton(" + (i+1) + ", " + numRobots + ")")
+            container.appendChild(button)
+        })
     }
 }
