@@ -7,6 +7,7 @@ function updateSimulation(data) {
 }
 
 function loadCanvasMapImage() {
+    canvasRobotImage.src = "/static/img/robot.png"
     canvasMapImage.src = '/static/img/map.jpeg';
     canvasMapImage.onload = () => {
         ctx.drawImage(canvasMapImage, 0, 0, canvas.width, canvas.height);
@@ -40,6 +41,10 @@ function drawSimulationMap() {
         robotPath.forEach((point, index) => {
             plotPoint(point.x, point.y, index === robotPath.length - 1)
         })
+
+        // add the image
+        val = pxToCanvas(element.x, element.y)
+        ctx.drawImage(canvasRobotImage, val[0] - 25, val[1] - 25, 50, 50)
     })
 }
 
@@ -69,9 +74,14 @@ function drawGrid() {
     }
 }
 
+function pxToCanvas(x, y) {
+    return [x * cellSize, canvas.height - (y * cellSize)]
+}
+
 function plotPoint(x, y, isRobot = false) {
-    const canvasX = x * cellSize
-    const canvasY = canvas.height - (y * cellSize)
+    val = pxToCanvas(x, y)
+    const canvasX = val[0]
+    const canvasY = val[1]
 
     ctx.beginPath()
     ctx.arc(canvasX, canvasY, isRobot ? 6 : 3, 0, 2 * Math.PI)
