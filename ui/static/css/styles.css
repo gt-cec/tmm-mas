@@ -132,6 +132,18 @@ div.robot-button-selected {
     background-color: green;
 }
 
+div.plan-info-tag {
+    background-color: paleturquoise;
+    padding: .5rem;
+    border-radius: .5rem;
+    margin-bottom: .75rem;
+}
+
+div.plan-info-title {
+    text-align: center;
+    margin-bottom: .5rem;
+}
+
 .messages {
     padding: 15px;
     background-color: #e9ecef;

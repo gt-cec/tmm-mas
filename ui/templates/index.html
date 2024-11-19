@@ -9,6 +9,7 @@
     <script src="{{ url_for('static', filename='js/robotButton.js') }}"></script>
     <script src="{{ url_for('static', filename='js/drawing.js') }}"></script>
     <script src="{{ url_for('static', filename='js/messages.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/plans.js') }}"></script>
     <script src="{{ url_for('static', filename='js/sockets.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
@@ -60,7 +61,6 @@
     </div>
 
     <script>
-        const dataDiv = document.getElementById('data')
         const statusMessage = document.getElementById('statusMessage')
         const playStopButton = document.getElementById('playStopButton')
         const disparitySlider = document.getElementById('disparitySlider')
