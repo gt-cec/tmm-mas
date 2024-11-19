@@ -1,6 +1,6 @@
 // robotButton.js: functions for handling the robot filter buttons
 
-function setRobotFilter() {
+function setRobotPlanFilter() {
     // go through the communications and hide those not filtered
     Array.from(document.getElementById("data").children).forEach(element => {
         // ignore robot button classes
@@ -8,7 +8,7 @@ function setRobotFilter() {
             return
         }        
         // filter of -1 means show everything
-        if (isRobotIdVisible(element.robotId)) {
+        if (isAtLeastOneRobotIdVisible(element.robotIds)) {
             element.style.display = "flex"
         }
         // hide others
@@ -19,18 +19,25 @@ function setRobotFilter() {
 
     // redraw the simulation map canvas
     drawSimulationMap()
+
+    // redraw the plan panel
+    displayPlan()
 }
 
 function isRobotIdVisible(robotId) {
     return robotFilterId == -1 || robotId == robotFilterId
 }
 
-function clickedRobotButton(robotId, numRobots) {
+function isAtLeastOneRobotIdVisible(robotIds) {
+    return robotFilterId == -1 || robotIds.includes(robotFilterId.toString())
+}
+
+function setRobotButtonVisuals() {
     for (let i = 0; i < numRobots; i++) {
         ["left", "right"].forEach((direction) => {
             let button = document.getElementById("robot-button-" + (i+1) + "-" + direction)
             // not the correct robot? Make sure the filter is removed
-            if ((i+1) != robotId) {
+            if ((i+1) != robotFilterId) {
                 button.classList.remove("robot-button-selected")
             }
             // correct robot and not already selected? Add the filter and select it
@@ -43,9 +50,12 @@ function clickedRobotButton(robotId, numRobots) {
             }
         })
     }
+}
+
+function clickedRobotButton(robotId) {
     robotFilterId = robotId == robotFilterId ? -1 : robotId
-    setRobotFilter()
-    displayPlan()
+    setRobotPlanFilter()
+    setRobotButtonVisuals()
 }
 
 function createRobotButtons(newNumRobots) {

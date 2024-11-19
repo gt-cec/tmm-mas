@@ -1,11 +1,5 @@
 // drawing.js: functions for drawing on the simulation canvas (map)
 
-// saves the robot data and redraws the simulation map canvas
-function updateSimulation(data) {
-    savedRobotData = data
-    drawSimulationMap()
-}
-
 function loadCanvasMapImage() {
     canvasRobotImage.src = "/static/img/robot.png"
     canvasMapImage.src = '/static/img/map.jpeg';
@@ -29,23 +23,67 @@ function drawSimulationMap() {
     // draw the grid
     drawGrid()
 
-    Object.keys(savedRobotData.robots).forEach((robotId) => {
-        // if the robot ID is not visible, ignore
-        if (!isRobotIdVisible(robotId)) {
-            return
-        }
-        let element = savedRobotData.robots[robotId]
-        robotPath.push([element.x, element.y])
-        drawPath(element.robotPath, element.colorPath)
-        drawPath(element.plan, element.colorPlan)
-        robotPath.forEach((point, index) => {
-            plotPoint(point.x, point.y, index === robotPath.length - 1)
+    if (savedRobotData.robots) {
+        Object.keys(savedRobotData.robots).forEach((robotId) => {
+            // if the robot ID is not visible, ignore
+            if (!isRobotIdVisible(robotId)) {
+                return
+            }
+            let element = savedRobotData.robots[robotId]
+            robotPath.push([element.x, element.y])
+            drawPath(element.robotPath, element.colorPath)
+            drawPath(element.plan, element.colorPlan)
+            robotPath.forEach((point, index) => {
+                plotPoint(point.x, point.y, index === robotPath.length - 1)
+            })
+    
+            // add the image
+            val = pxToCanvas(element.x, element.y)
+            ctx.drawImage(canvasRobotImage, val[0] - 25, val[1] - 25, 50, 50)
+    
+            // add a circle around the image if the robot is selected
+            if (robotFilterId == robotId) {
+                ctx.beginPath();
+                ctx.arc(val[0], val[1], 40, 0, 2 * Math.PI);
+                ctx.stroke();
+            }
         })
 
-        // add the image
-        val = pxToCanvas(element.x, element.y)
-        ctx.drawImage(canvasRobotImage, val[0] - 25, val[1] - 25, 50, 50)
-    })
+        // draw a circle around the robots that changed
+        shadedRobotIds.forEach((robotId) => {
+            drawShadedCircleAroundRobot(robotId)
+        })
+    }
+}
+
+// click handler
+function clicked(e){
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+
+    // calculate x and y relative to the canvas
+    const x = (e.clientX - rect.left) * (canvas.width / rect.width)
+    const y = (e.clientY - rect.top) * (canvas.height / rect.height)
+
+    // check if close to a robot
+    if (savedRobotData.robots) {
+        Object.keys(savedRobotData.robots).forEach((robotId) => {
+            // if the robot ID is not visible, ignore
+            if (!isRobotIdVisible(robotId)) {
+                return
+            }
+            let element = savedRobotData.robots[robotId]
+            robotLocation = pxToCanvas(element.x, element.y)
+            
+            if (Math.sqrt(dist_sq(x, y, robotLocation[0], robotLocation[1])) < 40) {
+                clickedRobotButton(robotId)
+            }
+        })
+    }
+}
+
+function dist_sq(x1, y1, x2, y2) {
+    return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)
 }
 
 function drawGrid() {
@@ -102,4 +140,16 @@ function drawPath(path, color) {
     ctx.strokeStyle = color
     ctx.lineWidth = 2
     ctx.stroke()
+}
+
+function drawShadedCircleAroundRobot(robotId) {
+    val = pxToCanvas(savedRobotData.robots[robotId]["x"], savedRobotData.robots[robotId]["y"])
+    drawShadedCircle(val[0], val[1])
+}
+
+function drawShadedCircle(x, y) {
+    ctx.fillStyle = 'rgba(255, 0, 0, 0.5)'; // Red with 50% opacity
+    ctx.beginPath();
+    ctx.arc(x, y, 40, 50, 0, 2 * Math.PI);
+    ctx.fill();
 }

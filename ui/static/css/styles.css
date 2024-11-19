@@ -1,3 +1,9 @@
+* {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -44,7 +50,6 @@ body {
     margin: 20px;
     width: 80vh;
     height: 80vh;
-    border: .5rem solid grey;
 }
 
 .right-section {
@@ -152,6 +157,11 @@ div.plan-info-title {
     margin-bottom: 20px;
     border: 1px solid #ccc;
     border-radius: 5px;
+}
+
+.fadeout {
+    opacity: 0;
+    transition: opacity 2s;
 }
 
 .slider-container {
