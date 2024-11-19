@@ -65,6 +65,7 @@
         const playStopButton = document.getElementById('playStopButton')
         const disparitySlider = document.getElementById('disparitySlider')
         const canvas = document.getElementById('simulationCanvas')
+        canvas.addEventListener("mousedown", clicked, false)  // click listener for the canvas
         const ctx = canvas.getContext('2d')
         const canvasMapImage = new Image()
         const canvasRobotImage = new Image()
@@ -79,8 +80,9 @@
         let robotPath = []
 
         var numRobots = -1  // number of robots in the simulation
-        var savedRobotData = {}  // last copy of all the robot data, for re-draws
-
+        var newRobotData = {"robots": {}}  // new robot data that has not been updated to user map yet (requires user to click the message)
+        var savedRobotData = {"robots": {}}  // last copy of all the robot data, for re-draws
+        var shadedRobotIds = []  // robot IDs to shade because of a recently selected message
 
         playStopButton.addEventListener("click", () => {
             isPlaying = !isPlaying

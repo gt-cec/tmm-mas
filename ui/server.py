@@ -19,8 +19,11 @@ input_file_path = 'robot_data_10 1.csv'
 # input_file_path = 'RMM.csv'
 hmm_arrays = generate_hmm_arrays(input_file_path)
 
+initial_data = True
+
 @socketio.on("message")
 def play_recorded(data):
+    global initial_data
     print("Received message:", data)
     if data == True:
         df = pd.read_csv(input_file_path, header=None)
@@ -53,6 +56,7 @@ def play_recorded(data):
             
             # Send the processed data to the client as a string
             socketio.send(process(result))
+            initial_data = False
             # Add a small delay to allow client to process data
             socketio.sleep(1)  # Wait for 0.5 seconds before sending the next message
 
@@ -106,17 +110,47 @@ def process(data):
     # Update the last mission time with the updated value from updated_hmm_array
     last_mission_time = updated_hmm_array[0][4]
 
+    tasks = {
+        "Go to": [
+            "objective A",
+            "objective B",
+            "objective C",
+            "base"
+        ],
+        "Acquire": [
+            "package #1",
+            "package #2",
+            "package #3"
+        ],
+        "Drop": [
+            "package #1",
+            "package #2",
+            "package #3"
+        ]
+    }
+    plans = []
+    robots = 2
+    for _ in range(robots):
+        robotPlanAbstract = []
+        for _ in range(random.randint(0, 5)):
+            task = list(tasks.keys())[random.randint(0, len(tasks)-1)]
+            obj = tasks[task][random.randint(0, len(tasks[task])-1)]
+            robotPlanAbstract.append(task + " " + obj)
+        plans.append(robotPlanAbstract)
+
     print("Updated HMM Array:", updated_hmm_array)
     print("Message:", message)
     return {
-        "result": message,
+        "initial": initial_data,
+        "message": message,
         "robots": {
             "1": {
                 "rmm_array": rmm_array,
                 "x": x,
                 "y": y,
-                "robotPath": [[1,0], [0,0], [y,x]],
+                "robotPath": [[1,0], [0,0], [x,y]],
                 "plan": plan,
+                "abstractedPlan": plans[0],
                 "colorPath": "red",
                 "colorPlan": "darkred"
             },
@@ -124,8 +158,9 @@ def process(data):
                 "rmm_array": rmm_array,
                 "x": y,
                 "y": x,
-                "robotPath": [[0,0], [0,1], [x,y]],
+                "robotPath": [[4,3], [3,4], [y,x]],
                 "plan": plan,
+                "abstractedPlan": plans[1],
                 "colorPath": "blue",
                 "colorPlan": "darkblue"
             }

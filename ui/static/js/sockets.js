@@ -31,15 +31,26 @@ function createSocket() {
                     dynamicThreshold = 'low'
             }
 
-            if (data.result) {
-                displayMessage(data.result, dynamicThreshold)
+            // if this is the first message, overwrite the savedRobotData and show the robots
+            if (data.initial) {
+                savedRobotData = data
+                drawSimulationMap()
             }
+
+            // if this data has a message, show the message (one message can inform changes to multiple robots)
+            if (data.message) {
+                displayMessage(data.message, dynamicThreshold, Object.keys(data.robots))
+            }
+
             if (data.robots !== undefined) {
                 // on the first run, set up the robot buttons
                 if (numRobots == -1) {
                     createRobotButtons(Object.keys(data.robots).length)
                 }
-                updateSimulation(data)
+                // set the new robot data
+                Object.keys(data.robots).forEach((robotId) => {
+                    newRobotData.robots[robotId] = data.robots[robotId]
+                })
             }
         }
     })
