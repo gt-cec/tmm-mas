@@ -33,13 +33,15 @@ function createSocket() {
 
             // if this is the first message, overwrite the savedRobotData and show the robots
             if (data.initial) {
-                savedRobotData = data
+                savedRobotData = data.robots
+                savedObjectives = data.objectives
+                initialRobotData = data.robots
                 drawSimulationMap()
             }
 
             // if this data has a message, show the message (one message can inform changes to multiple robots)
             if (data.message) {
-                displayMessage(data.message, dynamicThreshold, Object.keys(data.robots))
+                displayMessage(data.message, dynamicThreshold, Object.keys(data.robots), Object.keys(data.objectives))
             }
 
             if (data.robots !== undefined) {
@@ -49,7 +51,13 @@ function createSocket() {
                 }
                 // set the new robot data
                 Object.keys(data.robots).forEach((robotId) => {
-                    newRobotData.robots[robotId] = data.robots[robotId]
+                    newRobotData[robotId] = data.robots[robotId]
+                })
+            }
+
+            if (data.objectives !== undefined) {
+                Object.keys(data.objectives).forEach(objective => {
+                    newObjectives[objective] = data.objectives[objective]
                 })
             }
         }

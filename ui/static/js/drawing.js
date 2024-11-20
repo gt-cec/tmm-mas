@@ -1,7 +1,8 @@
 // drawing.js: functions for drawing on the simulation canvas (map)
 
-function loadCanvasMapImage() {
+function loadCanvasImages() {
     canvasRobotImage.src = "/static/img/robot.png"
+    canvasObjectiveImage.src = "/static/img/objective.png"
     canvasMapImage.src = '/static/img/map.jpeg';
     canvasMapImage.onload = () => {
         ctx.drawImage(canvasMapImage, 0, 0, canvas.width, canvas.height);
@@ -23,24 +24,34 @@ function drawSimulationMap() {
     // draw the grid
     drawGrid()
 
-    if (savedRobotData.robots) {
-        Object.keys(savedRobotData.robots).forEach((robotId) => {
+    // draw the robots
+    if (savedRobotData) {
+        Object.keys(savedRobotData).forEach((robotId) => {
             // if the robot ID is not visible, ignore
             if (!isRobotIdVisible(robotId)) {
                 return
             }
-            let element = savedRobotData.robots[robotId]
-            robotPath.push([element.x, element.y])
+
+            let element = savedRobotData[robotId]
+
+            // draw the robot's initial path
+            drawPath(element.robotInitialPlan, element.colorInitialPlan)
+
+            // draw the robot's path
             drawPath(element.robotPath, element.colorPath)
+
+            // draw the robot's plan
             drawPath(element.plan, element.colorPlan)
-            robotPath.forEach((point, index) => {
-                plotPoint(point.x, point.y, index === robotPath.length - 1)
+
+            // add a dot to each point in the path
+            element.plan.forEach((point, index) => {
+                plotPoint(point.x, point.y, index === element.robotPath.length - 1)
             })
-    
+
             // add the image
             val = pxToCanvas(element.x, element.y)
             ctx.drawImage(canvasRobotImage, val[0] - 25, val[1] - 25, 50, 50)
-    
+
             // add a circle around the image if the robot is selected
             if (robotFilterId == robotId) {
                 ctx.beginPath();
@@ -54,6 +65,11 @@ function drawSimulationMap() {
             drawShadedCircleAroundRobot(robotId)
         })
     }
+
+    // draw the objective markers
+    Object.keys(savedObjectives).forEach(objective => {
+        drawObjective(savedObjectives[objective].x, savedObjectives[objective].y, savedObjectives[objective].name)
+    })
 }
 
 // click handler
@@ -66,13 +82,13 @@ function clicked(e){
     const y = (e.clientY - rect.top) * (canvas.height / rect.height)
 
     // check if close to a robot
-    if (savedRobotData.robots) {
-        Object.keys(savedRobotData.robots).forEach((robotId) => {
+    if (savedRobotData) {
+        Object.keys(savedRobotData).forEach((robotId) => {
             // if the robot ID is not visible, ignore
             if (!isRobotIdVisible(robotId)) {
                 return
             }
-            let element = savedRobotData.robots[robotId]
+            let element = savedRobotData[robotId]
             robotLocation = pxToCanvas(element.x, element.y)
             
             if (Math.sqrt(dist_sq(x, y, robotLocation[0], robotLocation[1])) < 40) {
@@ -143,7 +159,7 @@ function drawPath(path, color) {
 }
 
 function drawShadedCircleAroundRobot(robotId) {
-    val = pxToCanvas(savedRobotData.robots[robotId]["x"], savedRobotData.robots[robotId]["y"])
+    val = pxToCanvas(savedRobotData[robotId]["x"], savedRobotData[robotId]["y"])
     drawShadedCircle(val[0], val[1])
 }
 
@@ -152,4 +168,12 @@ function drawShadedCircle(x, y) {
     ctx.beginPath();
     ctx.arc(x, y, 40, 50, 0, 2 * Math.PI);
     ctx.fill();
+}
+
+function drawObjective(x, y, name) {
+    // add the image
+    val = pxToCanvas(x, y)
+    ctx.drawImage(canvasObjectiveImage, val[0] - 25, val[1] - 25, 50, 50)
+    ctx.font = "25px Verdana"
+    ctx.fillText(name, val[0] - 18, val[1] + 45)
 }

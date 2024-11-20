@@ -150,9 +150,11 @@ def process(data):
                 "y": y,
                 "robotPath": [[1,0], [0,0], [x,y]],
                 "plan": plan,
+                "robotInitialPlan": [[2,4], [3,4], [3,5], [4,5]],
                 "abstractedPlan": plans[0],
                 "colorPath": "red",
-                "colorPlan": "darkred"
+                "colorPlan": "darkred",
+                "colorInitialPlan": "brown"
             },
             "2": {
                 "rmm_array": rmm_array,
@@ -160,11 +162,30 @@ def process(data):
                 "y": x,
                 "robotPath": [[4,3], [3,4], [y,x]],
                 "plan": plan,
+                "robotInitialPlan": [[6,3], [6,4], [7,5], [6,5]],
                 "abstractedPlan": plans[1],
                 "colorPath": "blue",
-                "colorPlan": "darkblue"
+                "colorPlan": "darkblue",
+                "colorInitialPlan": "darkslateblue"
             }
-        }
+        },
+        "objectives" : [
+            {
+                "name": "A",
+                "x": 2,
+                "y": 3
+            },
+            {
+                "name": "B",
+                "x": 7,
+                "y": 9
+            },
+            {
+                "name": "C",
+                "x": 9,
+                "y": 2
+            }
+        ]
     }
 
 @app.route('/reset', methods=['POST'])
