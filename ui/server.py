@@ -165,10 +165,7 @@ def process(data):
                 "previousLocationPlan": previous_robot_states["robots"]["1"]["currentLocationPlan"],
                 "initialPlan": [[2,4], [3,4], [3,5], [4,5]],
                 "currentAbstractedPlan": plans[0],
-                "previousAbstractedPlan": previous_robot_states["robots"]["1"]["currentAbstractedPlan"],
-                "colorPath": "red",
-                "colorPlan": "darkred",
-                "colorInitialPlan": "brown"
+                "previousAbstractedPlan": previous_robot_states["robots"]["1"]["currentAbstractedPlan"]
             },
             "2": {
                 "rmm_array": rmm_array,
@@ -180,10 +177,7 @@ def process(data):
                 "previousLocationPlan": previous_robot_states["robots"]["2"]["currentLocationPlan"],
                 "initialPlan": [[6,3], [6,4], [7,5], [6,5]],
                 "currentAbstractedPlan": plans[1],
-                "previousAbstractedPlan": previous_robot_states["robots"]["2"]["currentAbstractedPlan"],
-                "colorPath": "blue",
-                "colorPlan": "darkblue",
-                "colorInitialPlan": "darkslateblue"
+                "previousAbstractedPlan": previous_robot_states["robots"]["2"]["currentAbstractedPlan"]
             }
         },
         "objectives" : [
