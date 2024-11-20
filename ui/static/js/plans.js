@@ -17,7 +17,7 @@ function displayPlan() {
         let robotLastSync = document.createElement('div')
         robotLastSync.classList.add("plan-info-tag")
         robotLastSync.style.backgroundColor = "palelightblue"
-        robotLastSync.innerHTML = "Last Sync: 48s"
+        robotLastSync.innerHTML = "Last Sync: " + Math.round(Date.now() / 1000 - savedRobotData[robotFilterId].lastSeen) + "s"
         plans.append(robotLastSync)
 
         let space = document.createElement("div")
@@ -31,11 +31,11 @@ function displayPlan() {
         plans.append(completedPlanTitle)
 
         if (savedRobotData[robotFilterId]) {
-            currentPlan = savedRobotData[robotFilterId]["completedPlan"]
+            currentPlan = savedRobotData[robotFilterId].completedPlan
             currentPlan.forEach((description) => {
                 let task = document.createElement("div")
                 task.classList.add("plan-info-tag")
-                task.style.backgroundColor = "lightsteelblue"
+                task.style.backgroundColor = colorCompletedPlan
                 task.innerHTML = description
                 plans.append(task)
             });
@@ -48,11 +48,11 @@ function displayPlan() {
         plans.append(currentPlanTitle)
 
         if (savedRobotData[robotFilterId]) {
-            currentPlan = savedRobotData[robotFilterId]["abstractedPlan"]
+            currentPlan = savedRobotData[robotFilterId]["currentAbstractedPlan"]
             currentPlan.forEach((description) => {
                 let task = document.createElement("div")
                 task.classList.add("plan-info-tag")
-                task.style.backgroundColor = "palegreen"
+                task.style.backgroundColor = colorCurrentPlan
                 task.innerHTML = description
                 plans.append(task)
             });
@@ -72,7 +72,7 @@ function displayPlan() {
         previousPlan.forEach((description) => {
             let task = document.createElement("div")
             task.classList.add("plan-info-tag")
-            task.style.backgroundColor = "peachpuff"
+            task.style.backgroundColor = colorPreviousPlan
             task.innerHTML = description
             plans.append(task)
         });

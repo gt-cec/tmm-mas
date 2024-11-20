@@ -44,18 +44,18 @@ function drawSimulationMap() {
             let element = savedRobotData[robotId]
 
             // draw the robot's initial path
-            drawPath(element.robotInitialPlan, element.colorInitialPlan)
+            drawPath(element.initialPlan, colorInitialPlan)
 
-            // draw the robot's path
-            drawPath(element.robotPath, element.colorPath)
+            // draw the robot's completed path
+            drawPath(element.robotPath, colorCompletedPlan)
 
-            // draw the robot's plan
-            drawPath(element.plan, element.colorPlan)
+            // draw the robot's current plan
+            drawPath(element.currentLocationPlan, colorCurrentPlan, false, true)
 
-            // add a dot to each point in the path
-            element.plan.forEach((point, index) => {
-                plotPoint(point.x, point.y, index === element.robotPath.length - 1)
-            })
+            // draw the robot's previous plan if selected
+            if (robotFilterId != -1) {
+                drawPath(element.previousLocationPlan, colorPreviousPlan, dash=true)
+            }
 
             // add the image
             val = pxToCanvas(element.x, element.y)
@@ -141,18 +141,7 @@ function pxToCanvas(x, y) {
     return [x * cellSize, canvas.height - (y * cellSize)]
 }
 
-function plotPoint(x, y, isRobot = false) {
-    val = pxToCanvas(x, y)
-    const canvasX = val[0]
-    const canvasY = val[1]
-
-    ctx.beginPath()
-    ctx.arc(canvasX, canvasY, isRobot ? 6 : 3, 0, 2 * Math.PI)
-    ctx.fillStyle = isRobot ? 'red' : 'blue'
-    ctx.fill()
-}
-
-function drawPath(path, color) {
+function drawPath(path, color, dash=false, thick=false) {
     if (path.length < 2) return
 
     ctx.beginPath()
@@ -162,9 +151,12 @@ function drawPath(path, color) {
         ctx.lineTo(path[i][0] * cellSize, canvas.height - (path[i][1] * cellSize))
     }
 
+    ctx.setLineDash(dash ? [5, 10] : [])
+
     ctx.strokeStyle = color
-    ctx.lineWidth = 2
+    ctx.lineWidth = thick ? 5 : 2
     ctx.stroke()
+    ctx.setLineDash([])
 }
 
 function drawShadedCircleAroundRobot(robotId) {

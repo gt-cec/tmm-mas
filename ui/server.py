@@ -20,6 +20,9 @@ input_file_path = 'robot_data_10 1.csv'
 # input_file_path = 'RMM.csv'
 hmm_arrays = generate_hmm_arrays(input_file_path)
 
+previous_robot_states = {}
+current_robot_states = {"robots": {"1": {"currentLocationPlan": [], "currentAbstractedPlan": []}, "2": {"currentLocationPlan": [], "currentAbstractedPlan": []}}}
+
 initial_data = True
 
 @socketio.on("message")
@@ -37,13 +40,6 @@ def play_recorded(data):
             position_y = pos[1]
             time_taken = float(row[1])
             steps_remaining = int(row[2])
-            plan = [[position_x, position_y]]
-
-            last_loc = [position_x, position_y]
-            for i in range(steps_remaining):
-                new_loc = [last_loc[0] + random.randint(-1, 1), last_loc[1] + random.randint(-1, 1)]
-                last_loc = new_loc
-                plan.append(new_loc)
             
             # Prepare the processed data as a list of strings
             result = [
@@ -51,15 +47,14 @@ def play_recorded(data):
                 position_x,
                 position_y,
                 time_taken,
-                steps_remaining,
-                plan
+                steps_remaining
             ]
             
             # Send the processed data to the client as a string
             socketio.send(process(result))
             initial_data = False
             # Add a small delay to allow client to process data
-            socketio.sleep(20)  # Wait for 0.5 seconds before sending the next message
+            socketio.sleep(2)  # Wait for 0.5 seconds before sending the next message
 
         # After sending all rows, stop further communication
         print("Finished sending all data to client")
@@ -67,6 +62,8 @@ def play_recorded(data):
 
 def process(data):
     global last_mission_time  # Use the global variable
+    global current_robot_states
+    global previous_robot_states
 
     dynamic_threshold = "low"
 
@@ -88,7 +85,6 @@ def process(data):
     y = data[2]
     time_elapsed = data[3]
     steps_remaining = data[4]
-    plan = data[5]
     
     hmm_array_data = select_hmm_array(hmm_arrays, timestep)
     hmm_array = [hmm_array_data[0], hmm_array_data[1], hmm_array_data[2], round(hmm_array_data[3], 2), last_mission_time]     
@@ -129,9 +125,21 @@ def process(data):
             "package #3"
         ]
     }
+
+    plan_coordinates = []
     plans = []
     robots = 2
     for _ in range(robots):
+        x = random.randint(3, 7)
+        y = random.randint(3, 7)
+        plan = [[x, y]]
+        last_loc = [x, y]
+        for i in range(steps_remaining):
+            new_loc = [last_loc[0] + random.randint(-1, 1), last_loc[1] + random.randint(-1, 1)]
+            last_loc = new_loc
+            plan.append(new_loc)
+        plan_coordinates.append(plan)
+
         robotPlanAbstract = []
         for _ in range(random.randint(0, 5)):
             task = list(tasks.keys())[random.randint(0, len(tasks)-1)]
@@ -141,33 +149,38 @@ def process(data):
 
     print("Updated HMM Array:", updated_hmm_array)
     print("Message:", message)
-    return {
+    previous_robot_states = current_robot_states
+    current_robot_states = {
         "initial": initial_data,
         "message": message,
         "timestamp": time.time(),
         "robots": {
             "1": {
                 "rmm_array": rmm_array,
-                "x": x,
-                "y": y,
-                "robotPath": [[1,0], [0,0], [x,y]],
+                "x": plan_coordinates[0][0][0],
+                "y": plan_coordinates[0][0][1],
+                "robotPath": [[1,0], [0,0], [plan_coordinates[0][0][0],plan_coordinates[0][0][1]]],
                 "completedPlan": ["Go to objective A", "Pick up package #1"],
-                "plan": plan,
-                "robotInitialPlan": [[2,4], [3,4], [3,5], [4,5]],
-                "abstractedPlan": plans[0],
+                "currentLocationPlan": plan_coordinates[0],
+                "previousLocationPlan": previous_robot_states["robots"]["1"]["currentLocationPlan"],
+                "initialPlan": [[2,4], [3,4], [3,5], [4,5]],
+                "currentAbstractedPlan": plans[0],
+                "previousAbstractedPlan": previous_robot_states["robots"]["1"]["currentAbstractedPlan"],
                 "colorPath": "red",
                 "colorPlan": "darkred",
                 "colorInitialPlan": "brown"
             },
             "2": {
                 "rmm_array": rmm_array,
-                "x": y,
-                "y": x,
-                "robotPath": [[4,3], [3,4], [y,x]],
+                "x": plan_coordinates[1][0][0],
+                "y": plan_coordinates[1][0][1],
+                "robotPath": [[4,3], [3,4], [plan_coordinates[0][0][0],plan_coordinates[0][0][1]]],
                 "completedPlan": ["Go to objective B"],
-                "plan": plan,
-                "robotInitialPlan": [[6,3], [6,4], [7,5], [6,5]],
-                "abstractedPlan": plans[1],
+                "currentLocationPlan": plan_coordinates[1],
+                "previousLocationPlan": previous_robot_states["robots"]["2"]["currentLocationPlan"],
+                "initialPlan": [[6,3], [6,4], [7,5], [6,5]],
+                "currentAbstractedPlan": plans[1],
+                "previousAbstractedPlan": previous_robot_states["robots"]["2"]["currentAbstractedPlan"],
                 "colorPath": "blue",
                 "colorPlan": "darkblue",
                 "colorInitialPlan": "darkslateblue"
@@ -191,6 +204,7 @@ def process(data):
             }
         ]
     }
+    return current_robot_states
 
 @app.route('/reset', methods=['POST'])
 def reset():
