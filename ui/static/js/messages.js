@@ -22,7 +22,7 @@ function displayMessage(message, dynamicThreshold, robotIds, objectives) {
     if (!isAtLeastOneRobotIdVisible(messageBox.robotIds)) {
         messageBox.style.display = "none"
     }
-    document.getElementById('data').prepend(messageBox) // Prepend for latest messages at the top
+    document.getElementById('messages').prepend(messageBox) // Prepend for latest messages at the top
 
     messageBox.onclick = (e) => {
         // replace the plans of the relevant robot IDs, this uses the new robot data so clicking an old message does not overwrite with old data

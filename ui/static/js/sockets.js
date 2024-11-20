@@ -52,6 +52,7 @@ function createSocket() {
                 // set the new robot data
                 Object.keys(data.robots).forEach((robotId) => {
                     newRobotData[robotId] = data.robots[robotId]
+                    newRobotData[robotId].lastSeen = data.timestamp
                 })
             }
 

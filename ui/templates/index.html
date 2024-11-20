@@ -41,7 +41,7 @@
         <div class="communication-container">
             <div id="robot-buttons-container-right" class="robot-buttons-container"></div>
             <button id="playStopButton">Play</button>
-            <div id="data" class="messages">
+            <div id="messages" class="messages">
             </div>
             <div class="slider-container">
                 <label for="disparitySlider">MM Disparity:</label>
@@ -87,6 +87,8 @@
 
         var newObjectives = {}  // new objectives that may have not been sent
         var savedObjectives = {}  // objectives for the robot
+
+        var timeoutForDelayedRobot = 10  // threshold for when the timer icon appears by the robot
 
         playStopButton.addEventListener("click", () => {
             isPlaying = !isPlaying
