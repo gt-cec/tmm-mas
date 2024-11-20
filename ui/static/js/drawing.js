@@ -24,9 +24,18 @@ function drawSimulationMap() {
     // draw the grid
     drawGrid()
 
+    // draw the robot indicators 
+    drawRobotMessageIndicators()
+
     // draw the robots
     if (savedRobotData) {
         Object.keys(savedRobotData).forEach((robotId) => {
+            // check if the robot has not been updated for a while
+            let now = Date.now() / 1000
+            if (now - savedRobotData[robotId].lastSeen > timeoutForDelayedRobot) {
+                drawDelayedRobotIndicator(robotId)
+            }
+
             // if the robot ID is not visible, ignore
             if (!isRobotIdVisible(robotId)) {
                 return
@@ -173,7 +182,56 @@ function drawShadedCircle(x, y) {
 function drawObjective(x, y, name) {
     // add the image
     val = pxToCanvas(x, y)
-    ctx.drawImage(canvasObjectiveImage, val[0] - 25, val[1] - 25, 50, 50)
+    ctx.drawImage(canvasObjectiveImage, val[0] - 15, val[1] - 47, 50, 50)
+    ctx.fillStyle = "purple"
     ctx.font = "25px Verdana"
-    ctx.fillText(name, val[0] - 18, val[1] + 45)
+    ctx.fillText(name, val[0] - 9, val[1] + 25)
+}
+
+function drawRobotMessageIndicators() {
+    markedRobots = []
+    // for each message
+    Array.from(document.getElementById("messages").children).forEach(element => {
+        // ignore robot button classes
+        if (!element.classList.contains("message-box")) {
+            return
+        }
+
+        // if a robot is relevant and not currently marked
+        element.robotIds.forEach((robotId) => {
+            if (!markedRobots.includes(robotId)) {
+                // add id to the marked robot ids
+                markedRobots.push(robotId)
+                // draw the indicator
+                val = pxToCanvas(savedRobotData[robotId].x, savedRobotData[robotId].y)
+                ctx.fillStyle = "red"
+                ctx.font = "40px Verdana"
+                let robotVisible = isRobotIdVisible(robotId)
+                ctx.fillText("!", val[0] - (robotVisible ? 30 : 8), val[1] + (robotVisible ? 0 : 15))
+                // if robot is visible, add a circle around the indicator
+                if (!robotVisible) {
+                    ctx.strokeStyle = "red"
+                    ctx.beginPath();
+                    ctx.arc(val[0], val[1], 20, 0, 2 * Math.PI);
+                    ctx.stroke();
+                }
+            }
+        })
+    })
+}
+
+function drawDelayedRobotIndicator(robotId) {
+    // draw the indicator
+    val = pxToCanvas(savedRobotData[robotId].x, savedRobotData[robotId].y)
+    ctx.fillStyle = "goal"
+    ctx.font = "30px Verdana"
+    let robotVisible = isRobotIdVisible(robotId)
+    ctx.fillText("⏰", val[0] + (robotVisible ? -40 : -15), val[1] + (robotVisible ? -20 : 10))
+    // if robot is visible, add a circle around the indicator
+    if (!robotVisible) {
+        ctx.strokeStyle = "gold"
+        ctx.beginPath();
+        ctx.arc(val[0], val[1], 30, 0, 2 * Math.PI);
+        ctx.stroke();
+    }
 }

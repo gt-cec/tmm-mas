@@ -24,6 +24,23 @@ function displayPlan() {
         space.style.height = "1.0rem";
         plans.append(space);
 
+        // completed plan
+        let completedPlanTitle = document.createElement("div")
+        completedPlanTitle.innerHTML = "—— Completed Plan ——"
+        completedPlanTitle.classList.add("plan-info-title")
+        plans.append(completedPlanTitle)
+
+        if (savedRobotData[robotFilterId]) {
+            currentPlan = savedRobotData[robotFilterId]["completedPlan"]
+            currentPlan.forEach((description) => {
+                let task = document.createElement("div")
+                task.classList.add("plan-info-tag")
+                task.style.backgroundColor = "lightsteelblue"
+                task.innerHTML = description
+                plans.append(task)
+            });
+        }
+
         // current plan
         let currentPlanTitle = document.createElement("div")
         currentPlanTitle.innerHTML = "—— Current Plan ——"

@@ -9,6 +9,7 @@ from operation_functions import (
 )
 import random
 import pandas as pd
+import time
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -58,7 +59,7 @@ def play_recorded(data):
             socketio.send(process(result))
             initial_data = False
             # Add a small delay to allow client to process data
-            socketio.sleep(1)  # Wait for 0.5 seconds before sending the next message
+            socketio.sleep(20)  # Wait for 0.5 seconds before sending the next message
 
         # After sending all rows, stop further communication
         print("Finished sending all data to client")
@@ -143,12 +144,14 @@ def process(data):
     return {
         "initial": initial_data,
         "message": message,
+        "timestamp": time.time(),
         "robots": {
             "1": {
                 "rmm_array": rmm_array,
                 "x": x,
                 "y": y,
                 "robotPath": [[1,0], [0,0], [x,y]],
+                "completedPlan": ["Go to objective A", "Pick up package #1"],
                 "plan": plan,
                 "robotInitialPlan": [[2,4], [3,4], [3,5], [4,5]],
                 "abstractedPlan": plans[0],
@@ -161,6 +164,7 @@ def process(data):
                 "x": y,
                 "y": x,
                 "robotPath": [[4,3], [3,4], [y,x]],
+                "completedPlan": ["Go to objective B"],
                 "plan": plan,
                 "robotInitialPlan": [[6,3], [6,4], [7,5], [6,5]],
                 "abstractedPlan": plans[1],

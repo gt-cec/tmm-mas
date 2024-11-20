@@ -2,7 +2,7 @@
 
 function setRobotPlanFilter() {
     // go through the communications and hide those not filtered
-    Array.from(document.getElementById("data").children).forEach(element => {
+    Array.from(document.getElementById("messages").children).forEach(element => {
         // ignore robot button classes
         if (!element.classList.contains("message-box")) {
             return
