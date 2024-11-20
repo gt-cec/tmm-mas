@@ -30,8 +30,8 @@ function displayPlan() {
         currentPlanTitle.classList.add("plan-info-title")
         plans.append(currentPlanTitle)
 
-        if (savedRobotData.robots[robotFilterId]) {
-            currentPlan = savedRobotData.robots[robotFilterId]["abstractedPlan"]
+        if (savedRobotData[robotFilterId]) {
+            currentPlan = savedRobotData[robotFilterId]["abstractedPlan"]
             currentPlan.forEach((description) => {
                 let task = document.createElement("div")
                 task.classList.add("plan-info-tag")

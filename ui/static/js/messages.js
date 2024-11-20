@@ -1,5 +1,5 @@
 
-function displayMessage(message, dynamicThreshold, robotIds) {
+function displayMessage(message, dynamicThreshold, robotIds, objectives) {
     const messageBox = document.createElement('div')
     messageBox.classList.add('message-box')
 
@@ -17,6 +17,7 @@ function displayMessage(message, dynamicThreshold, robotIds) {
 
     messageBox.innerText = message
     messageBox.robotIds = robotIds
+    messageBox.objectives = objectives
     // if the robot ID is currently filtered out, set display to none
     if (!isAtLeastOneRobotIdVisible(messageBox.robotIds)) {
         messageBox.style.display = "none"
@@ -26,9 +27,13 @@ function displayMessage(message, dynamicThreshold, robotIds) {
     messageBox.onclick = (e) => {
         // replace the plans of the relevant robot IDs, this uses the new robot data so clicking an old message does not overwrite with old data
         messageBox.robotIds.forEach(robotId => {
-            savedRobotData.robots[robotId] = newRobotData.robots[robotId]
+            savedRobotData[robotId] = newRobotData[robotId]
         })
         shadedRobotIds = messageBox.robotIds
+
+        messageBox.objectives.forEach(objective => {
+            savedObjectives[objective] = newObjectives[objective]
+        })
         drawSimulationMap()
         fadeOutMessage(messageBox)
     }
