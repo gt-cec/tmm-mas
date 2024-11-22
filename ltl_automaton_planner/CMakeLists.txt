@@ -16,9 +16,9 @@ find_package(catkin REQUIRED COMPONENTS
 
 catkin_python_setup()
 
-generate_dynamic_reconfigure_options(
-  cfg/ltl_automaton_dynparam.cfg
-)
+# generate_dynamic_reconfigure_options(
+#   cfg/ltl_automaton_dynparam.cfg
+# )
 
 ###################################
 ## catkin specific configuration ##
