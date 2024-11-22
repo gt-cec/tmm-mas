@@ -67,8 +67,8 @@ class GridWorld(object):
     
     def load_elements(self):
         parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        with open(parent_dir + '/config/benchmark_block_'+str(self.grid_size)+'.yaml', 'r') as file:
-        # with open(parent_dir + '/config/isaac_block.yaml', 'r') as file:
+        # with open(parent_dir + '/config/benchmark_block_'+str(self.grid_size)+'.yaml', 'r') as file:
+        with open(parent_dir + '/config/isaac_block.yaml', 'r') as file:
             yaml_data = yaml.safe_load(file)
 
             if isinstance(yaml_data['blocks'], list):
@@ -81,8 +81,8 @@ class GridWorld(object):
                 print("The YAML file does not contain a list.")    
         
         print(self.wall)
-        with open(parent_dir + '/config/benchmark_bump_'+str(self.grid_size)+'.yaml', 'r') as file:
-        # with open(parent_dir + '/config/isaac_bump.yaml', 'r') as file:
+        # with open(parent_dir + '/config/benchmark_bump_'+str(self.grid_size)+'.yaml', 'r') as file:
+        with open(parent_dir + '/config/isaac_bump.yaml', 'r') as file:
             yaml_data = yaml.safe_load(file)
 
             if isinstance(yaml_data['bumps']['points'], list):

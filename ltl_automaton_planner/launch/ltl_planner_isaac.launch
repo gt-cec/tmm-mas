@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
   <!-- Arguments -->
-  <arg name="algo_type" default="dstar"/>
+  <arg name="algo_type" default="dstar"/> <!--dstar-relaxed/brute-force/local/relaxed-->
   <!-- <arg name="agent_name" default="turtlebot"/>
   
   <param name="agent_name" type="string" value="$(arg agent_name)" /> -->

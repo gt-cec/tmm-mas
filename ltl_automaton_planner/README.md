@@ -51,6 +51,46 @@ Planner node. Build a product graph from a given transition system and LTL formu
 - `replanning` ([ltl_automaton_msgs/TaskPlanning](/ltl_automaton_msgs/srv/TaskPlanning.srv))
     
     Triggers planning to satisfy the requested hard and soft task.
+
+#### Parameters
+- `agent_name` (string, default: "agent")
+
+    Agent name.
+    
+- `hard_task` (string)
+
+    Hard task to be carried out by the agent, is required. Should be written using syntax from [LTL2BA](http://www.lsv.fr/~gastin/ltl2ba/). It is advised to use a YAML file to define this parameter as some characters in LTL syntax might cause trouble with XML in launch files. More information on the syntax on the [wiki page](../../../wiki/LTL-Formula).
+
+- `soft_task` (string)
+
+    Soft task to be carried out by the agent, is optional. Soft tasks are enforced or not by the planner depending on the beta value. Should be written using syntax from [LTL2BA](http://www.lsv.fr/~gastin/ltl2ba/). It is advised to use a YAML file to define this parameter as some characters in LTL syntax might cause trouble with XML in launch files. More information on the syntax on the [wiki page](../../../wiki/LTL-Formula).
+
+- `initial_beta` (double, default: 1000)
+
+    Affect how the soft task is enforced by the planner. A higher value will help enforcing the soft task while a lower value can leave the soft task unenforced by the plan. The given value is only the initial one since beta can vary.
+
+- `gamma` (double, default: 10)
+
+    Suffix weighting parameter. A higher value will increase the suffix cost and therefor minimize suffix word length.
+
+- `transition_system_textfile` (string)
+
+    Action model transition system definition. More information on the action model can be found below.
+
+
+- `~check_timestamp` (boolean, default: true)
+    
+    If false, ignore a received TS state message when the timestamp is identical to previously received TS state message timestamp.
+
+
+- `~initial_ts_state_from_agent` (boolean, default: false)
+
+    If true, will wait for the TS state from agent to build initial state in product graph. If false, will use initial states from transition system definition.
+
+
+- `~replan_on_unplanned_move` (boolean, default: true)
+    
+    If true, will replan when receiving a TS state that is not the next one in the plan (output word) using the TS state as initial state.
     
 #### LTL formula
 For more information on LTL task formulation and syntax, please take a look at the [wiki page](../../../wiki/LTL-Formula)
