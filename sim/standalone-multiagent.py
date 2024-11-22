@@ -38,9 +38,9 @@ import drone
 
 ## File Paths
 
-key_path = r"C:\Users\haris\Documents\Isaac\multiagent-sim\example\grid.csv" #File describing the world grid
-coord_path = r"C:\Users\haris\Documents\Isaac\multiagent-sim\example\coords_final.csv" #File describing the path plan
-usd_path = r"C:\Users\haris\Documents\Isaac\multiagent-sim\Small_Enviornment-Multiagent.usd" #File with the world enfironment
+key_path = "./example/grid.csv" #File describing the world grid
+coord_path = "./example/coords_final.csv" #File describing the path plan
+usd_path = "./Small_Enviornment-Multiagent.usd" #File with the world enfironment
 quad_path1 = "/World/quads/quad1" #Path to the drone in the environment USD
 quad_path2 = "/World/quads/quad2" #Path to the drone in the environment USD
 quad_path3 = "/World/quads/quad3" #Path to the drone in the environment USD

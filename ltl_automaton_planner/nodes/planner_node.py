@@ -1,15 +1,6 @@
 #!/usr/bin/env python
-import roslib
-import numpy
 import rospy
-import sys
-import importlib
-import yaml
 import matplotlib.pyplot as plt
-
-from copy import deepcopy
-
-import std_msgs
 
 from ltl_automaton_planner.ltl_tools.ts import TSModel
 from ltl_automaton_planner.ltl_tools.ltl_planner import LTLPlanner
@@ -19,12 +10,9 @@ import networkx as nx
 from ltl_automaton_planner.ltl_automaton_utilities import state_models_from_ts, import_ts_from_file, handle_ts_state_msg, extract_numbers
 
 # Import LTL automaton message definitions
-from ltl_automaton_msgs.msg import TransitionSystemStateStamped, TransitionSystemState, LTLPlan, LTLState, LTLStateArray
+from ltl_automaton_msgs.msg import TransitionSystemState, LTLPlan, LTLState, LTLStateArray
 from ltl_automaton_msgs.srv import * #TaskPlanning, TaskPlanningResponse, TaskReplanningAdd, TaskReplanningDelete, TaskReplanningRelabel, TaskReplanningAddResponse, TaskReplanningDeleteResponse
 
-# Import dynamic reconfigure components for dynamic parameters (see dynamic_reconfigure and dynamic_params package)
-from dynamic_reconfigure.server import Server as DRServer
-from ltl_automaton_planner.cfg import LTLAutomatonDPConfig
 import time
 
 def show_automaton(automaton_graph):
@@ -66,7 +54,7 @@ class MainPlanner(object):
         if (rospy.has_param('hard_task')):
             self.hard_task = rospy.get_param('hard_task')
         else:
-            raise InitError("Cannot initialize LTL planner, no hard_task defined")
+            raise ValueError("Cannot initialize LTL planner, no hard_task defined")
         # Get LTL soft task
         self.soft_task = rospy.get_param('soft_task', "")
 

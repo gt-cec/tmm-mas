@@ -58,7 +58,7 @@ class GridWorld(object):
         # filename = "screen_%04d.png" % (self.frame_count)
         # pygame.image.save(self.screen, filename)
         time.sleep(5)
-        self.output_video = cv2.VideoWriter('/home/jren313/Downloads/output_video.avi', cv2.VideoWriter_fourcc(*'XVID'), 30, (self.width, self.height))
+        self.output_video = cv2.VideoWriter('~/tmm-mas/output_video.avi', cv2.VideoWriter_fourcc(*'XVID'), 30, (self.width, self.height))
 
         self.loc = {'C': (0, 1),
                     'P3': (0, 3),
@@ -89,37 +89,7 @@ class GridWorld(object):
             self.screen.blit(letter, (int(pos[0] * self.cell_size + self.cell_size/2), \
                 self.height - int(pos[1] * self.cell_size + self.cell_size/2)))
             
-
-# class GridWorld(object):
-#     def __init__(self):
-#          # Constants
-#         self.width, self.height = 160, 160
-#         self.grid_size = 2
-#         self.cell_size = self.width // self.grid_size
-
-#         # Initialize the screen
-#         self.screen = pygame.display.set_mode((self.width, self.height))
-#         self.font=pygame.font.SysFont('timesnewroman',  20)
-        
-#         # self.frame_count = 0 
-#         # filename = "screen_%04d.png" % (self.frame_count)
-#         # pygame.image.save(self.screen, filename)
-#         self.output_video = cv2.VideoWriter('/home/jren313/Downloads/output_video.avi', cv2.VideoWriter_fourcc(*'XVID'), 30, (self.width, self.height))
-
-#         self.loc = {'A': (0, 1),
-#                     'B': (1, 1),
-#                     }
-#         self.wall = {((0, 1), (1, 1)): 0,
-#                      ((1, 0), (1, 1)): 0}
-#         pygame.display.set_caption("Grid with Moving Circle")
-        
-#     def background(self):
-#         for key, pos in self.loc.items():
-#             letter = self.font.render(key, False, ORANGE, YELLOW)
-#             self.screen.blit(letter, (int(pos[0] * self.cell_size + self.cell_size/2), \
-#                 self.height - int(pos[1] * self.cell_size + self.cell_size/2)))
-
-
+            
 class LTLControllerDrone(object):
     def __init__(self, env):
         self.world = env
