@@ -11,7 +11,7 @@ Difficult terrain (or bumps) need to be added directly in the code in the form o
 
 Only simple PID control is implemented at this moment and a path plan should be provided to the quadcopter. For an example of what path plan coordinates should look like, reference `grid.csv` and `coords_final.csv`. While the drone motion is somewhat simulated, this example is primarily for visualization of the proposed algorithm. For the algorithm used to generate the path plan found in `coords_final.csv`, please contact Jiming Ren (jren313@gatech.edu)
 
-The environment USD file referenced in this example is too large to be uploaded to GitHub and can be found at the following link: [Environment USDs]([https://gtvault-my.sharepoint.com/:u:/g/personal/hmiller43_gatech_edu/Ed6wUSYb7UVHnxqCYqqqpQUBMMfWg0RtWXO7g1M0Osqr3g?e=ya8spc](https://gtvault-my.sharepoint.com/:f:/g/personal/hmiller43_gatech_edu/EiXSVUZyHghKi__9jqqyTwMBl0gtiv0T9s5Oy3fTkMTuDQ?e=eYURR2))
+The environment USD file referenced in this example is too large to be uploaded to GitHub and can be found at the following link: [Environment USDs](https://gtvault-my.sharepoint.com/:f:/g/personal/hmiller43_gatech_edu/EiXSVUZyHghKi__9jqqyTwMBl0gtiv0T9s5Oy3fTkMTuDQ?e=raiM9h)
 
 ### Controls
 The following keyboard inputs can be used once the simulation window has been fully loaded:
