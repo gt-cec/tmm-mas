@@ -272,13 +272,12 @@ state_dim:
 - Drone_state
 state_models:
   2d_pose_region:
-    initial: c0_r0
+    initial: c2_r2
     nodes:
       c0_r0:
         attr:
           hysteresis: 0.05
-          labels:
-          - a
+          labels: []
           length: 10
           pose: '[[5, 5], [0]]'
           type: square
@@ -594,7 +593,8 @@ state_models:
       c4_r3:
         attr:
           hysteresis: 0.05
-          labels: []
+          labels: 
+          - a
           length: 10
           pose: '[[45, 35], [0]]'
           type: square
