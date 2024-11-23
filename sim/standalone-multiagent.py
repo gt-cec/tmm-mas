@@ -31,6 +31,10 @@ from omni.isaac.core.articulations import Articulation
 from pxr import Gf, UsdPhysics, Usd, UsdGeom, Sdf
 import omni.usd
 
+import rclpy
+from rclpy.node import Node
+from interfaces_hmm_sim.msg import AgentPoses
+
 import drone
 
 ####################################################################################################
@@ -41,20 +45,28 @@ import drone
 key_path = "./example/grid.csv" #File describing the world grid
 coord_path = "./example/coords_final.csv" #File describing the path plan
 usd_path = "./Small_Enviornment-Multiagent.usd" #File with the world enfironment
-quad_path1 = "/World/quads/quad1" #Path to the drone in the environment USD
-quad_path2 = "/World/quads/quad2" #Path to the drone in the environment USD
-quad_path3 = "/World/quads/quad3" #Path to the drone in the environment USD
-quad_path4 = "/World/quads/quad4" #Path to the drone in the environment USD
+
+## Isaac Sim Paths
+
+quad_path1 = "/World/quads/quad1" #Path to drone in the environment USD
+quad_path2 = "/World/quads/quad2"
+quad_path3 = "/World/quads/quad3"
+quad_path4 = "/World/quads/quad4"
+
+quad_path_list = [quad_path1, quad_path2, quad_path3, quad_path4]
 
 ## Define Bumps
 
 bumps = [(3,1),(4,1),(5,2),(5,3),(2,4),(3,4)] #Difficult terrain points as list of ordered pairs: (y,x)
 
-# Enable Trace
-
-trace_enable = False
-
 ####################################################################################################
+
+## ROS2 Setup
+
+rclpy.init()
+node = rclpy.create_node('drone_pose_publisher')
+pose_publisher = node.create_publisher(AgentPoses, 'drone_poses', 10)
+
 
 ## Initialize World
 
@@ -198,10 +210,9 @@ y_grid4 = [0, 0, 0, 0]
 x_grid4 = [4, 5, 4, 5]
 dz4 = [1, 1, 1, 1]
 
-# print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-# print(dy)
-# print(dx)
-# print(dz)
+x_grid_list = [x_grid1, x_grid2, x_grid3, x_grid4]
+y_grid_list = [y_grid1, y_grid2, y_grid3, y_grid4]
+dz_list = [dz1, dz2, dz3, dz4]
 
 ####################################################################################################
 ##### Drone Controller Parameters #####
@@ -221,53 +232,26 @@ zPID = [kp_z,0,kd_z]
 start = False
 goal_reached = False
 
-## Store Drone Positions
-
-## Creat drone object
-drone1 = drone.Drone("quad1",quad_path1,PID,zPID)
-drone2 = drone.Drone("quad2",quad_path2,PID,zPID)
-drone3 = drone.Drone("quad3",quad_path3,PID,zPID)
-drone4 = drone.Drone("quad4",quad_path4,PID,zPID)
-
-drone1.setPath(x_grid1,y_grid1,dz1,key)
-drone2.setPath(x_grid2,y_grid2,dz2,key)
-drone3.setPath(x_grid3,y_grid3,dz3,key)
-drone4.setPath(x_grid4,y_grid4,dz4,key)
-
-finalgoal_check  = [False,False,False,False]
-
 stage = omni.usd.get_context().get_stage()
 dc=_dynamic_control.acquire_dynamic_control_interface()
 
-quad1 = {
-    "info": drone1,
-    "prim": Articulation(drone1.path, name=drone1.name),
-    "rb": UsdPhysics.RigidBodyAPI.Get(stage, drone1.path)
-}
+## Create drone object
+quad_list = []
+finalgoal_check = []
+quad_count = 1
+for path in quad_path_list:
+    drone_new = drone.Drone(f"quad{quad_count}",quad_path_list[quad_count-1],PID,zPID)
+    drone_new.setPath(x_grid_list[quad_count-1],y_grid_list[quad_count-1],dz_list[quad_count-1],key)
 
-quad2 = {
-    "info": drone2,
-    "prim": Articulation(drone2.path, name=drone2.name),
-    "rb": UsdPhysics.RigidBodyAPI.Get(stage, drone2.path)
-}
+    quad_new = {
+        "info": drone_new,
+        "prim": Articulation(drone_new.path, name=drone_new.name),
+        "rb": UsdPhysics.RigidBodyAPI.Get(stage, drone_new.path)
+    }
+    finalgoal_check.append(False)
+    quad_list.append(quad_new)
+    quad_count += 1
 
-quad3 = {
-    "info": drone3,
-    "prim": Articulation(drone3.path, name=drone3.name),
-    "rb": UsdPhysics.RigidBodyAPI.Get(stage, drone3.path)
-}
-
-quad4 = {
-    "info": drone4,
-    "prim": Articulation(drone4.path, name=drone4.name),
-    "rb": UsdPhysics.RigidBodyAPI.Get(stage, drone4.path)
-}
-
-quad_list = [quad1,quad2,quad3,quad4]
-
-# quad_nums = [1, 2, 3, 4]
-# quad_x = []
-# quad_y = []
 
 ####################################################################################################
 ##### Functions #####
@@ -306,17 +290,23 @@ def print_state(name,gp,d,dind,v,goal):
 ##### Main Code #####
 
 world.reset()
-while True:
+# rate = node.create_rate(1000) # Settings a rate too low may cause the simulation to crash
+                                # It is probably better to keep this off unless needed
+
+while rclpy.ok():
+    rclpy.spin_once(node, timeout_sec=0)
     appwindow = omni.appwindow.get_default_app_window()
     input = carb.input.acquire_input_interface()
     input.subscribe_to_keyboard_events(appwindow.get_keyboard(), keyboard_event)
+
+    drone_poses_msg = AgentPoses()
+
     drone_count = 0
-    for quad in quad_list:
-        drone_obj = quad["info"]
-
+    if start:
+        for quad in quad_list:
+            drone_obj = quad["info"]
         
-
-        if start:
+        
             object=dc.get_rigid_body(drone_obj.path)
             object_pose=dc.get_rigid_body_pose(object)
             global_pose,global_orient = quad["prim"].get_world_pose()
@@ -378,6 +368,12 @@ while True:
                 # dely_prev = dely
                 # delz_prev = delz
                 drone_obj.del_prev = [delx,dely,delz]
+
+                # Add drone pose to message
+                drone_poses_msg.agents.append(drone_count+1)
+                drone_poses_msg.x.append(xpose)
+                drone_poses_msg.y.append(ypose)
+                drone_poses_msg.z.append(zpose)
                 
                 print_state(drone_obj.name,global_pose,d_curr,dind,v_curr,goal_reached)
                 if np.all(np.array(finalgoal_check)):
@@ -389,14 +385,20 @@ while True:
                 vel = Gf.Vec3f(0,0,0)
                 quad["rb"].GetVelocityAttr().Set(vel)
 
-            
-        else:
-            vel = Gf.Vec3f(0,0,0)
-            quad["rb"].GetVelocityAttr().Set(vel)
+            quad["info"] = drone_obj
+            drone_count += 1
 
-        quad["info"] = drone_obj
-        drone_count += 1
+        # Publish drone poses
+        pose_publisher.publish(drone_poses_msg)
+        # rate.sleep() # See comment about rate above
+
+    else:
+        vel = Gf.Vec3f(0,0,0)
+        for quad in quad_list:
+            quad["rb"].GetVelocityAttr().Set(vel) 
         
+
     world.step(render=True)
 
 simulation_app.close()
+rclpy.shutdown()
