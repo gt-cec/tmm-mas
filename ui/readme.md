@@ -39,4 +39,4 @@ To start the Websocket server:
 
 `python server.py`
 
-In a web browser, open `127.0.0.1:5000`
+In a web browser, open `127.0.0.1:8080`
