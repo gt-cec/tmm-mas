@@ -6,9 +6,9 @@ As a toy problem, we consider a grid world where a single robot agent must navig
 
 In future work, we plan to extend this system to more complex multi-agent domains.
 
-### Running the code
+### Proof of Concept Demo
 
-A simplified demonstration of the capabilities use `rollout_simulation.py` and `plot_sim_results.py`.
+We have a quick-and-dirty proof-of-concept that ignores the UI and simulator to generate an agent navigating through a grid world and identifying which points the user is communicated to. The scripts used for this are `rollout_simulation.py` and `plot_sim_results.py`.
 
 To generate a simulation rollout:
 
@@ -22,9 +22,9 @@ The resulting plot shows the robot's estimate of the mission time at each simula
 
 ### UI Interface
 
-I made a template UI interface in the `ui/` folder, which can be used as a baseline upon which to create a visualization for the simulator.
+We use Python and the Flask-SocketIO webserver to organize plan information from robots in an IsaacSim simulator and stream it to a web-based UI.
 
-To run the example:
+(As of Dec 18 2024) The simulator / replanner and webserver have not been integrated yet. The webserver includes a demo generator (random plans that are mostly nonsensical) for testing.
 
 1. Start the server.
 
@@ -33,15 +33,18 @@ cd ui
 python server.py
 ```
 
-2. Open the webpage in your browser, you will see an empty blue rectangle.
+2. Open the webpage in your browser, you will see the user interface and a map image centered.
 
-`http://localhost:5000`
+`http://localhost:8080`
 
-3. In another terminal, send the image.
+3. (Demo plans) Click the "Play" button to start the demo plan, the script generates a plan and waits a few seconds before sending each step. Change this sleep time in `server.py->play_recorded()`.
 
-```
-cd ui
-python send_image.py
-```
+### To Do
 
-4. Check the webpage, you will see the CEC logo. The `send_image.py` script sent the image to the server, which emitted it to the webpage. In practice, you can use a script like `send_image.py` to pull from the simulator and send to the server, or you can use the server script to pull from the simulator. 
+There are a few things needed:
+
+1. Integration of replanner with IsaacSim.
+
+2. Integration of replanner or IsaacSim with the webserver.
+
+3. Improving the UI, both visually and by useful functionality.
