@@ -4,6 +4,11 @@ Link to paper: https://doi.org/10.48550/arXiv.2404.01219 (Citation to be added)
 
 This simulation was built with Isaac Sim 4.2.0 and ROS2 Humble Hawksbill on Ubuntu 22.04 Jammy Jellyfish.
 
+## Dependencies
+* ROS2:
+* Isaac Sim 4.2.0:
+* LTL-D* PLanner: Only needed if running the online planner version.
+
 ## Usage
 ### ROS2 Setup
 Isaac Sim uses it's own compiled version of ROS2 Humble through FastDDS. The method for setting up the ROS2 bridge for Isaac Sim can be found here: [ROS2 Bridge Setup](https://docs.omniverse.nvidia.com/isaacsim/latest/installation/install_ros.html#isaac-sim-app-enable-ros). The `interfaces_hmm_sim` package also needs to be built in a ROS2 workspace. Place this folder in the `src` folder of a ROS2 Workspace and use the command `colcon build --packages-select interfaces_hmm_sim` to build it. Make sure to source both ROS2 Humble and this workspace in any terminal used to run the standalone example.
