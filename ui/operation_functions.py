@@ -165,10 +165,10 @@ def generate_delay_message(robot_number, X, Y, A, B, scenario=None):
     return message_template
 
 
-def generate_communication_message(deviation, threshold, hmm_pos1, hmm_pos2, rmm_pos1, rmm_pos2, hmm_time, rmm_time):
+def generate_communication_message(deviation, threshold, hmm_pos1, hmm_pos2, rmm_pos1, rmm_pos2, hmm_time, rmm_time, robot_number):
     messages = []
     if abs(deviation) > threshold:
-        robot_number = 1  # Assuming robot number 1 for example
+        robot_number = robot_number  # Assuming robot number 1 for example
         X = hmm_time
         Y = rmm_time
         A = (hmm_pos1, hmm_pos2)
@@ -181,7 +181,7 @@ def generate_communication_message(deviation, threshold, hmm_pos1, hmm_pos2, rmm
 
 
 def dynamic_deviation_threshold_multi_logic(hmm_arrays, rmm_arrays, update_logic_functions, uncertainty_factor_pos,
-                                            uncertainty_factor_time, dynamic_threshold_mission_time):
+                                            uncertainty_factor_time, dynamic_threshold_mission_time, robot_number):
     updated_hmm_array = []
     current_hmm_mission_time = hmm_arrays[0][4]  # Initial mission time from the HMM array
 
@@ -201,7 +201,7 @@ def dynamic_deviation_threshold_multi_logic(hmm_arrays, rmm_arrays, update_logic
 
     # Generate communication message
     message = generate_communication_message(mission_time_deviation_value, dynamic_threshold_mission_time,
-                                              hmm_pos1, hmm_pos2, rmm_pos1, rmm_pos2, hmm_time, rmm_time)
+                                              hmm_pos1, hmm_pos2, rmm_pos1, rmm_pos2, hmm_time, rmm_time, robot_number)
     formatted_message = "\n".join(message)
 
     # Update mission time using the first update logic function
