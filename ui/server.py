@@ -16,7 +16,8 @@ socketio = SocketIO(app)
 
 # Global variable to hold the last mission time
 last_mission_time = 37  # Start with the initial value
-input_file_path = 'robot_data_10 1.csv'
+# input_file_path = 'robot_data_10 1.csv'
+input_file_path = 'formatted_robot1.csv'
 # input_file_path = 'RMM.csv'
 hmm_arrays = generate_hmm_arrays(input_file_path)
 
@@ -87,8 +88,29 @@ def process(data):
     steps_remaining = data[4]
     
     hmm_array_data = select_hmm_array(hmm_arrays, timestep)
-    hmm_array = [hmm_array_data[0], hmm_array_data[1], hmm_array_data[2], round(hmm_array_data[3], 2), last_mission_time]     
-    rmm_array = [timestep - 1, x, y, round(time_elapsed, 2), steps_remaining]
+    # hmm_array = [hmm_array_data[0], hmm_array_data[1], hmm_array_data[2], round(hmm_array_data[3], 2), last_mission_time]     
+ # Converting elements to standard Python types
+    hmm_array = [
+        float(hmm_array_data[0]),  # Convert to float
+        float(hmm_array_data[1]),  # Convert to float
+        float(hmm_array_data[2]),  # Convert to float
+        round(float(hmm_array_data[3]), 2),  # Convert and round to 2 decimal places
+        int(last_mission_time)  # Convert to int
+    ]
+
+
+       
+    shmm_row = ((x, y), time_elapsed, timestep + steps_remaining)
+    rmm_process = generate_rmm_array_for_row(shmm_row, timestep)
+
+    # Reformat the rmm_process to get rmm_array with the same type conversion as hmm_array
+    rmm_array = [
+        float(rmm_process[0]),  # Convert to float
+        float(rmm_process[1]),  # Convert to float
+        float(rmm_process[2]),  # Convert to float
+        round(float(rmm_process[3]), 2),  # Convert and round to 2 decimal places
+        int(rmm_process[4])  # Convert to int
+    ]    
     
     print("HMM Array:", hmm_array)
     print("RMM Array:", rmm_array)
