@@ -1,2 +1,6 @@
 .DS_Store
 *.pyc
+# Ignore specific file
+Small_Enviornment-Multiagent.usd
+# Ignore file with full WSL path
+/home/maverick/Ubuntu/virtualenvs_DockerIMGS/my_jupyter_environment/tmm-mas/Small_Enviornment-Multiagent.usd
