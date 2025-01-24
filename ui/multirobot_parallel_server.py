@@ -1,5 +1,6 @@
 
 
+
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 from multirobot_operation_functions import (
@@ -78,7 +79,6 @@ def play_recorded(data):
                 previous_robot_states = current_robot_states
                 current_robot_states = {
                     "initial": initial_data,
-                    "message": next(iter(robot_states.values()))["message"],  
                     "timestamp": time.time(),
                     "robots": robot_states,
                     "objectives": [
@@ -88,15 +88,11 @@ def play_recorded(data):
                     ]
                 }
 
-                # Print all robot messages for this iteration
-                for robot_id, state in robot_states.items():
-                    print(f"Robot {robot_id}: HMM={state['rmm_array']}, Message={state['message']}")
-
                 # Emit the updated state to the client
                 socketio.emit("message", current_robot_states)
                 initial_data = False
 
-            # socketio.sleep(2)  # Simulate processing delay
+            socketio.sleep(2)  # Simulate processing delay
             i += 1  # Increment the row index for all robots
 
 
@@ -135,6 +131,7 @@ def process(robot_id, data, tasks, plan_coordinates, plans):
 
     last_mission_times[robot_id] = updated_hmm_array[0][4]
 
+    # Generate plans
     x = random.randint(3, 7)
     y = random.randint(3, 7)
     plan = [[x, y]]
