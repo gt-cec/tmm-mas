@@ -46,23 +46,22 @@ from helper import parse_action_sequence, print_state
 ## File Paths
 
 key_path = "./example/grid.csv" #File describing the world grid
-coord_path = "./example/coords_final.csv" #File describing the path plan
 usd_path = "./environments/Small_Enviornment-Multiagent.usd" #File with the world enfironment
 
 ## Isaac Sim Paths
 
 quad_path1 = "/World/quads/quad1" #Path to drone in the environment USD
-# quad_path2 = "/World/quads/quad2"
-# quad_path3 = "/World/quads/quad3"
-# quad_path4 = "/World/quads/quad4"
+quad_path2 = "/World/quads/quad2"
+quad_path3 = "/World/quads/quad3"
 
-# quad_path_list = [quad_path1, quad_path2, quad_path3, quad_path4]
-# quad_path_list = [quad_path1, quad_path2, quad_path3]
-quad_path_list = [quad_path1]
+quad_path_list = [quad_path1, quad_path2, quad_path3]
+
+init_grid_poses = [(0,0),(4,3),(3,2)]
 
 ## Define Bumps
 
 bumps = [(3,1),(4,1),(5,2),(5,3),(2,4),(3,4)] #Difficult terrain points as list of ordered pairs: (y,x)
+blocks = [(2,2),(0,4)]
 
 ####################################################################################################
 
@@ -116,57 +115,6 @@ def suffix_plan_callback(msg, agent_node):
 # topic_suffix_plan = '/robot1/suffix_plan'
 # suffix_plan_subscriber = node.create_subscription(LTLPlan, topic_suffix_plan, suffix_plan_callback, 10)
 
-# def create_agent_nodes(num_agents):
-#     agent_nodes = []
-#     for i in range(num_agents):
-#         agent_name = f"robot{i + 1}"
-#         namespace = f"/{agent_name}"
-#         node = rclpy.create_node(f"isaac_node", namespace=namespace)
-
-#         # Publishers
-#         pose_publisher = node.create_publisher(AgentPoses, f"{namespace}/poses", 10)
-#         status_publisher = node.create_publisher(Status,f"{namespace}/status",10)
-
-#         # Subscribers
-#         # relay_response_subscriber = node.create_subscription(
-#         #     RelayResponse, f"{namespace}/replanning_response", relay_response_callback, 10
-#         # )
-#         # prefix_plan_subscriber = node.create_subscription(
-#         #     LTLPlan, f"{namespace}/prefix_plan", prefix_plan_callback, 10
-#         # )
-#         # suffix_plan_subscriber = node.create_subscription(
-#         #     LTLPlan, f"{namespace}/suffix_plan", suffix_plan_callback, 10
-#         # )
-
-#         agent_node = {
-#             "name": agent_name,
-#             "node": node,
-#             "number": i,
-#             "pose_publisher": pose_publisher,
-#             "status_publisher": status_publisher,
-#             "new_prefix_actions": [],
-#             "new_suffix_actions": [],
-#             "prefix_actions": [],
-#             "suffix_actions": []
-#         }
-        
-#         relay_response_subscriber = node.create_subscription(
-#             RelayResponse, f"{namespace}/replanning_response", lambda msg: relay_response_callback(msg, agent_node), 10
-#         )
-#         prefix_plan_subscriber = node.create_subscription(
-#             LTLPlan, f"{namespace}/prefix_plan", lambda msg: prefix_plan_callback(msg, agent_node), 10
-#         )
-#         suffix_plan_subscriber = node.create_subscription(
-#             LTLPlan, f"{namespace}/suffix_plan", lambda msg: suffix_plan_callback(msg, agent_node), 10
-#         )
-
-#         agent_node["relay_response_subscriber"] = relay_response_subscriber
-#         agent_node["prefix_plan_subscriber"] = prefix_plan_subscriber
-#         agent_node["suffix_plan_subscriber"] = suffix_plan_subscriber
-
-#         agent_nodes.append(agent_node)
-
-#     return agent_nodes
 
 def create_agent_nodes(num_agents):
     agent_nodes = []
@@ -253,133 +201,12 @@ with open(key_path,mode='r')as file:
             # print(key_line)
         line_count += 1
 
-## Import Path Plan
-# coordN = 0
-# with open(coord_path,mode='r')as file:
-#     coord_file = csv.reader(file)
-#     coordN = sum(1 for row in coord_file)
-
-# header_coords = list()
-# y_grid = np.zeros((1,coordN))
-# x_grid = np.zeros((1,coordN))
-# with open(coord_path,mode='r')as file:
-#     coord_file = csv.reader(file)
-#     line_count = 0
-#     for lines in coord_file:
-#         if line_count == 0:
-#             y_grid[0][0] = 0
-#             x_grid[0][0] = 0
-#             header_coords = lines
-#         else:
-#             coord_line = [int(i) for i in lines]
-#             # print(coord_line)
-#             y_grid[0][line_count] = coord_line[0]
-#             x_grid[0][line_count] = coord_line[1]
-            
-#             # coords[line_count-1] = coord_line[1:]
-#             # print(key_line)
-#         line_count += 1
-
-## Drone Path Plan
-# y_grid = [0,0,4,4,5,5,5,5,4,4,1,1,0,0,0,1,1,0,0] # Grid x-values
-# x_grid = [0,1,1,3,3,5,0,3,3,4,4,2,2,3,2,2,1,1,0] # Grid y-values
-# y_grid_init = np.uint32(y_grid).tolist()[0]
-# x_grid_init = np.uint32(x_grid).tolist()[0]
-
-# # dz = [1,1,3,1,3,1,3,3,1,1,1,1,1,1,1,1,1,1,1]
-# dz = np.ones((1,len(y_grid_init)))
-
-# coords = []
-# count = 0
-# for i in y_grid_init:
-#     coords.append((i,x_grid_init[count]))
-#     count += 1
-
-# count_b = 0
-# for i in coords:
-#     # print(i)
-#     if i in bumps:
-#         dz[0][count_b] = 3
-#         # print('in')
-#     count_b += 1
-
-# # print(dz)
-# dz_init = np.uint32(dz).tolist()[0]
-# # dind = 0
-
-# dz = []
-# y_grid = []
-# x_grid = []
-# prev_state = 99
-# state_ind = 0
-# for i in y_grid_init:
-#     state = 0
-#     if state_ind == 0:
-#         print('Simplifying coords')
-#     else: 
-#         if y_grid_init[state_ind] - y_grid_init[state_ind-1] > 0:
-#             state = 1
-#         elif y_grid_init[state_ind] - y_grid_init[state_ind-1] < 0:
-#             state = 3
-#         elif x_grid_init[state_ind] - x_grid_init[state_ind-1] > 0:
-#             state = 2
-#         elif x_grid_init[state_ind] - x_grid_init[state_ind-1] < 0:
-#             state = 4
-#         elif dz_init[state_ind] - dz_init[state_ind-1] > 0:
-#             state = 5
-#         elif dz_init[state_ind] - dz_init[state_ind-1] < 0:
-#             state = 6
-#         else: state = 0
-
-#         if np.abs(state - prev_state) > 0:
-#             y_grid.append(y_grid_init[state_ind-1])
-#             x_grid.append(x_grid_init[state_ind-1])
-#             dz.append(dz_init[state_ind-1])
-
-#     prev_state = state
-#     state_ind += 1
-
-# print(f'dy: {y_grid}')
-# print(f'dx: {x_grid}')
-# y_grid.append(2)
-# y_grid.append(1)
-# x_grid.append(4)
-# x_grid.append(4)
-# dz.append(3)
-# dz.append(1)
-
-# dy = [key[i][0] for i in y_grid]
-# dx = [key[i][1] for i in x_grid]
-
-# y_grid1 = y_grid
-# x_grid1 = x_grid
-# dz1 =  dz
-
-# y_grid2 = [2, 3, 3, 1, 1, 0, 0, 0, 0, 0, 2]
-# x_grid2 = [2, 2, 4, 4, 1, 1, 0, 1, 0, 1, 1]
-# dz2 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-
-# y_grid3 = [3, 3, 1, 1, 4, 4, 4, 1, 1, 4, 4, 4, 3, 3]
-# x_grid3 = [2, 5, 5, 0, 0, 1, 5, 5, 0, 0, 1, 5, 5, 2]
-# dz3 = [1, 1, 1, 1, 1, 3, 1, 1, 1, 1, 3, 1, 1, 1]
-
-# y_grid4 = [0, 0, 0, 0]
-# x_grid4 = [4, 5, 4, 5]
-# dz4 = [1, 1, 1, 1]
-
-# x_grid_list = [x_grid1, x_grid2, x_grid3, x_grid4]
-# y_grid_list = [y_grid1, y_grid2, y_grid3, y_grid4]
-# dz_list = [dz1, dz2, dz3, dz4]
-
-# x_grid_list = [x_grid1]
-# y_grid_list = [y_grid1]
-# dz_list = [dz1]
 
 ####################################################################################################
 ##### Drone Controller Parameters #####
 
 ## Simple PID Gains
-kp = 1.5
+kp = 5
 kp_z = 2
 kd = 2
 kd_z = 0.5
@@ -389,6 +216,8 @@ zPID = [kp_z,0,kd_z]
 
 ####################################################################################################
 ##### Initializations #####
+
+wait_val = 75
 
 start = False
 init_paths = False
@@ -401,6 +230,7 @@ dc=_dynamic_control.acquire_dynamic_control_interface()
 quad_list = []
 finalgoal_check = []
 init_start = []
+wait_count = []
 quad_count = 1
 for path in quad_path_list:
     drone_new = drone.Drone(f"quad{quad_count}",quad_path_list[quad_count-1],PID,zPID)
@@ -412,8 +242,9 @@ for path in quad_path_list:
         "rb": UsdPhysics.RigidBodyAPI.Get(stage, drone_new.path)
     }
     finalgoal_check.append(False)
-    init_start.append(True)
+    init_start.append(False)
     quad_list.append(quad_new)
+    wait_count.append(wait_val)
     quad_count += 1
 
 
@@ -447,7 +278,6 @@ world.reset()
 # rate = node.create_rate(1000) # Settings a rate too low may cause the simulation to crash
                                 # It is probably better to keep this off unless needed
 
-wait_count = 0
 while rclpy.ok():
     for agent in agent_nodes:
         rclpy.spin_once(agent["node"], timeout_sec=0)
@@ -456,8 +286,8 @@ while rclpy.ok():
     input = carb.input.acquire_input_interface()
     input.subscribe_to_keyboard_events(appwindow.get_keyboard(), keyboard_event)
 
-    if np.all(np.array(init_start)):
-        agent_count = 0
+    agent_count = 0
+    if not init_paths:
         for agent in agent_nodes:
             if not agent["prefix_actions"]:
                 init_status = Status()
@@ -468,7 +298,7 @@ while rclpy.ok():
                 # print(agent["name"])
                 # print("Waiting........")
             else:
-                init_start[agent_count] = False
+                init_start[agent_count] = True
                 x_coords, y_coords, z_coords, flags = parse_action_sequence(agent["prefix_actions"],bumps)
                 quad = quad_list[agent_count]
                 drone_obj = quad["info"]
@@ -478,13 +308,13 @@ while rclpy.ok():
                 print("------------------------------------------------")
                 print(agent["name"])
                 print(parse_action_sequence(agent["prefix_actions"],bumps))
-            agent_count += 1
-    else:
+                agent_count += 1
+    if (np.all(np.array(init_start))):
         init_paths = True
 
 
-    drone_count = 0
     if start and init_paths:
+        drone_count = 0
         for quad in quad_list:
             drone_obj = quad["info"]
             agent = agent_nodes[drone_count]
@@ -515,6 +345,14 @@ while rclpy.ok():
             dy = drone_obj.dy
             dz = drone_obj.dz
 
+            # json_data = {
+            #     "robot_name": robot_name,
+            #     "x_coord": current_pose[0],
+            #     "y_coord": current_pose[0],
+            #     "time_step": dind,
+            #     "time_remaining": steps
+            # }
+
             if replan_flag[drone_count]:
                 x_coords, y_coords, z_coords, flags = parse_action_sequence(agent["new_prefix_actions"],bumps)
                 drone_obj.setPath(y_coords, x_coords, z_coords, flags,key)
@@ -523,6 +361,11 @@ while rclpy.ok():
                 drone_status.agent = agent["name"]
                 drone_status.replan_received = True
                 agent["status_publisher"].publish(drone_status)
+
+            elif (wait_count[drone_count] < wait_val):
+                wait_count[drone_count] += 1
+                vel = Gf.Vec3f(0,0,0)
+                quad["rb"].GetVelocityAttr().Set(vel)
 
             elif quad["rb"] and dind < len(dx):
 
@@ -544,11 +387,23 @@ while rclpy.ok():
                 vy = kp_mod*dely + kd*(dely - del_prev[1])
                 vz = kp_z*(delz) + kd_z*(delz - del_prev[2])
                 v_curr = [vx,vy,vz]
+                # if (np.abs(delx) <= 1.5 and np.abs(dely) <= 1.5 and np.abs(delz) <= 0.05) and not drone_status_sent[drone_count]:
+                #     drone_status.agent = agent["name"]
+                #     drone_status.arrived = True
+                #     agent["status_publisher"].publish(drone_status)
+
+                #     drone_status_sent[drone_count] = True
                 if np.abs(delx) <= 0.5 and np.abs(dely) <= 0.5 and np.abs(delz) <= 0.05:
                     # vx = 0
                     # vy = 0
                     # vz = 0
                     drone_obj.dind +=1
+                    # next_grid_pose = (drone_obj.x_grid[drone_obj.dind],drone_obj.y_grid[drone_obj.dind])
+                    # if (next_grid_pose in bumps) or (next_grid_pose in blocks):
+                    #     print(f"********************************* {next_grid_pose} *********************************")
+                    #     print("********************************************************************************")
+                    wait_count[drone_count] = 0
+                    
                     drone_status.agent = agent["name"]
                     drone_status.arrived = True
                     agent["status_publisher"].publish(drone_status)

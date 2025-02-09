@@ -33,7 +33,13 @@ class Drone:
         self.dz = []
         self.flags = []
 
+        self.y_grid = []
+        self.x_grid = []
+
     def setPath(self, x_grid: list, y_grid: list, dz:list, flags:list, key) -> None:
+        self.y_grid = y_grid
+        self.x_grid = x_grid
+
         self.dy = [key[i][0] for i in y_grid]
         self.dx = [key[i][1] for i in x_grid]
         self.dz = dz
