@@ -1,0 +1,6 @@
+source;share/ltl_automaton_planner/hook/pythonpath.ps1
+source;share/ltl_automaton_planner/hook/pythonpath.dsv
+source;share/ltl_automaton_planner/hook/pythonpath.sh
+source;share/ltl_automaton_planner/hook/ament_prefix_path.ps1
+source;share/ltl_automaton_planner/hook/ament_prefix_path.dsv
+source;share/ltl_automaton_planner/hook/ament_prefix_path.sh

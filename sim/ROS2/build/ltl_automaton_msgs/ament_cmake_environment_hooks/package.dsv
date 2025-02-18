@@ -1,0 +1,4 @@
+source;share/ltl_automaton_msgs/local_setup.bash
+source;share/ltl_automaton_msgs/local_setup.dsv
+source;share/ltl_automaton_msgs/local_setup.sh
+source;share/ltl_automaton_msgs/local_setup.zsh

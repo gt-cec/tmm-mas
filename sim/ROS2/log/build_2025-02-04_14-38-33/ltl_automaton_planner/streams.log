@@ -1,0 +1,109 @@
+[0.343s] Invoking command in '/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_planner': PYTHONPATH=/home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/ltl_automaton_planner build --build-base /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build install --record /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/install.log --single-version-externally-managed install_data
+[0.469s] running egg_info
+[0.470s] creating ../../build/ltl_automaton_planner/ltl_automaton_planner.egg-info
+[0.470s] writing ../../build/ltl_automaton_planner/ltl_automaton_planner.egg-info/PKG-INFO
+[0.470s] writing dependency_links to ../../build/ltl_automaton_planner/ltl_automaton_planner.egg-info/dependency_links.txt
+[0.470s] writing entry points to ../../build/ltl_automaton_planner/ltl_automaton_planner.egg-info/entry_points.txt
+[0.470s] writing requirements to ../../build/ltl_automaton_planner/ltl_automaton_planner.egg-info/requires.txt
+[0.470s] writing top-level names to ../../build/ltl_automaton_planner/ltl_automaton_planner.egg-info/top_level.txt
+[0.470s] writing manifest file '../../build/ltl_automaton_planner/ltl_automaton_planner.egg-info/SOURCES.txt'
+[0.471s] reading manifest file '../../build/ltl_automaton_planner/ltl_automaton_planner.egg-info/SOURCES.txt'
+[0.472s] writing manifest file '../../build/ltl_automaton_planner/ltl_automaton_planner.egg-info/SOURCES.txt'
+[0.472s] running build
+[0.472s] running build_py
+[0.472s] creating /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build
+[0.472s] creating /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib
+[0.472s] creating /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner
+[0.472s] copying ltl_automaton_planner/relay_node.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner
+[0.472s] copying ltl_automaton_planner/ltl_automaton_utilities.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner
+[0.472s] copying ltl_automaton_planner/planner_node.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner
+[0.473s] copying ltl_automaton_planner/__init__.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner
+[0.473s] copying ltl_automaton_planner/benchmark_node.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner
+[0.473s] creating /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools
+[0.473s] copying ltl_automaton_planner/ltl_tools/ltl_planner.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools
+[0.473s] copying ltl_automaton_planner/ltl_tools/ts.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools
+[0.473s] copying ltl_automaton_planner/ltl_tools/dijkstra.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools
+[0.474s] copying ltl_automaton_planner/ltl_tools/relax.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools
+[0.474s] copying ltl_automaton_planner/ltl_tools/ltl2ba.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools
+[0.474s] copying ltl_automaton_planner/ltl_tools/discrete_plan.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools
+[0.474s] copying ltl_automaton_planner/ltl_tools/dstar.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools
+[0.474s] copying ltl_automaton_planner/ltl_tools/__init__.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools
+[0.474s] copying ltl_automaton_planner/ltl_tools/run.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools
+[0.474s] copying ltl_automaton_planner/ltl_tools/buchi.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools
+[0.474s] copying ltl_automaton_planner/ltl_tools/product.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools
+[0.475s] copying ltl_automaton_planner/ltl_tools/promela.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools
+[0.475s] creating /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/nodes
+[0.475s] copying ltl_automaton_planner/nodes/simulation_node.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/nodes
+[0.475s] copying ltl_automaton_planner/nodes/__init__.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/nodes
+[0.475s] copying ltl_automaton_planner/nodes/benchmark_node.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/nodes
+[0.475s] creating /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/boolean_formulas
+[0.475s] copying ltl_automaton_planner/boolean_formulas/lexer.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/boolean_formulas
+[0.475s] copying ltl_automaton_planner/boolean_formulas/parser.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/boolean_formulas
+[0.476s] copying ltl_automaton_planner/boolean_formulas/__init__.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/boolean_formulas
+[0.476s] running install
+[0.476s] running install_lib
+[0.476s] creating /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner
+[0.476s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/relay_node.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner
+[0.477s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_automaton_utilities.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner
+[0.477s] creating /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools
+[0.477s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools/ltl_planner.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools
+[0.477s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools/ts.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools
+[0.477s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools/dijkstra.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools
+[0.477s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools/relax.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools
+[0.477s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools/ltl2ba.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools
+[0.477s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools/discrete_plan.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools
+[0.477s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools/dstar.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools
+[0.477s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools/__init__.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools
+[0.477s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools/run.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools
+[0.477s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools/buchi.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools
+[0.477s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools/product.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools
+[0.477s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/ltl_tools/promela.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools
+[0.477s] creating /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/nodes
+[0.477s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/nodes/simulation_node.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/nodes
+[0.477s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/nodes/__init__.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/nodes
+[0.477s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/nodes/benchmark_node.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/nodes
+[0.477s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/planner_node.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner
+[0.477s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/__init__.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner
+[0.477s] creating /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/boolean_formulas
+[0.477s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/boolean_formulas/lexer.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/boolean_formulas
+[0.477s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/boolean_formulas/parser.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/boolean_formulas
+[0.478s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/boolean_formulas/__init__.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/boolean_formulas
+[0.478s] copying /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build/lib/ltl_automaton_planner/benchmark_node.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner
+[0.478s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/relay_node.py to relay_node.cpython-310.pyc
+[0.478s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_automaton_utilities.py to ltl_automaton_utilities.cpython-310.pyc
+[0.479s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools/ltl_planner.py to ltl_planner.cpython-310.pyc
+[0.480s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools/ts.py to ts.cpython-310.pyc
+[0.481s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools/dijkstra.py to dijkstra.cpython-310.pyc
+[0.481s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools/relax.py to relax.cpython-310.pyc
+[0.482s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools/ltl2ba.py to ltl2ba.cpython-310.pyc
+[0.482s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools/discrete_plan.py to discrete_plan.cpython-310.pyc
+[0.483s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools/dstar.py to dstar.cpython-310.pyc
+[0.485s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools/__init__.py to __init__.cpython-310.pyc
+[0.485s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools/run.py to run.cpython-310.pyc
+[0.486s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools/buchi.py to buchi.cpython-310.pyc
+[0.486s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools/product.py to product.cpython-310.pyc
+[0.487s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/ltl_tools/promela.py to promela.cpython-310.pyc
+[0.487s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/nodes/simulation_node.py to simulation_node.cpython-310.pyc
+[0.489s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/nodes/__init__.py to __init__.cpython-310.pyc
+[0.489s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/nodes/benchmark_node.py to benchmark_node.cpython-310.pyc
+[0.491s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/planner_node.py to planner_node.cpython-310.pyc
+[0.492s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/__init__.py to __init__.cpython-310.pyc
+[0.492s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/boolean_formulas/lexer.py to lexer.cpython-310.pyc
+[0.492s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/boolean_formulas/parser.py to parser.cpython-310.pyc
+[0.493s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/boolean_formulas/__init__.py to __init__.cpython-310.pyc
+[0.493s] byte-compiling /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner/benchmark_node.py to benchmark_node.cpython-310.pyc
+[0.495s] running install_data
+[0.495s] creating /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/share/ament_index
+[0.495s] creating /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/share/ament_index/resource_index
+[0.495s] creating /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/share/ament_index/resource_index/packages
+[0.495s] copying resource/ltl_automaton_planner -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/share/ament_index/resource_index/packages
+[0.495s] copying package.xml -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/share/ltl_automaton_planner
+[0.495s] copying launch/ltl_planner_isaac_launch.py -> /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/share/ltl_automaton_planner
+[0.495s] running install_egg_info
+[0.496s] Copying ../../build/ltl_automaton_planner/ltl_automaton_planner.egg-info to /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages/ltl_automaton_planner-0.0.0-py3.10.egg-info
+[0.496s] running install_scripts
+[0.508s] Installing benchmark_node script to /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/ltl_automaton_planner
+[0.508s] Installing planner_node script to /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/ltl_automaton_planner
+[0.508s] Installing relay_node script to /home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/ltl_automaton_planner
+[0.509s] writing list of installed files to '/home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/install.log'
+[0.522s] Invoked command in '/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_planner' returned '0': PYTHONPATH=/home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/ltl_automaton_planner build --build-base /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build install --record /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/install.log --single-version-externally-managed install_data

@@ -1,0 +1,5 @@
+[console_scripts]
+benchmark_node = ltl_automaton_planner.benchmark_node:main
+planner_node = ltl_automaton_planner.planner_node:main
+relay_node = ltl_automaton_planner.relay_node:main
+

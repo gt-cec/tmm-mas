@@ -1,0 +1,18 @@
+{
+  "package_name": "ltl_automaton_msgs",
+  "non_idl_tuples": [
+    "/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_msgs:msg/TransitionSystemState.msg",
+    "/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_msgs:msg/TransitionSystemStateStamped.msg",
+    "/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_msgs:msg/LTLPlan.msg",
+    "/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_msgs:msg/LTLState.msg",
+    "/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_msgs:msg/LTLStateArray.msg",
+    "/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_msgs:msg/LTLStateRuns.msg",
+    "/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_msgs:msg/RelayRequest.msg",
+    "/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_msgs:msg/RelayResponse.msg",
+    "/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_msgs:srv/TrapCheck.srv",
+    "/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_msgs:srv/TaskPlanning.srv",
+    "/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_msgs:srv/TaskReplanningModify.srv",
+    "/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_msgs:srv/TaskReplanningDelete.srv",
+    "/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_msgs:srv/TaskReplanningRelabel.srv"
+  ]
+}

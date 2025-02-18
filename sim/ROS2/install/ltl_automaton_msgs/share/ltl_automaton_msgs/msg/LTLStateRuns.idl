@@ -1,0 +1,15 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from ltl_automaton_msgs/msg/LTLStateRuns.msg
+// generated code does not contain a copyright notice
+
+#include "ltl_automaton_msgs/msg/LTLStateArray.idl"
+
+module ltl_automaton_msgs {
+  module msg {
+    @verbatim (language="comment", text=
+      "Define multiple histories of LTL state as an array of LTL state arrays.")
+    struct LTLStateRuns {
+      sequence<ltl_automaton_msgs::msg::LTLStateArray> runs;
+    };
+  };
+};

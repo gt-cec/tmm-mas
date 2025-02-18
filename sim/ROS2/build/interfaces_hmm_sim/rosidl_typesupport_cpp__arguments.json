@@ -1,0 +1,19 @@
+{
+  "package_name": "interfaces_hmm_sim",
+  "output_dir": "/home/maverick/LMCO/tmm-mas/sim/ROS2/build/interfaces_hmm_sim/rosidl_typesupport_cpp/interfaces_hmm_sim",
+  "template_dir": "/opt/ros/humble/share/rosidl_typesupport_cpp/resource",
+  "idl_tuples": [
+    "/home/maverick/LMCO/tmm-mas/sim/ROS2/build/interfaces_hmm_sim/rosidl_adapter/interfaces_hmm_sim:msg/AgentPoses.idl",
+    "/home/maverick/LMCO/tmm-mas/sim/ROS2/build/interfaces_hmm_sim/rosidl_adapter/interfaces_hmm_sim:msg/Status.idl"
+  ],
+  "target_dependencies": [
+    "/opt/ros/humble/lib/rosidl_typesupport_cpp/rosidl_typesupport_cpp",
+    "/opt/ros/humble/local/lib/python3.10/dist-packages/rosidl_typesupport_cpp/__init__.py",
+    "/opt/ros/humble/share/rosidl_typesupport_cpp/resource/action__type_support.cpp.em",
+    "/opt/ros/humble/share/rosidl_typesupport_cpp/resource/idl__type_support.cpp.em",
+    "/opt/ros/humble/share/rosidl_typesupport_cpp/resource/msg__type_support.cpp.em",
+    "/opt/ros/humble/share/rosidl_typesupport_cpp/resource/srv__type_support.cpp.em",
+    "/home/maverick/LMCO/tmm-mas/sim/ROS2/build/interfaces_hmm_sim/rosidl_adapter/interfaces_hmm_sim/msg/AgentPoses.idl",
+    "/home/maverick/LMCO/tmm-mas/sim/ROS2/build/interfaces_hmm_sim/rosidl_adapter/interfaces_hmm_sim/msg/Status.idl"
+  ]
+}

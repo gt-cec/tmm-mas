@@ -1,0 +1,17 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from ltl_automaton_msgs/msg/RelayResponse.msg
+// generated code does not contain a copyright notice
+
+#include "ltl_automaton_msgs/msg/LTLPlan.idl"
+
+module ltl_automaton_msgs {
+  module msg {
+    struct RelayResponse {
+      boolean success;
+
+      ltl_automaton_msgs::msg::LTLPlan new_plan_prefix;
+
+      ltl_automaton_msgs::msg::LTLPlan new_plan_suffix;
+    };
+  };
+};

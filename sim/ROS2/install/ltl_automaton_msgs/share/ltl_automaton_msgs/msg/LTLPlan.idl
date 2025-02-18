@@ -1,0 +1,25 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from ltl_automaton_msgs/msg/LTLPlan.msg
+// generated code does not contain a copyright notice
+
+#include "ltl_automaton_msgs/msg/TransitionSystemState.idl"
+#include "std_msgs/msg/Header.idl"
+
+module ltl_automaton_msgs {
+  module msg {
+    @verbatim (language="comment", text=
+      "Specify a plan from an LTL planner as a" "\n"
+      "sequence of actions")
+    struct LTLPlan {
+      std_msgs::msg::Header header;
+
+      @verbatim (language="comment", text=
+        "Sequence of actions in the plan")
+      sequence<string> action_sequence;
+
+      @verbatim (language="comment", text=
+        "Sequence of states in the plan")
+      sequence<ltl_automaton_msgs::msg::TransitionSystemState> ts_state_sequence;
+    };
+  };
+};

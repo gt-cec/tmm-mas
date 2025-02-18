@@ -1,0 +1,23 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from ltl_automaton_msgs/msg/RelayRequest.msg
+// generated code does not contain a copyright notice
+
+#include "ltl_automaton_msgs/msg/TransitionSystemState.idl"
+
+module ltl_automaton_msgs {
+  module msg {
+    struct RelayRequest {
+      sequence<int32> from_pose;
+
+      sequence<int32> to_pose;
+
+      double cost;
+
+      ltl_automaton_msgs::msg::TransitionSystemState current_state;
+
+      int32 exec_index;
+
+      string type;
+    };
+  };
+};

@@ -1,0 +1,277 @@
+[0.058s] DEBUG:colcon:Command line arguments: ['/usr/bin/colcon', 'build']
+[0.058s] DEBUG:colcon:Parsed command line arguments: Namespace(log_base=None, log_level=None, verb_name='build', build_base='build', install_base='install', merge_install=False, symlink_install=False, test_result_base=None, continue_on_error=False, executor='parallel', parallel_workers=16, event_handlers=None, ignore_user_meta=False, metas=['./colcon.meta'], base_paths=['.'], packages_ignore=None, packages_ignore_regex=None, paths=None, packages_up_to=None, packages_up_to_regex=None, packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_select_by_dep=None, packages_skip_by_dep=None, packages_skip_up_to=None, packages_select_build_failed=False, packages_skip_build_finished=False, packages_select_test_failures=False, packages_skip_test_passed=False, packages_select=None, packages_skip=None, packages_select_regex=None, packages_skip_regex=None, packages_start=None, packages_end=None, allow_overriding=[], cmake_args=None, cmake_target=None, cmake_target_skip_unavailable=False, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, ament_cmake_args=None, catkin_cmake_args=None, catkin_skip_building_tests=False, verb_parser=<colcon_defaults.argument_parser.defaults.DefaultArgumentsDecorator object at 0x7dd32fc2ec50>, verb_extension=<colcon_core.verb.build.BuildVerb object at 0x7dd32fc2e800>, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0x7dd32fc2e800>>)
+[0.145s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[0.145s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[0.145s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[0.145s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[0.145s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[0.145s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[0.145s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/home/maverick/LMCO/tmm-mas/sim/ROS2'
+[0.145s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[0.145s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[0.145s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[0.145s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[0.145s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[0.145s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[0.145s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[0.145s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[0.145s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[0.151s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['cmake', 'python']
+[0.151s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'cmake'
+[0.151s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python'
+[0.151s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['python_setup_py']
+[0.151s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python_setup_py'
+[0.151s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extensions ['ignore', 'ignore_ament_install']
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extension 'ignore'
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(build) ignored
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extensions ['ignore', 'ignore_ament_install']
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extension 'ignore'
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(install) ignored
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(interfaces_hmm_sim) by extensions ['ignore', 'ignore_ament_install']
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(interfaces_hmm_sim) by extension 'ignore'
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(interfaces_hmm_sim) by extension 'ignore_ament_install'
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(interfaces_hmm_sim) by extensions ['colcon_pkg']
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(interfaces_hmm_sim) by extension 'colcon_pkg'
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(interfaces_hmm_sim) by extensions ['colcon_meta']
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(interfaces_hmm_sim) by extension 'colcon_meta'
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(interfaces_hmm_sim) by extensions ['ros']
+[0.152s] Level 1:colcon.colcon_core.package_identification:_identify(interfaces_hmm_sim) by extension 'ros'
+[0.153s] DEBUG:colcon.colcon_core.package_identification:Package 'interfaces_hmm_sim' with type 'ros.ament_cmake' and name 'interfaces_hmm_sim'
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(lmco) by extensions ['ignore', 'ignore_ament_install']
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(lmco) by extension 'ignore'
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(lmco) by extension 'ignore_ament_install'
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(lmco) by extensions ['colcon_pkg']
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(lmco) by extension 'colcon_pkg'
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(lmco) by extensions ['colcon_meta']
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(lmco) by extension 'colcon_meta'
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(lmco) by extensions ['ros']
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(lmco) by extension 'ros'
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(lmco) by extensions ['cmake', 'python']
+[0.153s] Level 1:colcon.colcon_core.package_identification:_identify(lmco) by extension 'cmake'
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(lmco) by extension 'python'
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(lmco) by extensions ['python_setup_py']
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(lmco) by extension 'python_setup_py'
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(lmco/ltl_automaton_msgs) by extensions ['ignore', 'ignore_ament_install']
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(lmco/ltl_automaton_msgs) by extension 'ignore'
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(lmco/ltl_automaton_msgs) by extension 'ignore_ament_install'
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(lmco/ltl_automaton_msgs) by extensions ['colcon_pkg']
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(lmco/ltl_automaton_msgs) by extension 'colcon_pkg'
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(lmco/ltl_automaton_msgs) by extensions ['colcon_meta']
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(lmco/ltl_automaton_msgs) by extension 'colcon_meta'
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(lmco/ltl_automaton_msgs) by extensions ['ros']
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(lmco/ltl_automaton_msgs) by extension 'ros'
+[0.154s] DEBUG:colcon.colcon_core.package_identification:Package 'lmco/ltl_automaton_msgs' with type 'ros.ament_cmake' and name 'ltl_automaton_msgs'
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(lmco/ltl_automaton_planner) by extensions ['ignore', 'ignore_ament_install']
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(lmco/ltl_automaton_planner) by extension 'ignore'
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(lmco/ltl_automaton_planner) by extension 'ignore_ament_install'
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(lmco/ltl_automaton_planner) by extensions ['colcon_pkg']
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(lmco/ltl_automaton_planner) by extension 'colcon_pkg'
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(lmco/ltl_automaton_planner) by extensions ['colcon_meta']
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(lmco/ltl_automaton_planner) by extension 'colcon_meta'
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(lmco/ltl_automaton_planner) by extensions ['ros']
+[0.154s] Level 1:colcon.colcon_core.package_identification:_identify(lmco/ltl_automaton_planner) by extension 'ros'
+[0.155s] DEBUG:colcon.colcon_core.package_identification:Package 'lmco/ltl_automaton_planner' with type 'ros.ament_python' and name 'ltl_automaton_planner'
+[0.155s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extensions ['ignore', 'ignore_ament_install']
+[0.155s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extension 'ignore'
+[0.155s] Level 1:colcon.colcon_core.package_identification:_identify(log) ignored
+[0.155s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[0.155s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[0.155s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[0.155s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[0.155s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[0.171s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) check parameters
+[0.171s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) discover
+[0.171s] WARNING:colcon.colcon_ros.prefix_path.ament:The path '/home/maverick/ros2_ws/install/interfaces_hmm_sim' in the environment variable AMENT_PREFIX_PATH doesn't contain any 'local_setup.*' files.
+[0.172s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 278 installed packages in /opt/ros/humble
+[0.173s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) using defaults
+[0.194s] Level 5:colcon.colcon_core.verb:set package 'interfaces_hmm_sim' build argument 'cmake_args' from command line to 'None'
+[0.194s] Level 5:colcon.colcon_core.verb:set package 'interfaces_hmm_sim' build argument 'cmake_target' from command line to 'None'
+[0.194s] Level 5:colcon.colcon_core.verb:set package 'interfaces_hmm_sim' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.194s] Level 5:colcon.colcon_core.verb:set package 'interfaces_hmm_sim' build argument 'cmake_clean_cache' from command line to 'False'
+[0.194s] Level 5:colcon.colcon_core.verb:set package 'interfaces_hmm_sim' build argument 'cmake_clean_first' from command line to 'False'
+[0.194s] Level 5:colcon.colcon_core.verb:set package 'interfaces_hmm_sim' build argument 'cmake_force_configure' from command line to 'False'
+[0.194s] Level 5:colcon.colcon_core.verb:set package 'interfaces_hmm_sim' build argument 'ament_cmake_args' from command line to 'None'
+[0.194s] Level 5:colcon.colcon_core.verb:set package 'interfaces_hmm_sim' build argument 'catkin_cmake_args' from command line to 'None'
+[0.194s] Level 5:colcon.colcon_core.verb:set package 'interfaces_hmm_sim' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.194s] DEBUG:colcon.colcon_core.verb:Building package 'interfaces_hmm_sim' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/maverick/LMCO/tmm-mas/sim/ROS2/build/interfaces_hmm_sim', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim', 'merge_install': False, 'path': '/home/maverick/LMCO/tmm-mas/sim/ROS2/interfaces_hmm_sim', 'symlink_install': False, 'test_result_base': None}
+[0.194s] Level 5:colcon.colcon_core.verb:set package 'ltl_automaton_msgs' build argument 'cmake_args' from command line to 'None'
+[0.194s] Level 5:colcon.colcon_core.verb:set package 'ltl_automaton_msgs' build argument 'cmake_target' from command line to 'None'
+[0.194s] Level 5:colcon.colcon_core.verb:set package 'ltl_automaton_msgs' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.194s] Level 5:colcon.colcon_core.verb:set package 'ltl_automaton_msgs' build argument 'cmake_clean_cache' from command line to 'False'
+[0.194s] Level 5:colcon.colcon_core.verb:set package 'ltl_automaton_msgs' build argument 'cmake_clean_first' from command line to 'False'
+[0.194s] Level 5:colcon.colcon_core.verb:set package 'ltl_automaton_msgs' build argument 'cmake_force_configure' from command line to 'False'
+[0.194s] Level 5:colcon.colcon_core.verb:set package 'ltl_automaton_msgs' build argument 'ament_cmake_args' from command line to 'None'
+[0.194s] Level 5:colcon.colcon_core.verb:set package 'ltl_automaton_msgs' build argument 'catkin_cmake_args' from command line to 'None'
+[0.194s] Level 5:colcon.colcon_core.verb:set package 'ltl_automaton_msgs' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.195s] DEBUG:colcon.colcon_core.verb:Building package 'ltl_automaton_msgs' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_msgs', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs', 'merge_install': False, 'path': '/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_msgs', 'symlink_install': False, 'test_result_base': None}
+[0.195s] Level 5:colcon.colcon_core.verb:set package 'ltl_automaton_planner' build argument 'cmake_args' from command line to 'None'
+[0.195s] Level 5:colcon.colcon_core.verb:set package 'ltl_automaton_planner' build argument 'cmake_target' from command line to 'None'
+[0.195s] Level 5:colcon.colcon_core.verb:set package 'ltl_automaton_planner' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.195s] Level 5:colcon.colcon_core.verb:set package 'ltl_automaton_planner' build argument 'cmake_clean_cache' from command line to 'False'
+[0.195s] Level 5:colcon.colcon_core.verb:set package 'ltl_automaton_planner' build argument 'cmake_clean_first' from command line to 'False'
+[0.195s] Level 5:colcon.colcon_core.verb:set package 'ltl_automaton_planner' build argument 'cmake_force_configure' from command line to 'False'
+[0.195s] Level 5:colcon.colcon_core.verb:set package 'ltl_automaton_planner' build argument 'ament_cmake_args' from command line to 'None'
+[0.195s] Level 5:colcon.colcon_core.verb:set package 'ltl_automaton_planner' build argument 'catkin_cmake_args' from command line to 'None'
+[0.195s] Level 5:colcon.colcon_core.verb:set package 'ltl_automaton_planner' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.195s] DEBUG:colcon.colcon_core.verb:Building package 'ltl_automaton_planner' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner', 'merge_install': False, 'path': '/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_planner', 'symlink_install': False, 'test_result_base': None}
+[0.195s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[0.196s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[0.196s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_msgs' with build type 'ament_cmake'
+[0.196s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_msgs'
+[0.197s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[0.197s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.197s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.198s] DEBUG:colcon.colcon_core.shell:Ignoring prefix path '/home/maverick/ros2_ws/install'
+[0.199s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/home/maverick/LMCO/tmm-mas/sim/ROS2/interfaces_hmm_sim' with build type 'ament_cmake'
+[0.199s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/home/maverick/LMCO/tmm-mas/sim/ROS2/interfaces_hmm_sim'
+[0.199s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.199s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.200s] DEBUG:colcon.colcon_core.shell:Ignoring prefix path '/home/maverick/ros2_ws/install'
+[0.204s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_msgs': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_msgs -DCMAKE_INSTALL_PREFIX=/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs
+[0.208s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/maverick/LMCO/tmm-mas/sim/ROS2/build/interfaces_hmm_sim': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/maverick/LMCO/tmm-mas/sim/ROS2/build/interfaces_hmm_sim -- -j16 -l16
+[0.431s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/maverick/LMCO/tmm-mas/sim/ROS2/build/interfaces_hmm_sim' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/maverick/LMCO/tmm-mas/sim/ROS2/build/interfaces_hmm_sim -- -j16 -l16
+[0.437s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/maverick/LMCO/tmm-mas/sim/ROS2/build/interfaces_hmm_sim': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/maverick/LMCO/tmm-mas/sim/ROS2/build/interfaces_hmm_sim
+[0.471s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(interfaces_hmm_sim)
+[0.472s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/maverick/LMCO/tmm-mas/sim/ROS2/build/interfaces_hmm_sim' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/maverick/LMCO/tmm-mas/sim/ROS2/build/interfaces_hmm_sim
+[0.473s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim' for CMake module files
+[0.473s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim' for CMake config files
+[0.473s] Level 1:colcon.colcon_core.shell:create_environment_hook('interfaces_hmm_sim', 'cmake_prefix_path')
+[0.474s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/hook/cmake_prefix_path.ps1'
+[0.474s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/hook/cmake_prefix_path.dsv'
+[0.474s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/hook/cmake_prefix_path.sh'
+[0.475s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/lib'
+[0.475s] Level 1:colcon.colcon_core.shell:create_environment_hook('interfaces_hmm_sim', 'ld_library_path_lib')
+[0.475s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/hook/ld_library_path_lib.ps1'
+[0.475s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/hook/ld_library_path_lib.dsv'
+[0.475s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/hook/ld_library_path_lib.sh'
+[0.476s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/bin'
+[0.476s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/lib/pkgconfig/interfaces_hmm_sim.pc'
+[0.476s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/lib/python3.10/site-packages'
+[0.476s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/bin'
+[0.476s] INFO:colcon.colcon_core.shell:Creating package script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/package.ps1'
+[0.477s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/package.dsv'
+[0.477s] INFO:colcon.colcon_core.shell:Creating package script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/package.sh'
+[0.477s] INFO:colcon.colcon_core.shell:Creating package script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/package.bash'
+[0.478s] INFO:colcon.colcon_core.shell:Creating package script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/package.zsh'
+[0.478s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/colcon-core/packages/interfaces_hmm_sim)
+[0.478s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(interfaces_hmm_sim)
+[0.479s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim' for CMake module files
+[0.479s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim' for CMake config files
+[0.479s] Level 1:colcon.colcon_core.shell:create_environment_hook('interfaces_hmm_sim', 'cmake_prefix_path')
+[0.479s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/hook/cmake_prefix_path.ps1'
+[0.479s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/hook/cmake_prefix_path.dsv'
+[0.480s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/hook/cmake_prefix_path.sh'
+[0.480s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/lib'
+[0.480s] Level 1:colcon.colcon_core.shell:create_environment_hook('interfaces_hmm_sim', 'ld_library_path_lib')
+[0.480s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/hook/ld_library_path_lib.ps1'
+[0.480s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/hook/ld_library_path_lib.dsv'
+[0.480s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/hook/ld_library_path_lib.sh'
+[0.481s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/bin'
+[0.481s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/lib/pkgconfig/interfaces_hmm_sim.pc'
+[0.481s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/lib/python3.10/site-packages'
+[0.481s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/bin'
+[0.481s] INFO:colcon.colcon_core.shell:Creating package script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/package.ps1'
+[0.481s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/package.dsv'
+[0.482s] INFO:colcon.colcon_core.shell:Creating package script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/package.sh'
+[0.482s] INFO:colcon.colcon_core.shell:Creating package script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/package.bash'
+[0.482s] INFO:colcon.colcon_core.shell:Creating package script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/interfaces_hmm_sim/package.zsh'
+[0.482s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/maverick/LMCO/tmm-mas/sim/ROS2/install/interfaces_hmm_sim/share/colcon-core/packages/interfaces_hmm_sim)
+[1.556s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_msgs' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_msgs -DCMAKE_INSTALL_PREFIX=/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs
+[1.557s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_msgs': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_msgs -- -j16 -l16
+[5.807s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_msgs' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_msgs -- -j16 -l16
+[5.808s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_msgs': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_msgs
+[5.872s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(ltl_automaton_msgs)
+[5.872s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_msgs' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_msgs
+[5.872s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs' for CMake module files
+[5.873s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs' for CMake config files
+[5.873s] Level 1:colcon.colcon_core.shell:create_environment_hook('ltl_automaton_msgs', 'cmake_prefix_path')
+[5.873s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/hook/cmake_prefix_path.ps1'
+[5.874s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/hook/cmake_prefix_path.dsv'
+[5.874s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/hook/cmake_prefix_path.sh'
+[5.874s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/lib'
+[5.874s] Level 1:colcon.colcon_core.shell:create_environment_hook('ltl_automaton_msgs', 'ld_library_path_lib')
+[5.874s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/hook/ld_library_path_lib.ps1'
+[5.874s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/hook/ld_library_path_lib.dsv'
+[5.875s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/hook/ld_library_path_lib.sh'
+[5.875s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/bin'
+[5.875s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/lib/pkgconfig/ltl_automaton_msgs.pc'
+[5.875s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/lib/python3.10/site-packages'
+[5.875s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/bin'
+[5.875s] INFO:colcon.colcon_core.shell:Creating package script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/package.ps1'
+[5.876s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/package.dsv'
+[5.876s] INFO:colcon.colcon_core.shell:Creating package script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/package.sh'
+[5.876s] INFO:colcon.colcon_core.shell:Creating package script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/package.bash'
+[5.876s] INFO:colcon.colcon_core.shell:Creating package script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/package.zsh'
+[5.876s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/colcon-core/packages/ltl_automaton_msgs)
+[5.877s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(ltl_automaton_msgs)
+[5.877s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs' for CMake module files
+[5.877s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs' for CMake config files
+[5.877s] Level 1:colcon.colcon_core.shell:create_environment_hook('ltl_automaton_msgs', 'cmake_prefix_path')
+[5.877s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/hook/cmake_prefix_path.ps1'
+[5.878s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/hook/cmake_prefix_path.dsv'
+[5.878s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/hook/cmake_prefix_path.sh'
+[5.878s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/lib'
+[5.878s] Level 1:colcon.colcon_core.shell:create_environment_hook('ltl_automaton_msgs', 'ld_library_path_lib')
+[5.878s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/hook/ld_library_path_lib.ps1'
+[5.878s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/hook/ld_library_path_lib.dsv'
+[5.879s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/hook/ld_library_path_lib.sh'
+[5.879s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/bin'
+[5.879s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/lib/pkgconfig/ltl_automaton_msgs.pc'
+[5.879s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/lib/python3.10/site-packages'
+[5.879s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/bin'
+[5.879s] INFO:colcon.colcon_core.shell:Creating package script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/package.ps1'
+[5.880s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/package.dsv'
+[5.880s] INFO:colcon.colcon_core.shell:Creating package script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/package.sh'
+[5.880s] INFO:colcon.colcon_core.shell:Creating package script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/package.bash'
+[5.880s] INFO:colcon.colcon_core.shell:Creating package script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/ltl_automaton_msgs/package.zsh'
+[5.880s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/share/colcon-core/packages/ltl_automaton_msgs)
+[5.881s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_planner' with build type 'ament_python'
+[5.881s] Level 1:colcon.colcon_core.shell:create_environment_hook('ltl_automaton_planner', 'ament_prefix_path')
+[5.881s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/share/ltl_automaton_planner/hook/ament_prefix_path.ps1'
+[5.881s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/share/ltl_automaton_planner/hook/ament_prefix_path.dsv'
+[5.881s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/share/ltl_automaton_planner/hook/ament_prefix_path.sh'
+[5.882s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[5.882s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[5.882s] DEBUG:colcon.colcon_core.shell:Ignoring prefix path '/home/maverick/ros2_ws/install'
+[6.029s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_planner'
+[6.029s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[6.029s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[6.029s] DEBUG:colcon.colcon_core.shell:Ignoring prefix path '/home/maverick/ros2_ws/install'
+[6.229s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_planner': AMENT_PREFIX_PATH=/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs:${CMAKE_PREFIX_PATH} LD_LIBRARY_PATH=/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/lib:/home/maverick/ros2_ws/install/interfaces_hmm_sim/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib:/home/maverick/Downloads/isaacsim PYTHONPATH=/home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages:/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/ltl_automaton_planner build --build-base /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build install --record /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/install.log --single-version-externally-managed install_data
+[6.394s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner' for CMake module files
+[6.394s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/maverick/LMCO/tmm-mas/sim/ROS2/lmco/ltl_automaton_planner' returned '0': AMENT_PREFIX_PATH=/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs:${CMAKE_PREFIX_PATH} LD_LIBRARY_PATH=/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/lib:/home/maverick/ros2_ws/install/interfaces_hmm_sim/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib:/home/maverick/Downloads/isaacsim PYTHONPATH=/home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages:/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_msgs/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/ltl_automaton_planner build --build-base /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/build install --record /home/maverick/LMCO/tmm-mas/sim/ROS2/build/ltl_automaton_planner/install.log --single-version-externally-managed install_data
+[6.394s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner' for CMake config files
+[6.395s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib'
+[6.395s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/bin'
+[6.395s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/pkgconfig/ltl_automaton_planner.pc'
+[6.395s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/lib/python3.10/site-packages'
+[6.395s] Level 1:colcon.colcon_core.shell:create_environment_hook('ltl_automaton_planner', 'pythonpath')
+[6.395s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/share/ltl_automaton_planner/hook/pythonpath.ps1'
+[6.395s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/share/ltl_automaton_planner/hook/pythonpath.dsv'
+[6.396s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/share/ltl_automaton_planner/hook/pythonpath.sh'
+[6.396s] Level 1:colcon.colcon_core.environment:checking '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/bin'
+[6.396s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(ltl_automaton_planner)
+[6.396s] INFO:colcon.colcon_core.shell:Creating package script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/share/ltl_automaton_planner/package.ps1'
+[6.396s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/share/ltl_automaton_planner/package.dsv'
+[6.397s] INFO:colcon.colcon_core.shell:Creating package script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/share/ltl_automaton_planner/package.sh'
+[6.397s] INFO:colcon.colcon_core.shell:Creating package script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/share/ltl_automaton_planner/package.bash'
+[6.397s] INFO:colcon.colcon_core.shell:Creating package script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/share/ltl_automaton_planner/package.zsh'
+[6.397s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/maverick/LMCO/tmm-mas/sim/ROS2/install/ltl_automaton_planner/share/colcon-core/packages/ltl_automaton_planner)
+[6.397s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[6.398s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[6.398s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '0'
+[6.398s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[6.401s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[6.401s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[6.401s] INFO:colcon.colcon_notification.desktop_notification:Sending desktop notification using 'notify2'
+[6.407s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[6.407s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/local_setup.ps1'
+[6.408s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/_local_setup_util_ps1.py'
+[6.409s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/setup.ps1'
+[6.409s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/local_setup.sh'
+[6.410s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/_local_setup_util_sh.py'
+[6.410s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/setup.sh'
+[6.410s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/local_setup.bash'
+[6.411s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/setup.bash'
+[6.411s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/local_setup.zsh'
+[6.411s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/maverick/LMCO/tmm-mas/sim/ROS2/install/setup.zsh'

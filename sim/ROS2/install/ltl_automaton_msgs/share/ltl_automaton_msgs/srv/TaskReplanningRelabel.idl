@@ -1,0 +1,23 @@
+// generated from rosidl_adapter/resource/srv.idl.em
+// with input from ltl_automaton_msgs/srv/TaskReplanningRelabel.srv
+// generated code does not contain a copyright notice
+
+#include "ltl_automaton_msgs/msg/LTLPlan.idl"
+#include "ltl_automaton_msgs/msg/TransitionSystemState.idl"
+
+module ltl_automaton_msgs {
+  module srv {
+    struct TaskReplanningRelabel_Request {
+      sequence<string> state;
+
+      sequence<string> label;
+
+      ltl_automaton_msgs::msg::TransitionSystemState current_state;
+    };
+    struct TaskReplanningRelabel_Response {
+      boolean success;
+
+      ltl_automaton_msgs::msg::LTLPlan new_plan;
+    };
+  };
+};
