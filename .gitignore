@@ -4,5 +4,6 @@
 Small_Enviornment-Multiagent.usd
 # Ignore file with full WSL path
 *.usd
+echo "sim/environments/*.usd" >> .gitignore
 
 /home/maverick/Ubuntu/virtualenvs_DockerIMGS/my_jupyter_environment/tmm-mas/Small_Enviornment-Multiagent.usd
