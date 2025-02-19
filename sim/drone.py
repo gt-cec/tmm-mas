@@ -44,6 +44,11 @@ class Drone:
         self.dx = [key[i][1] for i in x_grid]
         self.dz = dz
         self.flags = flags
+    
+    def getPath(self):
+        x_values = self.x_grid
+        y_values = self.y_grid
+        return [[x, y] for x, y in zip(x_values, y_values)]
 
     def setPID(self, PID: list, zPID: list) -> None:
         self.PID = PID

@@ -16,8 +16,10 @@ simulation_app = SimulationApp(CONFIG)
 
 import argparse
 import sys
+import time
 import numpy as np
 import csv
+import json
 
 import carb
 import omni
@@ -38,7 +40,7 @@ from ltl_automaton_msgs.msg import TransitionSystemState, TransitionSystemStateS
 
 import drone
 import helper as hp
-from helper import parse_action_sequence, print_state, read_selected_columns
+from helper import elapsed_time, parse_action_sequence, print_state, read_selected_columns
 
 ####################################################################################################
 ##### User Inputs #####
@@ -68,6 +70,35 @@ init_grid_poses = [(0,0),(4,3),(3,2)]
 
 bumps = [(3,1),(4,1),(5,2),(5,3),(2,4),(3,4)] #Difficult terrain points as list of ordered pairs: (y,x)
 blocks = [(2,2),(0,4)]
+
+## JSON function
+
+filename_json = "simulation_data.json"
+
+def generate_json(start_time, robots, filname):
+    data = {
+        "simulator time": elapsed_time(start_time),
+        "robots": {}
+    }
+    for robot_id, robot_data in robots.items():
+        data["robots"][robot_id] = {
+            "plan": robot_data["plan"],
+            "plan index": robot_data["plan index"],
+            "immediate goal": robot_data["immediate goal"],
+            "x": robot_data["x"],
+            "y": robot_data["y"]
+        }
+    json_output = json.dumps(data, indent=4)
+
+    #######################################
+    ### Edit these lines to output JSON ###
+
+    with open(filname, "w") as f:
+        f.write(json_output)
+
+    #######################################
+
+    return json_output
 
 ####################################################################################################
 ##### ROS2 Setup #####
@@ -209,6 +240,9 @@ zPID = [kp_z,0,kd_z]
 ####################################################################################################
 ##### Initializations #####
 
+start_time = time.time()
+next_print_time = start_time + 10
+
 wait_val = 40
 
 start = False
@@ -224,6 +258,8 @@ finalgoal_check = []
 init_start = []
 wait_count = []
 quad_count = 1
+robots_JSON = {}
+        
 for path in quad_path_list:
     print(f"Initializing quad{quad_count}...")
     drone_new = drone.Drone(f"quad{quad_count}",quad_path_list[quad_count-1],PID,zPID)
@@ -241,7 +277,18 @@ for path in quad_path_list:
     init_start.append(False)
     quad_list.append(quad_new)
     wait_count.append(wait_val)
+
+    robot_id = drone_new.name
+    plan = drone_new.getPath()
+    robots_JSON[robot_id] = {
+        "plan": plan,
+        "plan_index": 1,
+        "immediate_goal": plan[1],
+        "x": plan[0],
+        "y": plan[0]
+    }
     quad_count += 1
+out_json = generate_json(start_time, robots_JSON, filename_json)
 
 print("Agents created!")
 
@@ -283,6 +330,7 @@ while rclpy.ok():
     input = carb.input.acquire_input_interface()
     input.subscribe_to_keyboard_events(appwindow.get_keyboard(), keyboard_event)
 
+    robots_JSON = {}
 
     if start:
         drone_count = 0
@@ -318,15 +366,7 @@ while rclpy.ok():
 
             flags = drone_obj.flags
 
-            # json_data = {
-            #     "robot_name": robot_name,
-            #     "x_coord": current_pose[0],
-            #     "y_coord": current_pose[0],
-            #     "time_step": dind,
-            #     "time_remaining": steps
-            # }
-
-            
+          
 
             if quad["rb"] and dind < len(dx):
 
@@ -435,6 +475,17 @@ while rclpy.ok():
                 quad["rb"].GetVelocityAttr().Set(vel)
 
             quad["info"] = drone_obj
+            robot_id = drone_obj.name
+            plan = drone_obj.getPath()
+            curr_ind = dind if dind > 0 else 0
+            robots_JSON[robot_id] = {
+                "plan": plan,
+                "plan_index": dind,
+                "immediate_goal": plan[dind],
+                "x": plan[curr_ind],
+                "y": plan[curr_ind]
+            }
+
             drone_count += 1
 
             # Publish drone poses
@@ -445,6 +496,11 @@ while rclpy.ok():
         vel = Gf.Vec3f(0,0,0)
         for quad in quad_list:
             quad["rb"].GetVelocityAttr().Set(vel) 
+
+    current_time = time.time()
+    if current_time >= next_print_time:
+        json_output = generate_json(current_time, robots_JSON)
+        next_print_time += 10
         
 
     world.step(render=True)
