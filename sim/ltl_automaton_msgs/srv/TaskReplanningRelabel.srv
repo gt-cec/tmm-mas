@@ -1,9 +1,0 @@
-string[] state
-string[] label
-
-TransitionSystemState current_state
-
----
-
-bool success
-LTLPlan new_plan

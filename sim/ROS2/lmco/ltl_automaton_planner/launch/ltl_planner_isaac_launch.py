@@ -15,7 +15,7 @@ def generate_launch_description():
     current_file_dir = os.path.dirname(os.path.realpath(__file__))
     
     # Navigate up to the src directory
-    workspace_dir = os.path.join('/home/haris/ros2_ws/', 'src/lmco')
+    workspace_dir = os.path.join('/home/maverick/ros2_ws/', 'src/lmco')
     package_src_dir = os.path.join(workspace_dir, 'ltl_automaton_planner')
     config_dir = os.path.join(package_src_dir, 'config')
 

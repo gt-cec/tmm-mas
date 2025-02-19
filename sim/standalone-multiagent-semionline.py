@@ -75,7 +75,7 @@ blocks = [(2,2),(0,4)]
 
 filename_json = "simulation_data.json"
 
-def generate_json(start_time, robots, filname):
+def generate_json(start_time, robots, filename):
     data = {
         "simulator time": elapsed_time(start_time),
         "robots": {}
@@ -83,8 +83,8 @@ def generate_json(start_time, robots, filname):
     for robot_id, robot_data in robots.items():
         data["robots"][robot_id] = {
             "plan": robot_data["plan"],
-            "plan index": robot_data["plan index"],
-            "immediate goal": robot_data["immediate goal"],
+            "plan_index": robot_data["plan_index"],
+            "immediate_goal": robot_data["immediate_goal"],
             "x": robot_data["x"],
             "y": robot_data["y"]
         }
@@ -93,7 +93,7 @@ def generate_json(start_time, robots, filname):
     #######################################
     ### Edit these lines to output JSON ###
 
-    with open(filname, "w") as f:
+    with open(filename, "w") as f:
         f.write(json_output)
 
     #######################################
@@ -499,7 +499,7 @@ while rclpy.ok():
 
     current_time = time.time()
     if current_time >= next_print_time:
-        json_output = generate_json(current_time, robots_JSON)
+        json_output = generate_json(current_time, robots_JSON, filename_json)
         next_print_time += 10
         
 

@@ -1,4 +1,0 @@
-source;share/ltl_automaton_msgs/environment/ament_prefix_path.sh
-source;share/ltl_automaton_msgs/environment/library_path.sh
-source;share/ltl_automaton_msgs/environment/path.sh
-source;share/ltl_automaton_msgs/environment/pythonpath.sh
