@@ -22,6 +22,7 @@ import numpy as np
 import time
 import csv
 from example_interfaces.srv import AddTwoInts
+from interfaces_hmm_sim.msg import Status
 #=================================================================
 #  Interfaces between LTL planner node and lower level controls
 #                       -----------------
@@ -31,6 +32,7 @@ from example_interfaces.srv import AddTwoInts
 # action attributes defined in the TS config file
 #=================================================================
 
+USE_ISAAC = False
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -130,6 +132,11 @@ class LTLControllerDrone(Node):
             'replanning_response',
             self.relay_callback,
             10)
+        self.status_sub = self.create_subscription(
+            Status,
+            'status',
+            self.status_callback,
+            10)
         
         self.relay_pub = self.create_publisher(RelayRequest, 'replanning_request', 10)
         self.on_hold = False
@@ -165,6 +172,9 @@ class LTLControllerDrone(Node):
         #         'BN Result of add_two_ints: for %d + %d = %d' %
         #         (20, 32, response.sum))
         self.create_timer(1.0/10, self.simulate)
+        self.sim_arrived = False
+        self.sim_received = False
+        self.sim_start = False
         # self.simulate()
     
     
@@ -193,6 +203,18 @@ class LTLControllerDrone(Node):
             self.suffix_action_list = msg.new_plan_suffix.action_sequence
             self.suffix_state_sequence = msg.new_plan_suffix.ts_state_sequence
             self.on_hold = False
+
+    def status_callback(self, msg):
+        self.sim_arrived = msg.arrived
+        self.sim_received = msg.replan_received
+        self.sim_start = msg.start
+        if (self.sim_arrived):
+            self.get_logger().info("sim action complete")
+        elif (self.sim_received):
+            self.get_logger().info("sim replan received")
+        # elif (self.sim_start):
+        #     self.get_logger().info("sim started")
+
 
     def next_move(self):
         # if self.plan_index > 20 and self.pose == (grid_size/2-1, grid_size/2-1): #self.len(self.prefix_action_list) + len(self.suffix_action_list):
@@ -505,7 +527,15 @@ class LTLControllerDrone(Node):
             if (self.get_clock().now().nanoseconds - self.t_sim.nanoseconds) / 1e9 >= self.next_interval/50:      
                 # self.get_logger().info(f"self.on_hold: {self.on_hold}")
                 if self.on_hold == False:             
-                    self.next_move()
+                    if USE_ISAAC:
+                        if (self.sim_arrived or self.sim_received or self.sim_start):
+                            # self.get_logger().info(f"Sim status: {self.sim_arrived}")
+                            self.next_move()
+                            self.sim_arrived = False
+                            self.sim_received = False
+                            self.sim_start = False
+                    else: self.next_move()
+
                 self.t_sim = self.get_clock().now()    
                 if self.pose != self.previous_pose:
                     if (self.previous_pose, self.pose) in self.world.bump or (self.pose, self.pose) in self.world.bump:
