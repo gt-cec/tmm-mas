@@ -74,32 +74,32 @@ blocks = [(2,2),(0,4)]
 ## JSON function
 
 #Harris JSON save
-filename_json = "simulation_data.json"
+# filename_json = "simulation_data.json"
 
-def generate_json(start_time, robots, filename):
-    data = {
-        "simulator time": elapsed_time(start_time),
-        "robots": {}
-    }
-    for robot_id, robot_data in robots.items():
-        data["robots"][robot_id] = {
-            "plan": robot_data["plan"],
-            "plan_index": robot_data["plan_index"],
-            "immediate_goal": robot_data["immediate_goal"],
-            "x": robot_data["x"],
-            "y": robot_data["y"]
-        }
-    json_output = json.dumps(data, indent=4)
+# def generate_json(start_time, robots, filename):
+#     data = {
+#         "simulator time": elapsed_time(start_time),
+#         "robots": {}
+#     }
+#     for robot_id, robot_data in robots.items():
+#         data["robots"][robot_id] = {
+#             "plan": robot_data["plan"],
+#             "plan_index": robot_data["plan_index"],
+#             "immediate_goal": robot_data["immediate_goal"],
+#             "x": robot_data["x"],
+#             "y": robot_data["y"]
+#         }
+#     json_output = json.dumps(data, indent=4)
 
-    #######################################
-    ### Edit these lines to output JSON ###
+#     #######################################
+#     ### Edit these lines to output JSON ###
 
-    with open(filename, "w") as f:
-        f.write(json_output)
+#     with open(filename, "w") as f:
+#         f.write(json_output)
 
-    #######################################
+#     #######################################
 
-    return json_output
+#     return json_output
 
 
 
@@ -166,7 +166,8 @@ def generate_json(start_time, robots):
             "plan_index": robot_data["plan_index"],
             "immediate_goal": robot_data["immediate_goal"],
             "x": robot_data["x"],
-            "y": robot_data["y"]
+            "y": robot_data["y"],
+            "mission_time": robot_data["mission_time"]
         }
 
     json_output = json.dumps(data, indent=4)
@@ -371,7 +372,8 @@ for path in quad_path_list:
         "plan_index": 1,
         "immediate_goal": plan[1],
         "x": plan[0],
-        "y": plan[0]
+        "y": plan[0],
+        "mission_data": len(plan)-1-1
     }
     quad_count += 1
 # out_json = generate_json(start_time, robots_JSON, filename_json)
@@ -570,7 +572,8 @@ while rclpy.ok():
                 "plan_index": dind,
                 "immediate_goal": plan[dind],
                 "x": plan[curr_ind],
-                "y": plan[curr_ind]
+                "y": plan[curr_ind],
+                "mission_time": len(plan)-dind-1
             }
 
             drone_count += 1
