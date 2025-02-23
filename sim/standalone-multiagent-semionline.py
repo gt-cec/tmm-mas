@@ -373,7 +373,7 @@ for path in quad_path_list:
         "immediate_goal": plan[1],
         "x": plan[0],
         "y": plan[0],
-        "mission_data": len(plan)-1-1
+        "mission_time": len(plan)-1-1
     }
     quad_count += 1
 # out_json = generate_json(start_time, robots_JSON, filename_json)
