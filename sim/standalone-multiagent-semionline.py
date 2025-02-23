@@ -73,6 +73,7 @@ blocks = [(2,2),(0,4)]
 
 ## JSON function
 
+#Harris JSON save
 filename_json = "simulation_data.json"
 
 def generate_json(start_time, robots, filename):
@@ -99,6 +100,91 @@ def generate_json(start_time, robots, filename):
     #######################################
 
     return json_output
+
+
+
+
+# # server code Alag
+# import json
+# import requests
+# import time
+
+# # Flask server URL (change if needed)
+# SERVER_URL = "http://127.0.0.1:5211/receive_data"
+
+# def generate_json(start_time, robots):
+#     data = {
+#         "simulator time": elapsed_time(start_time),
+#         "robots": {}
+#     }
+#     for robot_id, robot_data in robots.items():
+#         data["robots"][robot_id] = {
+#             "plan": robot_data["plan"],
+#             "plan_index": robot_data["plan_index"],
+#             "immediate_goal": robot_data["immediate_goal"],
+#             "x": robot_data["x"],
+#             "y": robot_data["y"]
+#         }
+
+#     json_output = json.dumps(data, indent=4)
+
+#     # Send JSON data to Flask server instead of saving it to a file
+#     try:
+#         response = requests.post(SERVER_URL, json=data)
+#         if response.status_code == 200:
+#             print("✅ JSON data sent successfully!")
+#         else:
+#             print(f"❌ Failed to send data - Status: {response.status_code}")
+#     except requests.exceptions.RequestException as e:
+#         print(f"⚠️ Error sending data: {e}")
+
+#     # Wait 5 seconds before the next send
+#     time.sleep(5)
+
+#     return json_output
+
+
+
+# Save each JSON as a separate file in a folder; To be used by UI team without setup
+
+import json
+import os
+
+# Directory to store JSON files
+output_dir = "robot_jsons"
+os.makedirs(output_dir, exist_ok=True)
+
+def generate_json(start_time, robots):
+    data = {
+        "simulator time": elapsed_time(start_time),
+        "robots": {}
+    }
+    
+    for robot_id, robot_data in robots.items():
+        data["robots"][robot_id] = {
+            "plan": robot_data["plan"],
+            "plan_index": robot_data["plan_index"],
+            "immediate_goal": robot_data["immediate_goal"],
+            "x": robot_data["x"],
+            "y": robot_data["y"]
+        }
+
+    json_output = json.dumps(data, indent=4)
+
+    # Find the next available index for naming the file
+    existing_files = [int(f.split("_")[-1].split(".")[0]) for f in os.listdir(output_dir) if f.startswith("robot_data_") and f.endswith(".json")]
+    next_index = max(existing_files) + 1 if existing_files else 1
+
+    # Save JSON file
+    file_path = os.path.join(output_dir, f"robot_data_{next_index}.json")
+    with open(file_path, "w") as f:
+        f.write(json_output)
+
+    print(f"Saved: {file_path}")
+    return json_output
+
+
+
 
 ####################################################################################################
 ##### ROS2 Setup #####
@@ -288,7 +374,8 @@ for path in quad_path_list:
         "y": plan[0]
     }
     quad_count += 1
-out_json = generate_json(start_time, robots_JSON, filename_json)
+# out_json = generate_json(start_time, robots_JSON, filename_json)
+out_json = generate_json(start_time, robots_JSON)
 
 print("Agents created!")
 
@@ -499,7 +586,8 @@ while rclpy.ok():
 
     current_time = time.time()
     if current_time >= next_print_time:
-        json_output = generate_json(current_time, robots_JSON, filename_json)
+        # json_output = generate_json(current_time, robots_JSON, filename_json)
+        json_output = generate_json(current_time, robots_JSON)
         next_print_time += 10
         
 
