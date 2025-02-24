@@ -20,6 +20,10 @@ socketio = SocketIO(app)
 # Global variables
 # set mission time based on JSON, check it out, some 75-82
 last_mission_times = {1: 51, 2: 49, 3: 47}
+# last_mission_times = {1: 76, 2: 80, 3: 72}
+
+
+
 input_file_paths = {
     1: 'formatted_robot1.csv',
     2: 'formatted_robot2.csv',
@@ -27,6 +31,13 @@ input_file_paths = {
 }
 
 hmm_arrays = {robot_id: generate_hmm_arrays(input_file_paths[robot_id]) for robot_id in range(1, 4)}
+print("hmm_arrays",hmm_arrays)
+
+
+
+
+
+
 previous_robot_states = {}
 current_robot_states = {
     "robots": {
@@ -44,9 +55,14 @@ def play_recorded(data):
     global initial_data, current_robot_states
     print("Received message to start processing:", data)
     if data:
+
+
+
         dfs = {robot_id: pd.read_csv(input_file_paths[robot_id], header=None) for robot_id in range(1, 4)}
-        # print(dfs)
+        print("dfs",dfs)
         active_robots = {robot_id: True for robot_id in dfs}  # Tracking active robots
+        print("Active_robots",active_robots)
+
 
         i = 0  
         while any(active_robots.values()):  # Continue as long as any robot is active

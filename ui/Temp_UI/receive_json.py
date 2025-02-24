@@ -45,6 +45,30 @@ def receive_data():
         print(f"❌ Error: {e}")
         return jsonify({"message": "Failed to process data", "error": str(e)}), 500
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5211)
 
