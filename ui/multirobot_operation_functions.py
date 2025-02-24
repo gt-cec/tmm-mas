@@ -3,89 +3,225 @@
 import numpy as np
 import pandas as pd
 
-def generate_rmm_array_for_row(shmm_row, index):
-    position_values = shmm_row[0]
-    time_value = shmm_row[1]
-    mission_time_value = shmm_row[2]
 
-    position_noise = np.random.normal(0, 1)
-    time_noise = np.random.normal(0, 3)
 
-    position_value1 = int(np.round(np.abs(position_values[0] + position_noise)))
-    position_value2 = int(np.round(np.abs(position_values[1] + np.random.normal(0, 0.1))))
-    time_taken = round((np.abs(time_value + time_noise)), 2)
-    mission_tim = int(mission_time_value)
 
-    position_value1 = np.clip(position_value1, 0, 5)
-    position_value2 = np.clip(position_value2, 0, 3)
+import re
 
-    rmm_array = [index, position_value1, position_value2, time_taken, mission_tim]
+def select_hmm_row(processed_data, robot_number, row_index):
+    """
+    Selects a specific row from processed robot data using a numeric robot ID.
+
+    :param processed_data: Dict containing processed robot data.
+    :param robot_number: Integer robot ID (1, 2, 3).
+    :param row_index: Index of the row to select.
+    :return: The selected row dictionary.
+    """
+    robot_id = f"quad{robot_number}"  # Map 1 → quad1, 2 → quad2, etc.
+
+    if robot_id not in processed_data:
+        print(f"❌ Robot {robot_id} not found!")
+        return None
+
+    robot_data = processed_data[robot_id]
+
+    if 0 <= row_index < len(robot_data):
+        return robot_data[row_index]
+    else:
+        print(f"❌ Row index {row_index} out of range for {robot_id}.")
+        return None
+
+
+def create_hmm_array_reformat(row_data):
+    """
+    Extracts and formats 'formatted_pos', 'interval', and 'mission_time' into an HMM array.
+
+    :param row_data: The dictionary row containing robot data.
+    :return: List containing formatted values for HMM processing.
+    """
+    if not row_data:
+        print("❌ Invalid row data provided!")
+        return None
+
+    # Extract numbers from formatted_pos (convert from string to tuple)
+    pos_match = re.findall(r"-?\d+", row_data["formatted_pos"])  
+    formatted_position = tuple(map(int, pos_match)) if pos_match else (None, None)
+
+    # Store in list
+    hmm_array = [formatted_position, row_data["interval"], row_data["mission_time"]]
+
+    return hmm_array
+
+
+
+# row_2_robot = select_hmm_row(processed_data, 1, row_index=2)
+# row_2_robot
+# {'formatted_pos': '([1, 1])',
+#  'interval': 0.008099555969238281,
+#  'mission_time': 76}
+
+# row_2_robot_hmm = create_hmm_array_reformat(row_2_robot)
+# row_2_robot_hmm
+# [(1, 1), 0.008099555969238281, 76]
+
+
+
+
+
+def create_rmm_array(data, robot_number, row_index):
+    """
+    Processes robot data and extracts a specific row into an RMM array.
+
+    :param data: Raw JSON data.
+    :param robot_number: Integer robot ID (1, 2, 3).
+    :param row_index: Index of the row to select.
+    :return: List containing formatted (x, y), interval, and mission_time as RMM array.
+    """
+    robot_id = f"quad{robot_number}"  # Convert number to quad ID
+
+    if "simulator time" not in data or "robots" not in data:
+        print("❌ Invalid data format!")
+        return None
+
+    if robot_id not in data["robots"]:
+        print(f"❌ Robot {robot_id} not found!")
+        return None
+
+    robot_info = data["robots"][robot_id]
+    simulator_time = data["simulator time"]
+
+    # Process positions from plan
+    positions = robot_info["plan"]  # Assuming plan includes the start point
+    processed_data = [
+        {"formatted_pos": f"({pos})", "interval": simulator_time, "mission_time": robot_info["mission_time"]}
+        for pos in positions
+    ]
+
+    if not (0 <= row_index < len(processed_data)):
+        print(f"❌ Row index {row_index} out of range for {robot_id}.")
+        return None
+
+    row_data = processed_data[row_index]
+
+    # Extract numbers from formatted_pos (convert from string to tuple)
+    pos_match = re.findall(r"-?\d+", row_data["formatted_pos"])  
+    formatted_position = tuple(map(int, pos_match)) if pos_match else (None, None)
+
+    # Create RMM array
+    rmm_array = [formatted_position, row_data["interval"], row_data["mission_time"]]
+
     return rmm_array
 
 
-def generate_hmm_arrays(input_file_path):
-    # Read the input CSV file
-    df = pd.read_csv(input_file_path, header=None)
+# robot_number = 1  # User inputs 1 for quad1
+# row_index = 2     # Select row 2
 
-    # Initialize lists to store the parsed data
-    index = []
-    position_x = []
-    position_y = []
-    time_taken = []
-    steps_remaining = []
+# rmm_array = create_rmm_array(data, robot_number, row_index)
 
-    # Parse the data
-    for i, row in df.iterrows():
-        pos = eval(row[0])  # Evaluate the position tuple (x, y)
-        index.append(i + 1)  # Create index starting from 1
-        position_x.append(pos[0])
-        position_y.append(pos[1])
-        time_taken.append(float(row[1]))
-        steps_remaining.append(int(row[2]))
+# if rmm_array:
+#     print("Final RMM Array:", rmm_array)
 
-    # Create a DataFrame with the parsed data and rename it to SHMM
-    SHMM = pd.DataFrame({
-        'Index': index,
-        'Position X': position_x,
-        'Position Y': position_y,
-        'Time Taken': time_taken,
-        'Steps Remaining': steps_remaining
-    })
 
-    # Prepare SHMM data for RMM generation
-    shmm_data = []
-    for i, row in SHMM.iterrows():
-        first_state = row['Position X']
-        second_state = row['Position Y']
-        time_elapsed = row['Time Taken']
-        steps_remaining = row['Steps Remaining']
-        mission_time = i + steps_remaining
-        shmm_data.append(((first_state, second_state), time_elapsed, mission_time))
 
-    # Prepare hmm_arrays in the desired format
-    HMM_arrays = [[i, pose[0][0], pose[0][1], round(pose[1], 2), pose[2]] for i, pose in enumerate(shmm_data)]
+# def generate_rmm_array_for_row(shmm_row, index):
+#     position_values = shmm_row[0]
+#     time_value = shmm_row[1]
+#     mission_time_value = shmm_row[2]
+
+#     position_noise = np.random.normal(0, 1)
+#     time_noise = np.random.normal(0, 3)
+
+#     position_value1 = int(np.round(np.abs(position_values[0] + position_noise)))
+#     position_value2 = int(np.round(np.abs(position_values[1] + np.random.normal(0, 0.1))))
+#     time_taken = round((np.abs(time_value + time_noise)), 2)
+#     mission_tim = int(mission_time_value)
+
+#     position_value1 = np.clip(position_value1, 0, 5)
+#     position_value2 = np.clip(position_value2, 0, 3)
+
+#     rmm_array = [index, position_value1, position_value2, time_taken, mission_tim]
+#     return rmm_array
+
+
+# def generate_hmm_arrays(input_file_path):
+#     # Read the input CSV file
+#     df = pd.read_csv(input_file_path, header=None)
+
+#     # Initialize lists to store the parsed data
+#     index = []
+#     position_x = []
+#     position_y = []
+#     time_taken = []
+#     steps_remaining = []
+
+#     # Parse the data
+#     for i, row in df.iterrows():
+#         pos = eval(row[0])  # Evaluate the position tuple (x, y)
+#         index.append(i + 1)  # Create index starting from 1
+#         position_x.append(pos[0])
+#         position_y.append(pos[1])
+#         time_taken.append(float(row[1]))
+#         steps_remaining.append(int(row[2]))
+
+#     # Create a DataFrame with the parsed data and rename it to SHMM
+#     SHMM = pd.DataFrame({
+#         'Index': index,
+#         'Position X': position_x,
+#         'Position Y': position_y,
+#         'Time Taken': time_taken,
+#         'Steps Remaining': steps_remaining
+#     })
+
+#     # Prepare SHMM data for RMM generation
+#     shmm_data = []
+#     for i, row in SHMM.iterrows():
+#         first_state = row['Position X']
+#         second_state = row['Position Y']
+#         time_elapsed = row['Time Taken']
+#         steps_remaining = row['Steps Remaining']
+#         mission_time = i + steps_remaining
+#         shmm_data.append(((first_state, second_state), time_elapsed, mission_time))
+
+#     # Prepare hmm_arrays in the desired format
+#     HMM_arrays = [[i, pose[0][0], pose[0][1], round(pose[1], 2), pose[2]] for i, pose in enumerate(shmm_data)]
     
-    return HMM_arrays
+#     return HMM_arrays
 
-def select_hmm_array(hmm_arrays, timestep):
-    """
-    Select a row of data from HMM_arrays based on the given timestep.
+# def select_hmm_array(hmm_arrays, timestep):
+#     """
+#     Select a row of data from HMM_arrays based on the given timestep.
 
-    Parameters:
-    hmm_arrays (list): The HMM arrays generated from the input CSV file.
-    timestep (int): The index value (1-based) for which to retrieve the corresponding row.
+#     Parameters:
+#     hmm_arrays (list): The HMM arrays generated from the input CSV file.
+#     timestep (int): The index value (1-based) for which to retrieve the corresponding row.
 
-    Returns:
-    list: The corresponding row of data from the HMM arrays, or None if not found.
-    """
-    # Adjust for 0-based index in Python
-    index = timestep - 1
+#     Returns:
+#     list: The corresponding row of data from the HMM arrays, or None if not found.
+#     """
+#     # Adjust for 0-based index in Python
+#     index = timestep - 1
     
-    # Check if the index is valid
-    if 0 <= index < len(hmm_arrays):
-        return hmm_arrays[index]
-    else:
-        return None  # Return None if the index is out of bounds
+#     # Check if the index is valid
+#     if 0 <= index < len(hmm_arrays):
+#         return hmm_arrays[index]
+#     else:
+#         return None  # Return None if the index is out of bounds
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def calculate_l1_norm(array1, array2):
     norm = np.abs(np.array(array2) - np.array(array1))

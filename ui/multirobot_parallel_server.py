@@ -18,6 +18,7 @@ app = Flask(__name__)
 socketio = SocketIO(app)
 
 # Global variables
+# set mission time based on JSON, check it out, some 75-82
 last_mission_times = {1: 51, 2: 49, 3: 47}
 input_file_paths = {
     1: 'formatted_robot1.csv',
@@ -44,6 +45,7 @@ def play_recorded(data):
     print("Received message to start processing:", data)
     if data:
         dfs = {robot_id: pd.read_csv(input_file_paths[robot_id], header=None) for robot_id in range(1, 4)}
+        # print(dfs)
         active_robots = {robot_id: True for robot_id in dfs}  # Tracking active robots
 
         i = 0  
@@ -55,6 +57,11 @@ def play_recorded(data):
             }
             plan_coordinates = []
             plans = []
+
+
+
+#change code below
+
             robot_states = {}
 
             for robot_id in range(1, 4):
@@ -62,9 +69,26 @@ def play_recorded(data):
                     if i < len(dfs[robot_id]):  # Checking if the more data rows exist
                         print(f"Processing timestep {i + 1} for Robot {robot_id}...")
                         row = dfs[robot_id].iloc[i]
+                        print("row",row)                    
                         result = [i + 1, eval(row[0])[0], eval(row[0])[1], float(row[1]), int(row[2])]
+                        print("result",result)
+
                         robot_state = process(robot_id, result, tasks, plan_coordinates, plans)
                         robot_states[str(robot_id)] = robot_state
+
+
+
+
+#change code above
+
+
+
+
+
+
+
+
+
 
                         # Print HMM, RMM, and message details
                         print(f"HMM Array for Robot {robot_id}: {robot_state['rmm_array']}")
@@ -94,6 +118,10 @@ def play_recorded(data):
 
             socketio.sleep(2)  # Simulate processing delay
             i += 1  # Increment the row index for all robots
+
+
+
+#change code below
 
 
 def process(robot_id, data, tasks, plan_coordinates, plans):
@@ -131,6 +159,16 @@ def process(robot_id, data, tasks, plan_coordinates, plans):
 
     last_mission_times[robot_id] = updated_hmm_array[0][4]
 
+
+
+#change code above
+
+
+
+
+
+
+
     # Generate plans
     x = random.randint(3, 7)
     y = random.randint(3, 7)
@@ -162,6 +200,11 @@ def process(robot_id, data, tasks, plan_coordinates, plans):
         "previousAbstractedPlan": current_robot_states["robots"][str(robot_id)]["currentAbstractedPlan"],
         "message": message
     }
+
+
+
+
+
 
 
 @app.route('/')
