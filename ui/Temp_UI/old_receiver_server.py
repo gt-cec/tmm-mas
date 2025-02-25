@@ -48,7 +48,7 @@ index_value = 0
 
 
 @socketio.on("message")
-def receive_data():
+def receive_data(data):
     global initial_data, current_robot_states
     global first_json_received  # Use the global flag
     global  index_value  # Track timestep globall

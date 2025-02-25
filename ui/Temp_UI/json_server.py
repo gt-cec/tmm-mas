@@ -61,135 +61,138 @@ def receive_data():
     global  index_value  # Track timestep globall
     global processed_hmm_arrays
 
-    try:
-        # Get the JSON data from the incoming request
-        data = request.json
-        # print(data)
-        # print(len(data))
-        JSON_data=data[0]
-        # print("JSON_data",JSON_data)
-        if not data:
-            raise ValueError("No JSON data received")
 
-        # Log the full incoming data for debugging (optional)
-        # print("Received JSON Data:")
-        # print(json.dumps(data, indent=4))
+    # Get the JSON data from the incoming request
+    data = request.json
+    # print(data)
+    # print(len(data))
+    JSON_data=data[0]
+    # print("JSON_data",JSON_data)
+    if not data:
+        raise ValueError("No JSON data received")
 
-        # Check if 'robots' key is present
-        if not isinstance(data, list):
-            raise ValueError("Data should be a list of JSONs.")
+    # Log the full incoming data for debugging (optional)
+    # print("Received JSON Data:")
+    # print(json.dumps(data, indent=4))
 
-
-
-        check_robot_data(JSON_data, expected_robots = ['quad1', 'quad2', 'quad3'])
+    # Check if 'robots' key is present
+    if not isinstance(data, list):
+        raise ValueError("Data should be a list of JSONs.")
 
 
-        # Only call `generate_hmm_arrays` for the first JSON
-        if not first_json_received:
-            first_json_received = True
-            # first_json = data
-            # Call the generate_hmm_arrays function for the first JSON data
-            processed_hmm_arrays=generate_hmm_arrays(JSON_data)
-            print("✅ generate_hmm_arrays called for the first JSON.")
-            # print(processed_hmm_arrays)
 
+    check_robot_data(JSON_data, expected_robots = ['quad1', 'quad2', 'quad3'])
+
+
+    # Only call `generate_hmm_arrays` for the first JSON
+    if not first_json_received:
+        first_json_received = True
+        # first_json = data
+        # Call the generate_hmm_arrays function for the first JSON data
+        processed_hmm_arrays=generate_hmm_arrays(JSON_data)
+        print("✅ generate_hmm_arrays called for the first JSON.")
+        # print(processed_hmm_arrays)
+
+    
+    # Process and print robot data for all robots
+    if "robots" not in JSON_data:
+        raise ValueError("Missing 'robots' key in JSON data.")
+
+
+
+    dfs = extract_robot_data(JSON_data)
+    print("dfs:", dfs)
+
+    # Track active robots
+    active_robots = {robot_id: len(dfs[robot_id]) > 0 for robot_id in dfs}
+    print("Active Robots:", active_robots)
+
+
+    tasks = {
+        "Go to": ["objective A", "objective B", "objective C", "base"],
+        "Acquire": ["package #1", "package #2", "package #3"],
+        "Drop": ["package #1", "package #2", "package #3"]
+    }
+    plan_coordinates = []
+    plans = []
+
+    print(f"\n🚀 Processing the Received JSON data")
+
+    current_index = index_value
+    index_value+=1
+
+
+
+    robot_states = {}
+
+    for robot_id, robot_data in JSON_data["robots"].items():
         
-        # Process and print robot data for all robots
-        if "robots" not in JSON_data:
-            raise ValueError("Missing 'robots' key in JSON data.")
+
+        row = dfs[robot_id][0]  
+        print("row:", row)                      # Convert the row to the expected format
+
+
+        formatted_position = row["formatted_pos"]  # This is already a tuple (x, y)
+        result = [
+            current_index,  # timestep increment
+            formatted_position[0],  # x-coordinate
+            formatted_position[1],  # y-coordinate
+            row["interval"],  # Time interval
+            row["mission_time"]  # Mission time
+        ]
+        print("result:", result)
 
 
 
-        dfs = extract_robot_data(JSON_data)
-        print("dfs:", dfs)
-
-        # Track active robots
-        active_robots = {robot_id: len(dfs[robot_id]) > 0 for robot_id in dfs}
-        print("Active Robots:", active_robots)
-
-
-        tasks = {
-            "Go to": ["objective A", "objective B", "objective C", "base"],
-            "Acquire": ["package #1", "package #2", "package #3"],
-            "Drop": ["package #1", "package #2", "package #3"]
-        }
-        plan_coordinates = []
-        plans = []
-
-        print(f"\n🚀 Processing the Received JSON data")
-
-        current_index = index_value
-        index_value+=1
+        robot_state = process(robot_id, result, tasks, plan_coordinates, plans,JSON_data)
+        print("robot_state",robot_state)
 
 
 
-        robot_states = {}
+        robot_number = int(robot_id.replace("quad", ""))
+        robot_states[(robot_number)] = robot_state
 
-        for robot_id, robot_data in JSON_data["robots"].items():
-            
-
-            row = dfs[robot_id][0]  
-            print("row:", row)                      # Convert the row to the expected format
-
-
-            formatted_position = row["formatted_pos"]  # This is already a tuple (x, y)
-            result = [
-                current_index,  # timestep increment
-                formatted_position[0],  # x-coordinate
-                formatted_position[1],  # y-coordinate
-                row["interval"],  # Time interval
-                row["mission_time"]  # Mission time
-            ]
-            print("result:", result)
+# Print HMM, RMM, and message details
+        print(f"HMM Array for Robot {robot_id}: {robot_state['rmm_array']}")
+        print(f"RMM Array for Robot {robot_id}: {robot_state['rmm_array']}")
+        # print(f"Message for Robot {robot_id}: {robot_state['message']}")
+        print("robot_states", robot_states)
 
 
 
-            robot_state = process(robot_id, result, tasks, plan_coordinates, plans,JSON_data)
-            print("robot_state",robot_state)
+        if robot_states:
+            previous_robot_states = current_robot_states
+            current_robot_states = {
+                "initial": initial_data,
+                "timestamp": time.time(),
+                "robots": robot_states,
+                "objectives": [
+                    {"name": "A", "x": 2, "y": 3},
+                    {"name": "B", "x": 7, "y": 9},
+                    {"name": "C", "x": 9, "y": 2}
+                ]
+            }
 
-
-
-            robot_number = int(robot_id.replace("quad", ""))
-            robot_states[(robot_number)] = robot_state
-
-    # Print HMM, RMM, and message details
-            print(f"HMM Array for Robot {robot_id}: {robot_state['rmm_array']}")
-            print(f"RMM Array for Robot {robot_id}: {robot_state['rmm_array']}")
-            # print(f"Message for Robot {robot_id}: {robot_state['message']}")
-            print("robot_states", robot_states)
-
-
-
-            if robot_states:
-                previous_robot_states = current_robot_states
-                current_robot_states = {
-                    "initial": initial_data,
-                    "timestamp": time.time(),
-                    "robots": robot_states,
-                    "objectives": [
-                        {"name": "A", "x": 2, "y": 3},
-                        {"name": "B", "x": 7, "y": 9},
-                        {"name": "C", "x": 9, "y": 2}
-                    ]
-                }
-
-                # Emit the updated state to the client
-                socketio.emit("message", current_robot_states)
-                initial_data = False
+            # Emit the updated state to the client
+            socketio.emit("message", current_robot_states)
+            initial_data = False
 
 
 
 
 
-            socketio.sleep(2)  # Simulate processing delay
+        socketio.sleep(2)  # Simulate processing delay
 
 
-        # return jsonify({"message": "All data received successfully!"}), 200
+    return jsonify({"message": "All data received successfully!"}), 200
 
-    except Exception as e:
-        # Return the error in JSON format if something goes wrong
-        print(f"❌ Error: {e}")
-        return jsonify({"message": "Failed to process data", "error": str(e)}), 500
+
+
+
+    # except Exception as e:
+    #     # Return the error in JSON format if something goes wrong
+    #     print(f"❌ Error: {e}")
+    #     return jsonify({"message": "Failed to process data", "error": str(e)}), 500
 
 
 
@@ -202,7 +205,10 @@ def receive_data():
 
 def process(robot_id, data, tasks, plan_coordinates, plans, JSON_data):
     global last_mission_times
+    global current_robot_states
+    global previous_robot_states
 
+    
     # print("robot_id",robot_id)
     current_index, x, y, time_elapsed, steps_remaining = data
     # print("timestep",timestep)
