@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Communication Box</title>
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/colors.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/robotButton.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/drawing.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/messages.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/plans.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/sockets.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+    <div class="left-section">
+        <div class="title">Plan</div>
+        <div class="communication-container">
+            <div id="robot-buttons-container-left" class="robot-buttons-container"></div>
+            <div id="plans" class="messages">
+            </div>
+        </div>
+    </div>
+    
+    <div class="center-section">
+        <div class="map-container">
+            <canvas id="simulationCanvas" width="700" height="700"></canvas>
+        </div>
+        <div id="statusMessage" class="connected-indicator-container">
+            <div class="circle"></div>
+            <div class="connected-text">
+                Connected
+            </div>
+        </div>
+    </div>
+
+    <div class="right-section">
+        <div class="title">Communication</div>
+        <div class="communication-container">
+            <div id="robot-buttons-container-right" class="robot-buttons-container"></div>
+            <button id="playStopButton">Play</button>
+            <div id="messages" class="messages">
+            </div>
+            <div class="slider-container">
+                <label for="disparitySlider">MM Disparity:</label>
+                <input type="range" id="disparitySlider" min="0" max="2" step="1" value="0">
+                <div class="slider-labels">
+                    <span>Low</span>
+                    <span>Medium</span>
+                    <span>High</span>
+                </div>
+            </div>
+            
+            <div class="input-box">
+                <input class="input-box-text" type="text" placeholder="Send a message...">
+                <button class="input-box-button" type="submit">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const statusMessage = document.getElementById('statusMessage')
+        const playStopButton = document.getElementById('playStopButton')
+        const disparitySlider = document.getElementById('disparitySlider')
+        const canvas = document.getElementById('simulationCanvas')
+        canvas.addEventListener("mousedown", clicked, false)  // click listener for the canvas
+        const ctx = canvas.getContext('2d')
+        const canvasMapImage = new Image()
+        const canvasRobotImage = new Image()
+        const canvasObjectiveImage = new Image()
+        loadCanvasImages()
+        const gridSize = 10
+        const cellSize = canvas.width / gridSize
+
+        var robotFilterId = -1  // which robot ID to filter
+
+        let socket = createSocket()
+        let isPlaying = false
+
+        var numRobots = -1  // number of robots in the simulation
+        var newRobotData = {}  // new robot data that has not been updated to user map yet (requires user to click the message)
+        var initialRobotdata = {}
+        var savedRobotData = {}  // last copy of all the robot data, for re-draws
+        var shadedRobotIds = []  // robot IDs to shade because of a recently selected message
+
+        var newObjectives = {}  // new objectives that may have not been sent
+        var savedObjectives = {}  // objectives for the robot
+
+        var timeoutForDelayedRobot = 10  // threshold for when the timer icon appears by the robot
+
+        playStopButton.addEventListener("click", () => {
+            isPlaying = !isPlaying
+            if (isPlaying) {
+                playStopButton.textContent = 'Stop'
+            }
+            else {
+                playStopButton.textContent = 'Play'
+            }
+            socket.send(isPlaying)
+        })
+
+        // Initial draw
+        drawGrid()
+    </script>
+</body>
+
+</html>
