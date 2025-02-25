@@ -22,18 +22,25 @@ socketio = SocketIO(app)
 
 # Global variables
 # set mission time based on JSON, check it out, some 75-82
-last_mission_times = {1: 76, 2: 80, 3: 72}
+# last_mission_times = {1: 76, 2: 80, 3: 72}
+last_mission_times = {
+    "quad1": 76, 
+    "quad2": 80, 
+    "quad3": 72
+}
+
 index_value = 0  # Keeps track of timestep across multiple requests
 
 previous_robot_states = {}
 current_robot_states = {
     "robots": {
-        str(robot_id): {
+        str(robot_num): {
             "currentLocationPlan": [],
             "currentAbstractedPlan": []
-        } for robot_id in range(1, 4)
+        } for robot_num in range(1, 4)
     }
 }
+print("current_robot_states",current_robot_states)
 initial_data = True
 
 # Flag to ensure `generate_hmm_arrays` is only called for the first JSON received
@@ -137,17 +144,169 @@ def receive_data():
 
 
 
+            robot_state = process(robot_id, result, tasks, plan_coordinates, plans,JSON_data)
+            print("robot_state",robot_state)
+
+
+
+            robot_number = int(robot_id.replace("quad", ""))
+            robot_states[(robot_number)] = robot_state
+
+    # Print HMM, RMM, and message details
+            print(f"HMM Array for Robot {robot_id}: {robot_state['rmm_array']}")
+            print(f"RMM Array for Robot {robot_id}: {robot_state['rmm_array']}")
+            # print(f"Message for Robot {robot_id}: {robot_state['message']}")
+            print("robot_states", robot_states)
+
+
+
+            if robot_states:
+                previous_robot_states = current_robot_states
+                current_robot_states = {
+                    "initial": initial_data,
+                    "timestamp": time.time(),
+                    "robots": robot_states,
+                    "objectives": [
+                        {"name": "A", "x": 2, "y": 3},
+                        {"name": "B", "x": 7, "y": 9},
+                        {"name": "C", "x": 9, "y": 2}
+                    ]
+                }
+
+                # Emit the updated state to the client
+                socketio.emit("message", current_robot_states)
+                initial_data = False
+
+
+
+
+            # # print(f"🔍 Checking robot_id: {robot_id}, row_index: {current_index}")
+            # # print(f"🔍 Available robots: {list(processed_hmm_arrays.keys())}")
+            # # if robot_id in processed_hmm_arrays:
+            # #     print(f"🔍 {robot_id} has {len(processed_hmm_arrays[robot_id])} rows")
+
+
+
+            # # print(f"🔍 Checking robot_id: {robot_id}, row_index: {current_index}")
+
+            # hmm_array_data_preformat  =  select_hmm_row(processed_hmm_arrays,str(robot_id), int(current_index))
+            # # print(f"HMM Array for Robot {robot_id}: {hmm_array_data_preformat}")
+
+            # hmm_array_data = hmm_array_reformat(hmm_array_data_preformat)
+            # # print(f"HMM Array for Robot {robot_id}: {hmm_array_data }")
+
+
+
+            # # Create the hmm_array with the necessary values
+            # hmm_array = [
+            #     int(current_index),  # First value: the current index (converted to int)
+            #     float(hmm_array_data[0][0]),  # Second value: hmm_array_data[1] (converted to float)
+            #     float(hmm_array_data[0][1]),  # Third value: hmm_array_data[2] (converted to float)
+            #     round(float(hmm_array_data[1]), 4),  # Fourth value: rounding hmm_array_data[3] (converted to float)
+            #     int(last_mission_times[str(robot_id)])  # Fifth value: mission time for the robot ID
+            # ]
+
+            # # # Print the relevant values
+            # # print(f"Current index: {int(current_index)}")
+            # # print(f"hmm_array_data[1]: {float(hmm_array_data[0][0])}")
+            # # print(f"hmm_array_data[2]: {float(hmm_array_data[0][1])}")
+            # # print(f"Rounded hmm_array_data[3]: {round(float(hmm_array_data[2]), 4)}")
+            # # print(f"last_mission_times for {robot_id}: {int(last_mission_times[str(robot_id)])}")
+
+            # # Print the final hmm_array
+            # print(f"HMM Array for Robot {robot_id}: {hmm_array}")
+
+
+
+
+            # rmm_array_create = create_rmm_array(JSON_data, str(robot_id))
+            # print(f"RMM Array for Robot prior to reformat {robot_id}: {rmm_array_create}")
+
+            # # shmm_row = ((x, y), time_elapsed, timestep + steps_remaining)
+            # # rmm_process = generate_rmm_array_for_row(shmm_row, timestep)
+
+            # # Create the rmm_array with the necessary values
+            # rmm_array = [
+            #     int(current_index),  # First value: the current index (converted to int)
+            #     float(rmm_array_create[0][0]),  # Second value: hmm_array_data[1] (converted to float)
+            #     float(rmm_array_create[0][1]),  # Third value: hmm_array_data[2] (converted to float)
+            #     round(float(rmm_array_create[1]), 4),  # Fourth value: rounding hmm_array_data[3] (converted to float)
+            #     int(rmm_array_create[2])
+            # ]
+            # print(f"RMM Array for Robot {robot_id}: {rmm_array}")
+
+
+            # hmm_array = [
+            #     float(current_index),
+            #     float(hmm_array_data[1]),
+            #     float(hmm_array_data[2]),
+            #     round(float(hmm_array_data[3]), 2),
+            #     int(last_mission_times[robot_id])
+            # ]
+            
+            # hmm_array = [
+            #     int(current_index),
+            #     float(hmm_array_data[1]),
+            #     float(hmm_array_data[2]),
+            #     round(float(hmm_array_data[3]), 2),
+            #     int(last_mission_times[str(robot_id)])
+            # ]
+                    
+            # # print(f"Current index: {int(current_index)}")
+            # # print(f"hmm_array_data[1]: {float(hmm_array_data[0][1])}")
+            # # print(f"hmm_array_data[2]: {float(hmm_array_data[0][2])}")
+            # # print(f"Rounded hmm_array_data[3]: {float(hmm_array_data[2] )}")
+            # # print(f"last_mission_times for {robot_id}: {int(last_mission_times[str(robot_id)])}")
+            
+
+            # print(f"Current index: {int(current_index)}")
+
+            # print(f"hmm_array_data[1]: {float(hmm_array_data[0][0])}")
+            # print(f"hmm_array_data[2]: {float(hmm_array_data[0][1])}")
+
+
+            # print(f"Rounded hmm_array_data[3]: {round(float(hmm_array_data[2]), 4)}")
+            # print(f"last_mission_times for {robot_id}: {int(last_mission_times[str(robot_id)])}")
+            
+
+
+
+            # print(f"HMM Array for Robot {robot_id}: {int(last_mission_times[str(robot_id)])}")
+
+
+
+    #         robot_state = process(robot_id, result, tasks, plan_coordinates, plans)
+
+    #         robot_states[str(robot_id)] = robot_state
+
+
+    # # Print HMM, RMM, and message details
+    #         print(f"HMM Array for Robot {robot_id}: {robot_state['hm m_array']}")
+    #         print(f"RMM Array for Robot {robot_id}: {robot_state['rmm_array']}")
+    #         print(f"Message for Robot {robot_id}: {robot_state['message']}")
+
+
+
+
+
+
+
+#           #uncomment stuff below for testing.
+            # print(f"\n🚀 JSON Data Received")
+            # # for robot_id, robot_data in JSON_data["robots"].items():
+
+
+
             # print(f"\n🚀 Data Received (Robot ID: {robot_id}):")
             # print(f"📅 Simulation Time: {JSON_data.get('simulator time', 'N/A')}s")
             # print(f"📍 Current Position: (x: {robot_data['x'][0]}, y: {robot_data['y'][1]})")
             # print(f"🎯 Plan Index: {robot_data.get('plan_index', 'N/A')}")
 
 
+            socketio.sleep(2)  # Simulate processing delay
 
 
-
-
-    #     return jsonify({"message": "All data received successfully!"}), 200
+        # return jsonify({"message": "All data received successfully!"}), 200
 
     # except Exception as e:
     #     # Return the error in JSON format if something goes wrong
@@ -155,37 +314,28 @@ def receive_data():
     #     return jsonify({"message": "Failed to process data", "error": str(e)}), 500
 
 
-            robot_state = process(robot_id, result, tasks, plan_coordinates, plans)
-
-            robot_states[str(robot_id)] = robot_state
-
-    # Print HMM, RMM, and message details
-            print(f"HMM Array for Robot {robot_id}: {robot_state['rmm_array']}")
-            print(f"RMM Array for Robot {robot_id}: {robot_state['rmm_array']}")
-            print(f"Message for Robot {robot_id}: {robot_state['message']}")
 
 
 
 
+        # if robot_states:
+        #     previous_robot_states = current_robot_states
+        #     current_robot_states = {
+        #         "initial": initial_data,
+        #         "timestamp": time.time(),
+        #         "robots": robot_states,
+        #         "objectives": [
+        #             {"name": "A", "x": 2, "y": 3},
+        #             {"name": "B", "x": 7, "y": 9},
+        #             {"name": "C", "x": 9, "y": 2}
+        #         ]
+        #     }
 
-        if robot_states:
-            previous_robot_states = current_robot_states
-            current_robot_states = {
-                "initial": initial_data,
-                "timestamp": time.time(),
-                "robots": robot_states,
-                "objectives": [
-                    {"name": "A", "x": 2, "y": 3},
-                    {"name": "B", "x": 7, "y": 9},
-                    {"name": "C", "x": 9, "y": 2}
-                ]
-            }
+        #     # Emit the updated state to the client
+        #     socketio.emit("message", current_robot_states)
+        #     initial_data = False
 
-            # Emit the updated state to the client
-            socketio.emit("message", current_robot_states)
-            initial_data = False
-
-        socketio.sleep(2)  # Simulate processing delay
+        # socketio.sleep(2)  # Simulate processing delay
 
 
 
@@ -193,67 +343,81 @@ def receive_data():
 
 
 
-        print(f"\n🚀 JSON Data Received")
-        for robot_id, robot_data in JSON_data["robots"].items():
 
 
-
-            print(f"\n🚀 Data Received (Robot ID: {robot_id}):")
-            print(f"📅 Simulation Time: {JSON_data.get('simulator time', 'N/A')}s")
-            print(f"📍 Current Position: (x: {robot_data['x'][0]}, y: {robot_data['y'][1]})")
-            print(f"🎯 Plan Index: {robot_data.get('plan_index', 'N/A')}")
-
-        return jsonify({"message": "All data received successfully!"}), 200
-
-    except Exception as e:
-        # Return the error in JSON format if something goes wrong
-        print(f"❌ Error: {e}")
-        return jsonify({"message": "Failed to process data", "error": str(e)}), 500
-
-
-
-
-def process(robot_id, data, tasks, plan_coordinates, plans):
+def process(robot_id, data, tasks, plan_coordinates, plans, JSON_data):
     global last_mission_times
 
-    print("robot_id",robot_id)
-    timestep, x, y, time_elapsed, steps_remaining = data
-    print("timestep",timestep)
+    # print("robot_id",robot_id)
+    current_index, x, y, time_elapsed, steps_remaining = data
+    # print("timestep",timestep)
     # print("processed_hmm_arrays", processed_hmm_arrays)
 
-    # Debugging: Check processed_hmm_arrays structure
-    if robot_id not in processed_hmm_arrays:
-        print(f"❌ {robot_id} not found in processed_hmm_arrays")
-    else:
-        print(f"Processing robot {robot_id} at timestep {timestep}")
+    # # Debugging: Check processed_hmm_arrays structure
+    # if robot_id not in processed_hmm_arrays:
+    #     print(f"❌ {robot_id} not found in processed_hmm_arrays")
+    # else:
+    #     print(f"Processing robot {robot_id} at timestep {timestep}")
 
 
-    hmm_array_data_preformat  =  select_hmm_row(processed_hmm_arrays,str(robot_id), int(timestep))
 
-    # hmm_array_data_preformat  =  select_hmm_row(processed_hmm_arrays, robot_id="robot_id", row_index =   timestep)
+
+    # print(f"🔍 Checking robot_id: {robot_id}, row_index: {current_index}")
+    # print(f"🔍 Available robots: {list(processed_hmm_arrays.keys())}")
+    # if robot_id in processed_hmm_arrays:
+    #     print(f"🔍 {robot_id} has {len(processed_hmm_arrays[robot_id])} rows")
+
+
+
+    # print(f"🔍 Checking robot_id: {robot_id}, row_index: {current_index}")
+
+    hmm_array_data_preformat  =  select_hmm_row(processed_hmm_arrays,str(robot_id), int(current_index))
+    # print(f"HMM Array for Robot {robot_id}: {hmm_array_data_preformat}")
+
     hmm_array_data = hmm_array_reformat(hmm_array_data_preformat)
+    # print(f"HMM Array for Robot {robot_id}: {hmm_array_data }")
 
-    # hmm_array_data = select_hmm_array(hmm_arrays[robot_id], timestep)
 
+
+    # Create the hmm_array with the necessary values
     hmm_array = [
-        float(timestep),
-        float(hmm_array_data[1]),
-        float(hmm_array_data[2]),
-        round(float(hmm_array_data[3]), 2),
-        int(last_mission_times[robot_id])
+        int(current_index),  # First value: the current index (converted to int)
+        float(hmm_array_data[0][0]),  # Second value: hmm_array_data[1] (converted to float)
+        float(hmm_array_data[0][1]),  # Third value: hmm_array_data[2] (converted to float)
+        round(float(hmm_array_data[1]), 4),  # Fourth value: rounding hmm_array_data[3] (converted to float)
+        int(last_mission_times[str(robot_id)])  # Fifth value: mission time for the robot ID
     ]
 
-    rmm_array_create = create_rmm_array(data, robot_id)
+    # # Print the relevant values
+    # print(f"Current index: {int(current_index)}")
+    # print(f"hmm_array_data[1]: {float(hmm_array_data[0][0])}")
+    # print(f"hmm_array_data[2]: {float(hmm_array_data[0][1])}")
+    # print(f"Rounded hmm_array_data[3]: {round(float(hmm_array_data[2]), 4)}")
+    # print(f"last_mission_times for {robot_id}: {int(last_mission_times[str(robot_id)])}")
+
+    # Print the final hmm_array
+    # print(f"HMM Array for Robot {robot_id}: {hmm_array}")
+
+
+
+
+    rmm_array_create = create_rmm_array(JSON_data, str(robot_id))
+    # print(f"RMM Array for Robot prior to reformat {robot_id}: {rmm_array_create}")
 
     # shmm_row = ((x, y), time_elapsed, timestep + steps_remaining)
     # rmm_process = generate_rmm_array_for_row(shmm_row, timestep)
+
+    # Create the rmm_array with the necessary values
     rmm_array = [
-        float(timestep),
-        float(rmm_array_create[1]),
-        float(rmm_array_create[2]),
-        round(float(rmm_array_create[3]), 2),
-        int(rmm_array_create[4])
+        int(current_index),  # First value: the current index (converted to int)
+        float(rmm_array_create[0][0]),  # Second value: hmm_array_data[1] (converted to float)
+        float(rmm_array_create[0][1]),  # Third value: hmm_array_data[2] (converted to float)
+        round(float(rmm_array_create[1]), 4),  # Fourth value: rounding hmm_array_data[3] (converted to float)
+        int(rmm_array_create[2])
     ]
+    # print(f"RMM Array for Robot {robot_id}: {rmm_array}")
+
+
 
     update_logic_functions = [bayesian_probabilistic_update_general]
     uncertainty_factor_pos = 0.05
@@ -261,10 +425,17 @@ def process(robot_id, data, tasks, plan_coordinates, plans):
 
     updated_hmm_array, message = dynamic_deviation_threshold_multi_logic(
         [hmm_array], [rmm_array], update_logic_functions, uncertainty_factor_pos, uncertainty_factor_time,
-        dynamic_threshold_mission_time=10, robot_number=robot_id
-    )
+        dynamic_threshold_mission_time=10, robot_id=robot_id)
 
-    last_mission_times[robot_id] = updated_hmm_array[0][4]
+    print("updated_hmm_array",updated_hmm_array)
+    print(f"Message for Robot {robot_id}: {message}")
+
+
+
+    last_mission_times[str(robot_id)] = updated_hmm_array[0][4]
+
+
+    robot_number = int(robot_id.replace("quad", ""))
 
 
 
@@ -293,10 +464,10 @@ def process(robot_id, data, tasks, plan_coordinates, plans):
         "robotPath": [[1, 0], [0, 0], [plan[0][0], plan[0][1]]],
         "completedPlan": ["Go to objective A", "Pick up package #1"],
         "currentLocationPlan": plan,
-        "previousLocationPlan": current_robot_states["robots"][str(robot_id)]["currentLocationPlan"],
+        "previousLocationPlan": current_robot_states["robots"][str(robot_number)]["currentLocationPlan"],
         "initialPlan": [[2, 4], [3, 4], [3, 5], [4, 5]],
         "currentAbstractedPlan": robotPlanAbstract,
-        "previousAbstractedPlan": current_robot_states["robots"][str(robot_id)]["currentAbstractedPlan"],
+        "previousAbstractedPlan": current_robot_states["robots"][str(robot_number)]["currentAbstractedPlan"],
         "message": message
     }
 
@@ -320,329 +491,6 @@ if __name__ == '__main__':
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# @app.route("/receive_data", methods=["POST"])
-# def receive_data():
-#     global initial_data, current_robot_states
-#     global first_json_received, global_timestep  # Track timestep globally
-#     try:
-#         data = request.json
-#         JSON_data = data[0]
-#         if not data:
-#             raise ValueError("No JSON data received")
-
-#         if "robots" not in JSON_data:
-#             raise ValueError("Missing 'robots' key in JSON data.")
-
-#         # Extract robot data into dfs
-#         dfs = extract_robot_data(JSON_data)
-#         print("dfs:", dfs)
-
-#         # Track active robots
-#         active_robots = {robot_id: len(dfs[robot_id]) > 0 for robot_id in dfs}
-#         print("Active Robots:", active_robots)
-
-#         # Use global timestep counter
-#         while any(active_robots.values()):  
-#             tasks = {
-#                 "Go to": ["objective A", "objective B", "objective C", "base"],
-#                 "Acquire": ["package #1", "package #2", "package #3"],
-#                 "Drop": ["package #1", "package #2", "package #3"]
-#             }
-#             plan_coordinates = []
-#             plans = []
-#             robot_states = {}
-
-#             for robot_id in JSON_data["robots"].keys():  # Process all robots
-#                 if robot_id in dfs and active_robots[robot_id]:  
-#                     if global_timestep < len(dfs[robot_id]):  
-#                         print(f"Processing timestep {global_timestep + 1} for Robot {robot_id}...")
-#                         row = dfs[robot_id][global_timestep]  
-#                         print("row:", row)
-
-#                         # Convert the row to the expected format
-#                         formatted_position = row["formatted_pos"]  
-#                         result = [
-#                             global_timestep + 1,  # Now correctly increasing
-#                             formatted_position[0],  
-#                             formatted_position[1],  
-#                             row["interval"],  
-#                             row["mission_time"]  
-#                         ]
-#                         print("result:", result)
-
-#                         # Process the robot's state
-#                         robot_state = process(robot_id, result, tasks, plan_coordinates, plans)
-#                         robot_states[robot_id] = robot_state  
-
-#                     else:
-#                         active_robots[robot_id] = False  
-#                         print(f"Robot {robot_id} has finished processing all rows.")
-
-#             if robot_states:
-#                 previous_robot_states = current_robot_states
-#                 current_robot_states = {
-#                     "initial": initial_data,
-#                     "timestamp": time.time(),
-#                     "robots": robot_states,
-#                     "objectives": [
-#                         {"name": "A", "x": 2, "y": 3},
-#                         {"name": "B", "x": 7, "y": 9},
-#                         {"name": "C", "x": 9, "y": 2}
-#                     ]
-#                 }
-
-#                 socketio.emit("message", current_robot_states)
-#                 initial_data = False
-
-#             socketio.sleep(2)  
-#             global_timestep += 1  # ✅ Now timestep updates across requests
-
-#         return jsonify({"message": "All data received successfully!"}), 200
-
-#     except Exception as e:
-#         print(f"❌ Error: {e}")
-#         return jsonify({"message": "Failed to process data", "error": str(e)}), 500
-
-
-# @app.route("/receive_data", methods=["POST"])
-# def receive_data():
-#     global initial_data, current_robot_states
-#     global first_json_received  # Use the global flag
-#     global global_timestep  # Track timestep globally
-
-#     try:
-#         # Get the JSON data from the incoming request
-#         data = request.json
-#         # Check if data is valid
-#         if not data:
-#             raise ValueError("No JSON data received")
-
-#         # Process the first JSON
-#         if not first_json_received:
-#             first_json_received = True
-#             processed_hmm_arrays = generate_hmm_arrays(data[0])
-#             print("✅ generate_hmm_arrays called for the first JSON.")
-
-#         JSON_data = data[0]  # Assuming data is a list and we need the first item
-
-#         if "robots" not in JSON_data:
-#             raise ValueError("Missing 'robots' key in JSON data.")
-        
-#         # Extract robot data
-#         dfs = extract_robot_data(JSON_data)
-#         print("dfs:", dfs)
-
-#         # Track active robots
-#         active_robots = {robot_id: len(dfs[robot_id]) > 0 for robot_id in dfs}
-#         print("Active Robots:", active_robots)
-
-#         # Process robots data
-#         while any(active_robots.values()):  # Continue as long as any robot has data
-#             tasks = {
-#                 "Go to": ["objective A", "objective B", "objective C", "base"],
-#                 "Acquire": ["package #1", "package #2", "package #3"],
-#                 "Drop": ["package #1", "package #2", "package #3"]
-#             }
-#             robot_states = {}
-
-#             for robot_id in JSON_data["robots"].keys():  # Process all robots
-#                 if robot_id in dfs and active_robots[robot_id]:
-#                     print("global_timestep", global_timestep)
-#                     print("len(dfs[robot_id])", len(dfs[robot_id]))
-
-#                     if True:
-#                         print(f"Processing timestep {global_timestep + 1} for Robot {robot_id}...")
-#                         row = dfs[robot_id][0]  # Example, modify based on data structure
-#                         print("row:", row)
-
-#                         # Process the robot's state (example)
-#                         formatted_position = row["formatted_pos"]
-#                         result = [
-#                             global_timestep + 1,
-#                             formatted_position[0],
-#                             formatted_position[1],
-#                             row["interval"],
-#                             row["mission_time"]
-#                         ]
-#                         print("result:", result)
-
-#                         # Robot state processing can happen here
-#                         # robot_state = process(robot_id, result, tasks)
-#                         # robot_states[str(robot_id)] = robot_state
-
-#                     else:
-#                         active_robots[robot_id] = False
-#                         print(f"Robot {robot_id} has finished processing all rows.")
-
-#             # Check if robots have finished, and print the status
-#             if not any(active_robots.values()):
-#                 print("All robots have finished processing.")
-
-#             # Emit the robot states (if any) to the client
-#             if robot_states:
-#                 current_robot_states = {
-#                     "robots": robot_states,
-#                     "timestamp": time.time()
-#                 }
-#                 socketio.emit("message", current_robot_states)
-
-#             # Sleep for a moment to allow time for new data to be processed
-#             socketio.sleep(2)
-
-#             # Reset for the next timestep
-#             global_timestep += 1
-
-#         # Log final data received for debugging
-#         print(f"\n🚀 JSON Data Received")
-#         for robot_id, robot_data in JSON_data["robots"].items():
-#             print(f"\n🚀 Data Received (Robot ID: {robot_id}):")
-#             print(f"📅 Simulation Time: {JSON_data.get('simulator time', 'N/A')}s")
-#             print(f"📍 Current Position: (x: {robot_data['x'][0]}, y: {robot_data['y'][1]})")
-#             print(f"🎯 Plan Index: {robot_data.get('plan_index', 'N/A')}")
-
-#         return jsonify({"message": "All data received successfully!"}), 200
-
-#     except Exception as e:
-#         print(f"❌ Error: {e}")
-#         return jsonify({"message": "Failed to process data", "error": str(e)}), 500
-
-
-
-
-
-
-
-
-#         while any(active_robots.values()):  # Continue as long as any robot has data
-#             tasks = {
-#                 "Go to": ["objective A", "objective B", "objective C", "base"],
-#                 "Acquire": ["package #1", "package #2", "package #3"],
-#                 "Drop": ["package #1", "package #2", "package #3"]
-#             }
-#             plan_coordinates = []
-#             plans = []
-#             robot_states = {}
-
-
-
-
-
-
-
-
-
-
-#             for robot_id in JSON_data["robots"].keys():  # Process all robots
-#                 if robot_id in dfs and active_robots[robot_id]:  
-#                     # print("global_timestep",global_timestep)
-#                     # print("len(dfs[robot_id])",len(dfs[robot_id]))
-
-#                     if global_timestep < len(dfs[robot_id]):  # Checking if the more data rows exist
-
-#                         # if len(dfs[robot_id]) != 0:  
-#                         # if True:
-#                         print(f"Processing timestep {global_timestep + 1} for Robot {robot_id}...")
-#                         row = dfs[robot_id][0]  
-#                         print("row:", row)                      # Convert the row to the expected format
-
-
-#                         formatted_position = row["formatted_pos"]  # This is already a tuple (x, y)
-#                         result = [
-#                             global_timestep + 1,  # timestep increment
-#                             formatted_position[0],  # x-coordinate
-#                             formatted_position[1],  # y-coordinate
-#                             row["interval"],  # Time interval
-#                             row["mission_time"]  # Mission time
-#                         ]
-#                         print("result:", result)
-
-#                             # Process the robot's state
-#                             # robot_state = process(robot_id, result, tasks, plan_coordinates, plans)
-#                             # robot_states[str(robot_id)] = robot_state
-
-#                             # # Print HMM, RMM, and message details
-#                             # print(f"HMM Array for Robot {robot_id}: {robot_state['rmm_array']}")
-#                             # print(f"RMM Array for Robot {robot_id}: {robot_state['rmm_array']}")
-#                             # print(f"Message for Robot {robot_id}: {robot_state['message']}")
-
-
-
-#                     else:
-#                             # Mark this robot as inactive
-#                         active_robots[robot_id] = False
-#                         print(f"Robot {robot_id} has finished processing all rows.")
-
-#             if robot_states:
-#                 previous_robot_states = current_robot_states
-#                 current_robot_states = {
-#                     "initial": initial_data,
-#                     "timestamp": time.time(),
-#                     "robots": robot_states,
-#                     "objectives": [
-#                         {"name": "A", "x": 2, "y": 3},
-#                         {"name": "B", "x": 7, "y": 9},
-#                         {"name": "C", "x": 9, "y": 2}
-#                     ]
-#                 }
-
-#                 # Emit the updated state to the client
-#                 socketio.emit("message", current_robot_states)
-#                 initial_data = False
-
-
-#             socketio.sleep(2)  
-#             global_timestep += 1  # ✅ Now timestep updates across requests
-
-
-
-
-#         print(f"\n🚀 JSON Data Received")
-#         for robot_id, robot_data in JSON_data["robots"].items():
-
-
-
-#             print(f"\n🚀 Data Received (Robot ID: {robot_id}):")
-#             print(f"📅 Simulation Time: {JSON_data.get('simulator time', 'N/A')}s")
-#             print(f"📍 Current Position: (x: {robot_data['x'][0]}, y: {robot_data['y'][1]})")
-#             print(f"🎯 Plan Index: {robot_data.get('plan_index', 'N/A')}")
-
-
-
-
-
-
-
-#         return jsonify({"message": "All data received successfully!"}), 200
-
-#     except Exception as e:
-#         # Return the error in JSON format if something goes wrong
-#         print(f"❌ Error: {e}")
-#         return jsonify({"message": "Failed to process data", "error": str(e)}), 500
-
-
-
-
-# if __name__ == "__main__":
-#     app.run(debug=True, host='0.0.0.0', port=5211)
 
 
 
