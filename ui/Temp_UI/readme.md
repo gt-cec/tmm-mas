@@ -23,8 +23,24 @@ Before running the server, ensure you have the following installed:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/your-repo-name.git
-   cd your-repo-name
+   git clone git@github.com:gt-cec/tmm-mas.git
+   cd tmm-mas/ui/Temp_Ui
 
    
+2. Running the Server
+Start the server by running the following command:
 
+
+   ```bash
+    python final_receiver_server_json.py
+
+The server will start on http://0.0.0.0:5211. You can access it via http://127.0.0.1:5211 in your browser.
+
+3. Sending JSON Data
+To send JSON data to the server, use the send_json.py script. This script reads JSON files from a directory (robot_jsons) and sends them to the server one by one.
+
+Place your JSON files in the robot_jsons directory. Ensure the files are named in a sequential order (e.g., robot_1.json, robot_2.json, etc.).
+
+Run the send_json.py script:
+   ```bash
+    python send_json.py
