@@ -81,7 +81,7 @@ def select_hmm_row(processed_data, robot_number, row_index):
         return None
 
 
-def create_hmm_array_reformat(row_data):
+def hmm_array_reformat(row_data):
     """
     Extracts and formats 'formatted_pos', 'interval', and 'mission_time' into an HMM array.
 
@@ -109,7 +109,7 @@ def create_hmm_array_reformat(row_data):
 #  'interval': 0.008099555969238281,
 #  'mission_time': 76}
 
-# row_2_robot_hmm = create_hmm_array_reformat(row_2_robot)
+# row_2_robot_hmm = hmm_array_reformat(row_2_robot)
 # row_2_robot_hmm
 # [(1, 1), 0.008099555969238281, 76]
 
