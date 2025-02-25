@@ -1,7 +1,7 @@
 {
-    "simulator time": 1.9073486328125e-06,
+    "simulator time": 140.00553369522095,
     "robots": {
-        "quad1": {
+        "robot0": {
             "plan": [
                 [
                     0,
@@ -316,22 +316,16 @@
                     2
                 ]
             ],
-            "plan_index": 54,
+            "plan_index": 71,
             "immediate_goal": [
-                4,
-                3
+                3,
+                5
             ],
-            "x": [
-                4,
-                3
-            ],
-            "y": [
-                4,
-                3
-            ],
-            "mission_time": 23
+            "x": 3,
+            "y": 5,
+            "mission_time": 6
         },
-        "quad2": {
+        "robot1": {
             "plan": [
                 [
                     3,
@@ -662,22 +656,16 @@
                     2
                 ]
             ],
-            "plan_index": 59,
+            "plan_index": 71,
             "immediate_goal": [
-                3,
-                2
+                1,
+                5
             ],
-            "x": [
-                3,
-                2
-            ],
-            "y": [
-                3,
-                2
-            ],
-            "mission_time": 22
+            "x": 1,
+            "y": 5,
+            "mission_time": 10
         },
-        "quad3": {
+        "robot2": {
             "plan": [
                 [
                     2,
@@ -976,20 +964,14 @@
                     2
                 ]
             ],
-            "plan_index": 52,
+            "plan_index": 68,
             "immediate_goal": [
-                5,
-                2
+                3,
+                4
             ],
-            "x": [
-                5,
-                2
-            ],
-            "y": [
-                5,
-                2
-            ],
-            "mission_time": 21
+            "x": 3,
+            "y": 4,
+            "mission_time": 5
         }
     }
 }

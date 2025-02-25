@@ -1,7 +1,7 @@
 {
-    "simulator time": 2.384185791015625e-06,
+    "simulator time": 130.0073118209839,
     "robots": {
-        "quad1": {
+        "robot0": {
             "plan": [
                 [
                     0,
@@ -316,22 +316,16 @@
                     2
                 ]
             ],
-            "plan_index": 51,
+            "plan_index": 66,
             "immediate_goal": [
                 3,
-                2
+                5
             ],
-            "x": [
-                3,
-                2
-            ],
-            "y": [
-                3,
-                2
-            ],
-            "mission_time": 26
+            "x": 3,
+            "y": 5,
+            "mission_time": 11
         },
-        "quad2": {
+        "robot1": {
             "plan": [
                 [
                     3,
@@ -662,22 +656,16 @@
                     2
                 ]
             ],
-            "plan_index": 54,
+            "plan_index": 66,
             "immediate_goal": [
-                5,
-                1
+                2,
+                4
             ],
-            "x": [
-                5,
-                1
-            ],
-            "y": [
-                5,
-                1
-            ],
-            "mission_time": 27
+            "x": 2,
+            "y": 4,
+            "mission_time": 15
         },
-        "quad3": {
+        "robot2": {
             "plan": [
                 [
                     2,
@@ -976,20 +964,14 @@
                     2
                 ]
             ],
-            "plan_index": 49,
+            "plan_index": 64,
             "immediate_goal": [
-                3,
-                3
+                4,
+                5
             ],
-            "x": [
-                3,
-                3
-            ],
-            "y": [
-                3,
-                3
-            ],
-            "mission_time": 24
+            "x": 4,
+            "y": 5,
+            "mission_time": 9
         }
     }
 }
