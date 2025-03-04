@@ -597,15 +597,15 @@ while rclpy.ok():
         for quad in quad_list:
             quad["rb"].GetVelocityAttr().Set(vel) 
 
-<<<<<<< HEAD
+#<<<<<<< HEAD
     current_time = time.time()
     if (current_time >= next_print_time and start):
         # json_output = generate_json(current_time, robots_JSON, filename_json)
         json_output = generate_json(current_time, robots_JSON)
         next_print_time += 10
-=======
+#=======
     
->>>>>>> 67c89a8f3f7167f908cbbe7e53507cb6c296fc61
+#>>>>>>> 67c89a8f3f7167f908cbbe7e53507cb6c296fc61
         
 
     world.step(render=True)
