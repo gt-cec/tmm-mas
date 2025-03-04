@@ -588,7 +588,7 @@ while rclpy.ok():
             quad["rb"].GetVelocityAttr().Set(vel) 
 
     current_time = time.time()
-    if current_time >= next_print_time:
+    if (current_time >= next_print_time and start):
         # json_output = generate_json(current_time, robots_JSON, filename_json)
         json_output = generate_json(current_time, robots_JSON)
         next_print_time += 10
