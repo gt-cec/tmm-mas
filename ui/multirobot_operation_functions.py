@@ -3,6 +3,227 @@
 import numpy as np
 import pandas as pd
 
+
+
+
+import re
+
+
+
+def generate_hmm_arrays(data):
+    """
+    Processes robot data from JSON and generates HMM arrays.
+
+    :param data: Raw JSON data.
+    :return: Dictionary containing processed data as generated_hmm_arrays.
+    """
+    if "simulator time" not in data or "robots" not in data:
+        print("❌ Invalid data format!")
+        return None
+
+    simulator_time = data["simulator time"]
+    generated_hmm_arrays = {}
+
+    # Process each robot
+    for robot_id, robot_info in data["robots"].items():
+        positions = robot_info["plan"]  # Use plan as positions
+
+        # Create processed data with formatted structure
+        generated_hmm_arrays[robot_id] = [
+            {"formatted_pos": f"({pos})", "interval": simulator_time, "mission_time": robot_info["mission_time"]}
+            for pos in positions
+        ]
+
+    return generated_hmm_arrays
+
+
+# generated_hmm_arrays = generate_hmm_arrays(data)
+
+# if generated_hmm_arrays:
+#     print("Generated HMM Arrays:", generated_hmm_arrays)
+# {
+#     "quad1": [
+#         {"formatted_pos": "(1,1)", "interval": 0.008099555969238281, "mission_time": 76},
+#         {"formatted_pos": "(2,2)", "interval": 0.008099555969238281, "mission_time": 76},
+#         {"formatted_pos": "(3,3)", "interval": 0.008099555969238281, "mission_time": 76}
+#     ],
+#     "quad2": [
+#         {"formatted_pos": "(4,4)", "interval": 0.008099555969238281, "mission_time": 82},
+#         {"formatted_pos": "(5,5)", "interval": 0.008099555969238281, "mission_time": 82},
+#         {"formatted_pos": "(6,6)", "interval": 0.008099555969238281, "mission_time": 82}
+#     ]
+# }
+
+
+
+
+def select_hmm_row(processed_data, robot_number, row_index):
+    """
+    Selects a specific row from processed robot data using a numeric robot ID.
+
+    :param processed_data: Dict containing processed robot data.
+    :param robot_number: Integer robot ID (1, 2, 3).
+    :param row_index: Index of the row to select.
+    :return: The selected row dictionary.
+    """
+    robot_id = f"quad{robot_number}"  # Map 1 → quad1, 2 → quad2, etc.
+
+    if robot_id not in processed_data:
+        print(f"❌ Robot {robot_id} not found!")
+        return None
+
+    robot_data = processed_data[robot_id]
+
+    if 0 <= row_index < len(robot_data):
+        return robot_data[row_index]
+    else:
+        print(f"❌ Row index {row_index} out of range for {robot_id}.")
+        return None
+
+
+def hmm_array_reformat(row_data):
+    """
+    Extracts and formats 'formatted_pos', 'interval', and 'mission_time' into an HMM array.
+
+    :param row_data: The dictionary row containing robot data.
+    :return: List containing formatted values for HMM processing.
+    """
+    if not row_data:
+        print("❌ Invalid row data provided!")
+        return None
+
+    # Extract numbers from formatted_pos (convert from string to tuple)
+    pos_match = re.findall(r"-?\d+", row_data["formatted_pos"])  
+    formatted_position = tuple(map(int, pos_match)) if pos_match else (None, None)
+
+    # Store in list
+    hmm_array = [formatted_position, row_data["interval"], row_data["mission_time"]]
+
+    return hmm_array
+
+
+
+# row_2_robot = select_hmm_row(processed_data, 1, row_index=2)
+# row_2_robot
+# {'formatted_pos': '([1, 1])',
+#  'interval': 0.008099555969238281,
+#  'mission_time': 76}
+
+# row_2_robot_hmm = hmm_array_reformat(row_2_robot)
+# row_2_robot_hmm
+# [(1, 1), 0.008099555969238281, 76]
+
+
+
+def create_rmm_array(data, robot_number):
+    """
+    Extracts (x[0], y[1]), simulator time, and mission time for a given robot.
+
+    :param data: Raw JSON data.
+    :param robot_number: Integer robot ID (1, 2, 3).
+    :return: List containing [(x[0], y[1]), simulator_time, mission_time] as RMM array.
+    """
+    robot_id = f"quad{robot_number}"  # Convert number to quad ID
+
+    if "simulator time" not in data or "robots" not in data:
+        print("❌ Invalid data format!")
+        return None
+
+    if robot_id not in data["robots"]:
+        print(f"❌ Robot {robot_id} not found!")
+        return None
+
+    robot_info = data["robots"][robot_id]
+    simulator_time = data["simulator time"]
+
+    # Extract first values of x and y
+    x_val = robot_info["x"][0] if len(robot_info["x"]) > 0 else None
+    y_val = robot_info["y"][1] if len(robot_info["y"]) > 1 else None
+    mission_time = robot_info["mission_time"]
+
+    # Create RMM array
+    rmm_array = [(x_val, y_val), simulator_time, mission_time]
+
+    return rmm_array
+
+# robot_number = 1  # User inputs 1 for quad1
+
+# rmm_array = create_rmm_array(data, robot_number)
+
+# if rmm_array:
+#     print("Final RMM Array:", rmm_array)
+# Final RMM Array: [(0, 0), 0.008099555969238281, 76]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# def create_rmm_array(data, robot_number, row_index):
+#     """
+#     Processes robot data and extracts a specific row into an RMM array.
+
+#     :param data: Raw JSON data.
+#     :param robot_number: Integer robot ID (1, 2, 3).
+#     :param row_index: Index of the row to select.
+#     :return: List containing formatted (x, y), interval, and mission_time as RMM array.
+#     """
+#     robot_id = f"quad{robot_number}"  # Convert number to quad ID
+
+#     if "simulator time" not in data or "robots" not in data:
+#         print("❌ Invalid data format!")
+#         return None
+
+#     if robot_id not in data["robots"]:
+#         print(f"❌ Robot {robot_id} not found!")
+#         return None
+
+#     robot_info = data["robots"][robot_id]
+#     simulator_time = data["simulator time"]
+
+#     # Process positions from plan
+#     positions = robot_info["plan"]  # Assuming plan includes the start point
+#     processed_data = [
+#         {"formatted_pos": f"({pos})", "interval": simulator_time, "mission_time": robot_info["mission_time"]}
+#         for pos in positions
+#     ]
+
+#     if not (0 <= row_index < len(processed_data)):
+#         print(f"❌ Row index {row_index} out of range for {robot_id}.")
+#         return None
+
+#     row_data = processed_data[row_index]
+
+#     # Extract numbers from formatted_pos (convert from string to tuple)
+#     pos_match = re.findall(r"-?\d+", row_data["formatted_pos"])  
+#     formatted_position = tuple(map(int, pos_match)) if pos_match else (None, None)
+
+#     # Create RMM array
+#     rmm_array = [formatted_position, row_data["interval"], row_data["mission_time"]]
+
+#     return rmm_array
+
+
+# robot_number = 1  # User inputs 1 for quad1
+# row_index = 2     # Select row 2
+
+# rmm_array = create_rmm_array(data, robot_number, row_index)
+
+# if rmm_array:
+#     print("Final RMM Array:", rmm_array)
+# Final RMM Array: [(1, 1), 0.008099555969238281, 76]
+
+
+
 def generate_rmm_array_for_row(shmm_row, index):
     position_values = shmm_row[0]
     time_value = shmm_row[1]
@@ -86,6 +307,22 @@ def select_hmm_array(hmm_arrays, timestep):
         return hmm_arrays[index]
     else:
         return None  # Return None if the index is out of bounds
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def calculate_l1_norm(array1, array2):
     norm = np.abs(np.array(array2) - np.array(array1))

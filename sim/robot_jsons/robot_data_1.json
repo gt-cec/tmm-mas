@@ -1,5 +1,5 @@
 {
-    "simulator time": 0.008081436157226562,
+    "simulator time": 0.012862443923950195,
     "robots": {
         "quad1": {
             "plan": [
@@ -328,7 +328,8 @@
             "y": [
                 0,
                 0
-            ]
+            ],
+            "mission_time": 76
         },
         "quad2": {
             "plan": [
@@ -673,7 +674,8 @@
             "y": [
                 3,
                 4
-            ]
+            ],
+            "mission_time": 80
         },
         "quad3": {
             "plan": [
@@ -986,7 +988,8 @@
             "y": [
                 2,
                 0
-            ]
+            ],
+            "mission_time": 72
         }
     }
 }

@@ -316,19 +316,20 @@
                     2
                 ]
             ],
-            "plan_index": 74,
+            "plan_index": 75,
             "immediate_goal": [
-                4,
+                3,
                 3
             ],
             "x": [
-                4,
+                3,
                 3
             ],
             "y": [
-                4,
+                3,
                 3
-            ]
+            ],
+            "mission_time": 2
         },
         "quad2": {
             "plan": [
@@ -661,19 +662,20 @@
                     2
                 ]
             ],
-            "plan_index": 75,
+            "plan_index": 76,
             "immediate_goal": [
                 4,
-                4
+                3
             ],
             "x": [
                 4,
-                4
+                3
             ],
             "y": [
                 4,
-                4
-            ]
+                3
+            ],
+            "mission_time": 5
         },
         "quad3": {
             "plan": [
@@ -974,7 +976,7 @@
                     2
                 ]
             ],
-            "plan_index": 72,
+            "plan_index": 73,
             "immediate_goal": [
                 3,
                 2
@@ -986,7 +988,8 @@
             "y": [
                 3,
                 2
-            ]
+            ],
+            "mission_time": 0
         }
     }
 }
