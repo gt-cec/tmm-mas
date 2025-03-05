@@ -556,10 +556,6 @@ while rclpy.ok():
 
                 # print_state(drone_obj.name,global_pose,goal,dind,v_curr,goal_reached)
                 
-            if np.all(np.array(finalgoal_check)):
-                print("All goals reach!")
-                start = not start
-                
             else:
                 finalgoal_check[drone_count] = True
                 # print(f'Final goal: {drone_count}, {dind}')
