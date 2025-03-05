@@ -151,6 +151,99 @@ def receive_data():
 
     return jsonify({"message": "All data received successfully!"}), 200
 
+
+
+
+# def process(robot_id, data, tasks, plan_coordinates, plans, JSON_data):
+#     global last_mission_times
+#     global current_robot_states
+#     global previous_robot_states
+
+#     current_index, x, y, time_elapsed, steps_remaining = data
+
+#     hmm_array_data_preformat = select_hmm_row(processed_hmm_arrays, str(robot_id), int(current_index))
+#     hmm_array_data = hmm_array_reformat(hmm_array_data_preformat)
+
+#     hmm_array = [
+#         int(current_index),
+#         float(hmm_array_data[0][0]),
+#         float(hmm_array_data[0][1]),
+#         round(float(hmm_array_data[1]), 4),
+#         int(last_mission_times[str(robot_id)])
+#     ]
+
+#     rmm_array_create = create_rmm_array(JSON_data, str(robot_id))
+#     rmm_array = [
+#         int(current_index),
+#         float(rmm_array_create[0][0]),
+#         float(rmm_array_create[0][1]),
+#         round(float(rmm_array_create[1]), 4),
+#         int(rmm_array_create[2])
+#     ]
+
+#     update_logic_functions = [bayesian_probabilistic_update_general]
+#     uncertainty_factor_pos = 0.05
+#     uncertainty_factor_time = 0.01
+
+#     updated_hmm_array, message = dynamic_deviation_threshold_multi_logic(
+#         [hmm_array], [rmm_array], update_logic_functions, uncertainty_factor_pos, uncertainty_factor_time,
+#         dynamic_threshold_mission_time=10, robot_id=robot_id)
+
+
+#     print(f"HMM Array for Robot {robot_id}: {hmm_array }")
+#     print(f"RMM Array for Robot {robot_id}: {rmm_array}")
+#     print("updated_hmm_array", updated_hmm_array)
+#     print(f"Message for Robot {robot_id}: {message}")
+
+#     last_mission_times[str(robot_id)] = updated_hmm_array[0][4]
+#     print("last_mission_times",last_mission_times)
+
+
+
+#     robot_number = int(robot_id.replace("quad", ""))
+
+#     # Generate plans
+#     x = random.randint(3, 7)
+#     y = random.randint(3, 7)
+#     plan = [[x, y]]
+#     last_loc = [x, y]
+#     for _ in range(steps_remaining):
+#         new_loc = [last_loc[0] + random.randint(-1, 1), last_loc[1] + random.randint(-1, 1)]
+#         last_loc = new_loc
+#         plan.append(new_loc)
+#     plan_coordinates.append(plan)
+
+#     robotPlanAbstract = []
+#     for _ in range(random.randint(0, 5)):
+#         task = random.choice(list(tasks.keys()))
+#         obj = random.choice(tasks[task])
+#         robotPlanAbstract.append(f"{task} {obj}")
+#     plans.append(robotPlanAbstract)
+
+#     # Ensure the robot state exists in current_robot_states
+#     if str(robot_number) not in current_robot_states["robots"]:
+#         current_robot_states["robots"][str(robot_number)] = {
+#             "currentLocationPlan": [],
+#             "currentAbstractedPlan": []
+#         }
+
+#     return {
+#         "rmm_array": rmm_array,
+#         "x": plan[0][0],
+#         "y": plan[0][1],
+#         "robotPath": [[1, 0], [0, 0], [plan[0][0], plan[0][1]]],
+#         "completedPlan": ["Go to objective A", "Pick up package #1"],
+#         "currentLocationPlan": plan,
+#         "previousLocationPlan": current_robot_states["robots"][str(robot_number)]["currentLocationPlan"],
+#         "initialPlan": [[2, 4], [3, 4], [3, 5], [4, 5]],
+#         "currentAbstractedPlan": robotPlanAbstract,
+#         "previousAbstractedPlan": current_robot_states["robots"][str(robot_number)]["currentAbstractedPlan"],
+#         "message": message
+#     }
+
+
+
+
 def process(robot_id, data, tasks, plan_coordinates, plans, JSON_data):
     global last_mission_times
     global current_robot_states
@@ -186,16 +279,13 @@ def process(robot_id, data, tasks, plan_coordinates, plans, JSON_data):
         [hmm_array], [rmm_array], update_logic_functions, uncertainty_factor_pos, uncertainty_factor_time,
         dynamic_threshold_mission_time=10, robot_id=robot_id)
 
-
-    print(f"HMM Array for Robot {robot_id}: {hmm_array }")
+    print(f"HMM Array for Robot {robot_id}: {hmm_array}")
     print(f"RMM Array for Robot {robot_id}: {rmm_array}")
     print("updated_hmm_array", updated_hmm_array)
     print(f"Message for Robot {robot_id}: {message}")
 
     last_mission_times[str(robot_id)] = updated_hmm_array[0][4]
-    print("last_mission_times",last_mission_times)
-
-
+    print("last_mission_times", last_mission_times)
 
     robot_number = int(robot_id.replace("quad", ""))
 
@@ -224,7 +314,9 @@ def process(robot_id, data, tasks, plan_coordinates, plans, JSON_data):
             "currentAbstractedPlan": []
         }
 
+    # Return the robot state with the correct robot ID
     return {
+        "robot_id": robot_id,  # Add robot_id to the state
         "rmm_array": rmm_array,
         "x": plan[0][0],
         "y": plan[0][1],
@@ -237,6 +329,7 @@ def process(robot_id, data, tasks, plan_coordinates, plans, JSON_data):
         "previousAbstractedPlan": current_robot_states["robots"][str(robot_number)]["currentAbstractedPlan"],
         "message": message
     }
+
 
 @app.route('/')
 def index():
