@@ -9,6 +9,7 @@ import requests
 
 # Directory containing JSON files
 output_dir = "robot_jsons"
+# output_dir = "04_03_robot_jsons"
 # server_url = "http://127.0.0.1:5000/receive_data"
 server_url = "http://127.0.0.1:5211/receive_data"
 # server_url = "http://127.0.0.1:5211/reset"

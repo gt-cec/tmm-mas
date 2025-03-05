@@ -74,11 +74,11 @@ def receive_data():
         raise ValueError("Missing 'robots' key in JSON data.")
 
     dfs = extract_robot_data(JSON_data)
-    print("dfs:", dfs)
+    # print("dfs:", dfs)
 
     # Track active robots
     active_robots = {robot_id: len(dfs[robot_id]) > 0 for robot_id in dfs}
-    print("Active Robots:", active_robots)
+    # print("Active Robots:", active_robots)
 
     tasks = {
         "Go to": ["objective A", "objective B", "objective C", "base"],
@@ -107,16 +107,28 @@ def receive_data():
         ]
         print("result:", result)
 
+
+
+
+
         robot_state = process(robot_id, result, tasks, plan_coordinates, plans, JSON_data)
-        print("robot_state", robot_state)
+
+
+
+
+
+
+
+
+        # print("robot_state", robot_state)
 
         robot_number = int(robot_id.replace("quad", ""))
         robot_states[robot_number] = robot_state
 
         # Print HMM, RMM, and message details
-        print(f"HMM Array for Robot {robot_id}: {robot_state['rmm_array']}")
-        print(f"RMM Array for Robot {robot_id}: {robot_state['rmm_array']}")
-        print("robot_states", robot_states)
+        # print(f"HMM Array for Robot {robot_id}: {robot_state['rmm_array']}")
+        # print(f"RMM Array for Robot {robot_id}: {robot_state['rmm_array']}")
+        # print("robot_states", robot_states)
 
         if robot_states:
             previous_robot_states = current_robot_states
@@ -174,10 +186,16 @@ def process(robot_id, data, tasks, plan_coordinates, plans, JSON_data):
         [hmm_array], [rmm_array], update_logic_functions, uncertainty_factor_pos, uncertainty_factor_time,
         dynamic_threshold_mission_time=10, robot_id=robot_id)
 
+
+    print(f"HMM Array for Robot {robot_id}: {hmm_array }")
+    print(f"RMM Array for Robot {robot_id}: {rmm_array}")
     print("updated_hmm_array", updated_hmm_array)
     print(f"Message for Robot {robot_id}: {message}")
 
     last_mission_times[str(robot_id)] = updated_hmm_array[0][4]
+    print("last_mission_times",last_mission_times)
+
+
 
     robot_number = int(robot_id.replace("quad", ""))
 

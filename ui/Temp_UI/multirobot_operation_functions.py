@@ -581,7 +581,8 @@ def check_robot_data(JSON_data, expected_robots):
 
 
 def calculate_l1_norm(array1, array2):
-    norm = np.abs(np.array(array2) - np.array(array1))
+    # norm = np.abs(np.array(array2) - np.array(array1))
+    norm = (np.array(array2) - np.array(array1))
     return norm
 
 def bayesian_probabilistic_update_general(original_value, deviation, threshold, uncertainty_factor):
