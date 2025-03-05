@@ -52,5 +52,5 @@ while True:
             if not is_playing:
                 print("⏸️ Play stopped. Pausing...")
                 break
-    time.sleep(5)
+    # time.sleep(5)
 

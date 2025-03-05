@@ -46,7 +46,7 @@ for file in json_files:
         print(f"❌ Failed to send {file} - Status: {response.status_code}")
 
     # Delay between sending each request
-    time.sleep(3)  # Adjust the delay as needed
+    # time.sleep(3)  # Adjust the delay as needed
 
 
 

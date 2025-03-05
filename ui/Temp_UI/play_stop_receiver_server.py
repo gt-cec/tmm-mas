@@ -114,7 +114,7 @@ def receive_data():
             socketio.emit("message", current_robot_states)
             initial_data = False
 
-        socketio.sleep(2)
+        # socketio.sleep(2)
 
     return jsonify({"message": "All data received successfully!"}), 200
 
