@@ -1,0 +1,163 @@
+
+ <!DOCTYPE html>
+ <html lang="en">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Communication Box</title>
+     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+ </head>
+ 
+ <body>
+     <div class="container">
+         <button id="playStopButton">Play</button>
+         <div id="statusMessage">Status: Stopped</div>
+     </div>
+ 
+     <script>
+         const socket = io();
+         let isPlaying = false;
+ 
+         document.getElementById("playStopButton").addEventListener("click", () => {
+             isPlaying = !isPlaying;
+             document.getElementById("playStopButton").textContent = isPlaying ? "Stop" : "Play";
+             document.getElementById("statusMessage").textContent = `Status: ${isPlaying ? "Playing" : "Stopped"}`;
+             socket.send(isPlaying);
+         });
+ 
+         socket.on("message", (data) => {
+             console.log("Received message:", data);
+         });
+     </script>
+ </body>
+ </html>
+ 
+
+<!-- bugged up front end but play stop works -->
+<!-- <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Communication Box</title>
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/colors.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/robotButton.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/drawing.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/messages.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/plans.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/sockets.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+    <div class="left-section">
+        <div class="title">Plan</div>
+        <div class="communication-container">
+            <div id="robot-buttons-container-left" class="robot-buttons-container">
+                <button class="robot-button" data-robot="1">Robot 1</button>
+                <button class="robot-button" data-robot="2">Robot 2</button>
+                <button class="robot-button" data-robot="3">Robot 3</button>
+            </div>
+            <div id="plans" class="messages"></div>
+        </div>
+    </div>
+    
+    <div class="center-section">
+        <div class="map-container">
+            <canvas id="simulationCanvas" width="700" height="700"></canvas>
+        </div>
+        <div id="statusMessage" class="connected-indicator-container">
+            <div class="circle"></div>
+            <div class="connected-text">Connected</div>
+        </div>
+    </div>
+
+    <div class="right-section">
+        <div class="title">Communication</div>
+        <div class="communication-container">
+            <div id="robot-buttons-container-right" class="robot-buttons-container">
+                <button class="robot-button" data-robot="1">Robot 1</button>
+                <button class="robot-button" data-robot="2">Robot 2</button>
+                <button class="robot-button" data-robot="3">Robot 3</button>
+            </div>
+            <button id="playStopButton">Play</button>
+            <div id="messages" class="messages"></div>
+
+            <div class="slider-container">
+                <label for="disparitySlider">MM Disparity:</label>
+                <input type="range" id="disparitySlider" min="0" max="2" step="1" value="0">
+                <div class="slider-labels">
+                    <span>Low</span>
+                    <span>Medium</span>
+                    <span>High</span>
+                </div>
+            </div>
+
+            <div class="input-box">
+                <input class="input-box-text" type="text" id="messageInput" placeholder="Send a message...">
+                <button class="input-box-button" id="sendMessageButton" type="submit">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        let isPlaying = false;
+        const playStopButton = document.getElementById("playStopButton");
+        const messagesContainer = document.getElementById("messages");
+        const sendMessageButton = document.getElementById("sendMessageButton");
+        const messageInput = document.getElementById("messageInput");
+
+        // Handle Play/Stop button
+        playStopButton.addEventListener("click", () => {
+            isPlaying = !isPlaying;
+            playStopButton.textContent = isPlaying ? "Stop" : "Play";
+            socket.send(isPlaying);
+        });
+
+        // Handle incoming messages
+        socket.on("message", (data) => {
+            console.log("Received message:", data);
+            if (typeof data === "object" && data.robots) {
+                updateRobotMessages(data);
+            } else {
+                displayMessage(`System: ${data}`);
+            }
+        });
+
+        // Display messages in the Communication panel
+        function displayMessage(msg) {
+            const messageElement = document.createElement("div");
+            messageElement.textContent = msg;
+            messagesContainer.appendChild(messageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;  // Auto-scroll
+        }
+
+        // Update messages for robots
+        function updateRobotMessages(data) {
+            messagesContainer.innerHTML = "";
+            Object.keys(data.robots).forEach(robot => {
+                const robotMessage = `Robot ${robot}: ${JSON.stringify(data.robots[robot].message)}`;
+                displayMessage(robotMessage);
+            });
+        }
+
+        // Handle sending messages manually
+        sendMessageButton.addEventListener("click", () => {
+            const message = messageInput.value.trim();
+            if (message) {
+                socket.send(message);
+                messageInput.value = "";
+                displayMessage(`You: ${message}`);
+            }
+        });
+
+        drawGrid();
+    </script>
+</body>
+</html> -->
+
+
