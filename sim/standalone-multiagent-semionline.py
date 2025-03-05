@@ -319,7 +319,7 @@ print("World started!")
 
 ## Simple PID Gains
 kp = 6
-kp_z = 2
+kp_z = 3
 kd = 2
 kd_z = 0.5
 
@@ -559,11 +559,17 @@ while rclpy.ok():
             if np.all(np.array(finalgoal_check)):
                 print("All goals reach!")
                 start = not start
+                
             else:
                 finalgoal_check[drone_count] = True
+                # print(f'Final goal: {drone_count}, {dind}')
 
                 vel = Gf.Vec3f(0,0,0)
                 quad["rb"].GetVelocityAttr().Set(vel)
+
+            if np.all(np.array(finalgoal_check)):
+                    print("All goals reach!")
+                    start = not start
 
             quad["info"] = drone_obj
             robot_id = f'robot{drone_count}'
@@ -586,7 +592,7 @@ while rclpy.ok():
             # rate.sleep() # See comment about rate above
 
         current_time = time.time()
-        print(f'Time: {current_time}')
+        print(f'Time: {elapsed_time(start_time)}')
         if current_time >= next_print_time:
             # json_output = generate_json(current_time, robots_JSON, filename_json)
             json_output = generate_json(start_time, robots_JSON)
@@ -597,15 +603,12 @@ while rclpy.ok():
         for quad in quad_list:
             quad["rb"].GetVelocityAttr().Set(vel) 
 
-#<<<<<<< HEAD
+
     current_time = time.time()
     if (current_time >= next_print_time and start):
         # json_output = generate_json(current_time, robots_JSON, filename_json)
         json_output = generate_json(current_time, robots_JSON)
         next_print_time += 10
-#=======
-    
-#>>>>>>> 67c89a8f3f7167f908cbbe7e53507cb6c296fc61
         
 
     world.step(render=True)
