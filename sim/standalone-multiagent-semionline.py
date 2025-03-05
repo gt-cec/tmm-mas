@@ -589,6 +589,12 @@ while rclpy.ok():
             # pose_publisher.publish(drone_poses_msg)
             # rate.sleep() # See comment about rate above
 
+        current_time = time.time()
+        if (current_time >= next_print_time and start):
+            # json_output = generate_json(current_time, robots_JSON, filename_json)
+            json_output = generate_json(start_time, robots_JSON)
+            next_print_time += json_time
+
         
     else:
         vel = Gf.Vec3f(0,0,0)
@@ -596,11 +602,7 @@ while rclpy.ok():
             quad["rb"].GetVelocityAttr().Set(vel) 
 
 
-    current_time = time.time()
-    if (current_time >= next_print_time and start):
-        # json_output = generate_json(current_time, robots_JSON, filename_json)
-        json_output = generate_json(start_time, robots_JSON)
-        next_print_time += json_time
+    
         
 
     world.step(render=True)
