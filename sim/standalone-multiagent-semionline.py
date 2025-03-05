@@ -78,6 +78,8 @@ blocks = [(2,2),(0,4)]
 
 ## JSON function
 
+json_time = 5
+
 #Harris JSON save
 # filename_json = "simulation_data.json"
 
@@ -367,14 +369,14 @@ for path in quad_path_list:
     quad_list.append(quad_new)
     wait_count.append(wait_val)
 
-    robot_id = drone_new.name
+    robot_id = f'robot{quad_count}'
     plan = drone_new.getPath()
     robots_JSON[robot_id] = {
         "plan": plan,
         "plan_index": 1,
         "immediate_goal": plan[1],
-        "x": plan[0],
-        "y": plan[0],
+        "x": plan[0][0],
+        "y": plan[0][1],
         "mission_time": len(plan)-1-1
     }
     quad_count += 1
@@ -568,7 +570,7 @@ while rclpy.ok():
                     start = not start
 
             quad["info"] = drone_obj
-            robot_id = f'robot{drone_count}'
+            robot_id = f'robot{drone_count+1}'
             plan = drone_obj.getPath()
             goal_ind = dind if dind < len(plan) else len(plan)-1
             curr_ind = goal_ind-1 if goal_ind > 0 else 0
@@ -597,8 +599,8 @@ while rclpy.ok():
     current_time = time.time()
     if (current_time >= next_print_time and start):
         # json_output = generate_json(current_time, robots_JSON, filename_json)
-        json_output = generate_json(current_time, robots_JSON)
-        next_print_time += 10
+        json_output = generate_json(start_time, robots_JSON)
+        next_print_time += json_time
         
 
     world.step(render=True)
