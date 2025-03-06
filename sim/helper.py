@@ -50,16 +50,7 @@ def parse_action_sequence(action_sequence, bumps):
     return x_coords, y_coords, z_coords, flags
 
 def parse_action_sequence_from_yaml(file_path, bumps):
-    """
-    Parses an action sequence from a YAML file.
 
-    Args:
-        file_path (str): Path to the YAML file containing the action sequence.
-        bumps (set): A set of tuples representing bump coordinates.
-
-    Returns:
-        tuple: Four lists containing x, y, z coordinates and flags.
-    """
     # Load the YAML file
     with open(file_path, 'r') as file:
         data = yaml.safe_load(file)
@@ -109,14 +100,7 @@ def parse_action_sequence_from_yaml(file_path, bumps):
     return x_coords, y_coords, z_coords, flags
 
 def save_action_sequence_to_csv(file_path, bumps, output_csv):
-    """
-    Parses an action sequence from a YAML file and saves it as columns in a CSV file.
 
-    Args:
-        file_path (str): Path to the YAML file containing the action sequence.
-        bumps (set): A set of tuples representing bump coordinates.
-        output_csv (str): Path to the output CSV file.
-    """
     x_coords, y_coords, z_coords, flags = parse_action_sequence_from_yaml(file_path, bumps)
 
     with open(output_csv, 'w', newline='') as csvfile:
@@ -137,35 +121,8 @@ def print_state(name,gp,d,dind,v,goal):
         # print(f'Velocity: {v[0]},{v[1]},{v[2]}')
         print('-------------------------------------')
 
-def save_robot_data(robot_name, current_pose, idx, steps, plans, filename):
-
-    # Create a dictionary with the results
-    robot_data = {
-        "robot_name": robot_name,
-        "x_coord": current_pose[0],
-        "y_coord": current_pose[0],
-        "time_step": idx,
-        "time_remaining": steps,
-        "replans": plans
-    }
-
-    # Save the dictionary as a JSON file
-    with open(filename, 'w') as json_file:
-        json.dump(robot_data, json_file, indent=4)
-
-    print(f"Data for robot '{robot_name}' saved to {filename}.")
-
 def read_selected_columns(file_path, columns):
-    """
-    Reads specified columns from a CSV file and returns them as separate lists.
 
-    Args:
-        file_path (str): Path to the CSV file.
-        columns (list of str): List of column names to extract.
-
-    Returns:
-        tuple: Separate lists for each specified column.
-    """
     extracted_columns = {col: [] for col in columns}
 
     with open(file_path, 'r') as csvfile:
@@ -182,3 +139,15 @@ def read_selected_columns(file_path, columns):
                         extracted_columns[col].append(value)
 
     return tuple(extracted_columns[col] for col in columns)
+
+def load_replans(file_path):
+
+    with open(file_path, 'r') as file:
+        data = yaml.safe_load(file)
+    
+    action_sequences = {}
+    
+    for key, value in data.items():
+        action_sequences[key] = value.get("action_sequence", [])
+    
+    return action_sequences
