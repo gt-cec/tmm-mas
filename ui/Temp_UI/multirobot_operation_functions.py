@@ -49,6 +49,52 @@ def extract_robot_data(data):
 
 
 
+def abstract_plan(robot_data):
+    """
+    Abstract the plan information from the robot data.
+    """
+    abstracted_plan = []
+    plan = robot_data.get("plan", [])
+    immediate_goal = robot_data.get("immediate_goal", [])
+    mission_time = robot_data.get("mission_time", 0)
+    replan_flag = robot_data.get("replan_flag", False)
+
+    if plan:
+        # Get the final goal position from the plan
+        final_goal = plan[-1]
+        abstracted_plan.append(f"Go to ({final_goal[0]}, {final_goal[1]})")
+
+        # Add direction information
+        if len(plan) > 1:
+            current_pos = plan[0]
+            next_pos = plan[1]
+            direction = get_direction(current_pos, next_pos)
+            abstracted_plan.append(f"Direction: {direction}")
+
+        if replan_flag:
+            abstracted_plan.append("Replanning occurred")
+        abstracted_plan.append(f"Mission time: {mission_time}")
+
+    return abstracted_plan
+
+def get_direction(current_pos, next_pos):
+    """
+    Determine the direction based on current and next positions.
+    """
+    dx = next_pos[0] - current_pos[0]
+    dy = next_pos[1] - current_pos[1]
+
+    if dx > 0:
+        return "East"
+    elif dx < 0:
+        return "West"
+    elif dy > 0:
+        return "North"
+    elif dy < 0:
+        return "South"
+    else:
+        return "Stationary"
+
 
 
 # def generate_hmm_arrays(data):

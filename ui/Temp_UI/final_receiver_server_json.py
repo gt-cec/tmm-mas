@@ -144,10 +144,10 @@ def receive_data():
             }
 
             # Emit the updated state to the client
-            socketio.emit("message", current_robot_states)
-            initial_data = False
+        socketio.emit("message", current_robot_states)
+        initial_data = False
 
-        socketio.sleep(2)  # Simulate processing delay
+    socketio.sleep(2)  # Simulate processing delay
 
     return jsonify({"message": "All data received successfully!"}), 200
 # uncomment above, skip below

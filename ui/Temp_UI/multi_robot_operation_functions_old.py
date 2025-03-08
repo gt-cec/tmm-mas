@@ -37,6 +37,8 @@ def generate_hmm_arrays(data):
     return generated_hmm_arrays
 
 
+
+
 # generated_hmm_arrays = generate_hmm_arrays(data)
 
 # if generated_hmm_arrays:
