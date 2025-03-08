@@ -50,7 +50,7 @@ function drawSimulationMap() {
             drawPath(element.robotPath, colorCompletedPlan)
 
             // draw the robot's current plan
-            drawPath(element.currentLocationPlan, colorCurrentPlan, false, true)
+            drawPath(element.currentLocationPlan, colorCurrentPlan, false, true, true)
 
             // draw the robot's previous plan if selected
             if (robotFilterId != -1) {
@@ -141,20 +141,53 @@ function pxToCanvas(x, y) {
     return [x * cellSize, canvas.height - (y * cellSize)]
 }
 
-function drawPath(path, color, dash=false, thick=false) {
+function drawPath(path, color, dash=false, thick=false, roundedCorners=false) {
     if (path.length < 2) return
+    var count = 0
 
     ctx.beginPath()
     ctx.moveTo(path[0][0] * cellSize, canvas.height - (path[0][1] * cellSize))
 
-    for (let i = 1; i < path.length; i++) {
-        ctx.lineTo(path[i][0] * cellSize, canvas.height - (path[i][1] * cellSize))
+    if (roundedCorners == true) {
+        var currentCoords = path[0]
+        var nextCoords = path[0]
+        var arcRadius = 0.15
+
+        for (let i = 1; i < path.length; i++) {
+            var curNextDifX = Math.abs(nextCoords[0] - currentCoords[0])
+            var curNextDifY = Math.abs(nextCoords[1] - currentCoords[1])
+            var nextAfterDifX = Math.abs(path[i][0] - nextCoords[0])
+            var nextAfterDifY = Math.abs(path[i][1] - nextCoords[1])
+            var curAfterDifX = Math.abs(path[i][0] - currentCoords[0])
+            var curAfterDifY = Math.abs(path[i][1] - currentCoords[1])
+            var curAdjacentNext = (curNextDifX == 1 && curNextDifY == 0) != (curNextDifX == 0 && curNextDifY == 1)
+            var nextAdjacentAfter = (nextAfterDifX == 1 && nextAfterDifY == 0) != (nextAfterDifX == 0 && nextAfterDifY == 1)
+            var curAdjacentAfter = (curAfterDifX == 1 && curAfterDifY == 0) != (curAfterDifX == 0 && curAfterDifY == 1)
+            if ((curAdjacentNext != nextAdjacentAfter) && curAdjacentAfter) {
+                arcRadius = 0.07
+            } else {
+                arcRadius = 0.15
+            }
+
+            ctx.arcTo(nextCoords[0] * cellSize, canvas.height - (nextCoords[1] * cellSize), path[i][0] * cellSize, canvas.height - (path[i][1] * cellSize), arcRadius * cellSize)
+            
+            currentCoords = nextCoords
+            nextCoords = path[i]
+        }
+
+        ctx.lineTo(nextCoords[0] * cellSize, canvas.height - (nextCoords[1] * cellSize))
+    } 
+
+    else {
+        for (let i = 1; i < path.length; i++) {
+            ctx.lineTo(path[i][0] * cellSize, canvas.height - (path[i][1] * cellSize))
+        }
     }
 
     ctx.setLineDash(dash ? [5, 10] : [])
 
     ctx.strokeStyle = color
-    ctx.lineWidth = thick ? 5 : 2
+    ctx.lineWidth = thick ? 4 : 2
     ctx.stroke()
     ctx.setLineDash([])
 }
