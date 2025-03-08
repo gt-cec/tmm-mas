@@ -121,15 +121,36 @@ function createSocket() {
             //     displayMessage(data.message, dynamicThreshold, Object.keys(data.robots), Object.keys(data.objectives))
             // }
 
+            // In sockets.js, within the socket.on("message") handler
+            if (data.robots !== undefined) {
+                // on the first run, set up the robot buttons
+                if (numRobots == -1) {
+                    createRobotButtons(Object.keys(data.robots).length)
+                }
+                // set the new robot data
+                Object.keys(data.robots).forEach((robotId) => {
+                    newRobotData[robotId] = data.robots[robotId]
+                    newRobotData[robotId].lastSeen = data.timestamp
+                    
+                    // Update savedRobotData to reflect the current data
+                    savedRobotData[robotId] = data.robots[robotId]
+                    savedRobotData[robotId].lastSeen = data.timestamp
+                })
+                
+                // Update the plan display if a robot is selected
+                if (robotFilterId != -1) {
+                    displayPlan()
+                }
+            }
 
-if (data.robots) {
-    Object.keys(data.robots).forEach(robotId => {
-        const robotState = data.robots[robotId];
-        if (robotState.message) {
-            displayMessage(robotState.message, dynamicThreshold, [robotId], Object.keys(data.objectives));
-        }
-    });
-}
+            if (data.robots) {
+                Object.keys(data.robots).forEach(robotId => {
+                    const robotState = data.robots[robotId];
+                    if (robotState.message) {
+                        displayMessage(robotState.message, dynamicThreshold, [robotId], Object.keys(data.objectives));
+                    }
+                });
+            }
 
             if (data.robots !== undefined) {
                 // on the first run, set up the robot buttons
