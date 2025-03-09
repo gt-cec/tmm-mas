@@ -12,6 +12,7 @@
     <script src="{{ url_for('static', filename='js/messages.js') }}"></script>
     <script src="{{ url_for('static', filename='js/plans.js') }}"></script>
     <script src="{{ url_for('static', filename='js/sockets.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/test.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 
@@ -44,6 +45,7 @@
             <button id="playStopButton">Play</button>
             <div id="messages" class="messages">
             </div>
+            <!--
             <div class="slider-container">
                 <label for="disparitySlider">MM Disparity:</label>
                 <input type="range" id="disparitySlider" min="0" max="2" step="1" value="0">
@@ -58,6 +60,7 @@
                 <input class="input-box-text" type="text" placeholder="Send a message...">
                 <button class="input-box-button" type="submit">Submit</button>
             </div>
+            -->
         </div>
     </div>
 
@@ -89,6 +92,11 @@
         var newObjectives = {}  // new objectives that may have not been sent
         var savedObjectives = {}  // objectives for the robot
 
+        var previousRobotPositions = {
+            1: null,
+            2: null,
+            3: null,
+        } // previous robot positions
         var timeoutForDelayedRobot = 10  // threshold for when the timer icon appears by the robot
 
         playStopButton.addEventListener("click", () => {

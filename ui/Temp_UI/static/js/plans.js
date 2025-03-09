@@ -107,6 +107,7 @@ function displayPlan() {
         plans.append(space);
 
         // completed plan
+        /**
         let completedPlanTitle = document.createElement("div")
         completedPlanTitle.innerHTML = "—— Completed Plan ——"
         completedPlanTitle.classList.add("plan-info-title")
@@ -122,6 +123,7 @@ function displayPlan() {
                 plans.append(task)
             });
         }
+         */
 
         // current plan
         let currentPlanTitle = document.createElement("div")

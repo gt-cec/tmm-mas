@@ -1,8 +1,8 @@
 
-function displayMessage(message, dynamicThreshold, robotIds, objectives) {
+function displayMessage(message, robotIds, objectives) {
     const messageBox = document.createElement('div')
     messageBox.classList.add('message-box')
-
+/* 
     switch (dynamicThreshold) {
         case 'low':
             messageBox.classList.add('message-low')
@@ -14,7 +14,7 @@ function displayMessage(message, dynamicThreshold, robotIds, objectives) {
             messageBox.classList.add('message-high')
             break
     }
-
+ */
     messageBox.innerText = message
     messageBox.robotIds = robotIds
     messageBox.objectives = objectives
