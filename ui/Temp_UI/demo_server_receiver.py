@@ -22,11 +22,18 @@ app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")  # Allow CORS for UI connections
 
 # Global variables
+# last_mission_times = {
+#     "quad1": 76, 
+#     "quad2": 80, 
+#     "quad3": 72
+# }
+
 last_mission_times = {
-    "quad1": 76, 
-    "quad2": 80, 
-    "quad3": 72
+    "quad1": 61, 
+    "quad2": 58, 
+    "quad3": 61
 }
+
 
 index_value = 0  # Keeps track of timestep across multiple requests
 previous_robot_states = {

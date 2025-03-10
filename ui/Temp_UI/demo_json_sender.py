@@ -8,7 +8,7 @@ import requests
 import socketio
 
 # output_dir = "robot_jsons"
-output_dir = "04_03_robot_jsons"
+output_dir = "updated_robot_jsons_03_08"
 server_url = "http://127.0.0.1:5211/receive_data"
 socket_server_url = "http://127.0.0.1:5211"
 

@@ -22,10 +22,16 @@ app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")  # Allow CORS for UI connections
 
 # Global variables
+# last_mission_times = {
+#     "robot1": 76, 
+#     "robot2": 80, 
+#     "robot3": 72
+# }
+
 last_mission_times = {
-    "robot1": 76, 
-    "robot2": 80, 
-    "robot3": 72
+    "quad1": 61, 
+    "quad2": 58, 
+    "quad3": 61
 }
 
 index_value = 0  # Keeps track of timestep across multiple requests
@@ -126,7 +132,7 @@ def receive_data():
     if not first_json_received:
         first_json_received = True
         processed_hmm_arrays = generate_hmm_arrays(JSON_data)
-        print("✅ generate_hmm_arrays called for the first JSON.")
+        print("✅ generate_hmm_arrays called for the first JSON.",processed_hmm_arrays)
 
     if "robots" not in JSON_data:
         return jsonify({"error": "Missing 'robots' key in JSON data."}), 400
