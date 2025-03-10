@@ -7,7 +7,8 @@ import os
 import requests
 import socketio
 
-output_dir = "robot_jsons"
+# output_dir = "robot_jsons"
+output_dir = "04_03_robot_jsons"
 server_url = "http://127.0.0.1:5211/receive_data"
 socket_server_url = "http://127.0.0.1:5211"
 

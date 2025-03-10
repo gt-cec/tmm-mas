@@ -414,8 +414,11 @@ def create_rmm_array(data, robot_id):
     simulator_time = data["simulator time"]
 
     # Extract first values of x and y
+    # x_val = robot_info["x"][0] if len(robot_info["x"]) > 0 else None
+    # y_val = robot_info["y"][1] if len(robot_info["y"]) > 1 else None
     x_val = robot_info["x"][0] if len(robot_info["x"]) > 0 else None
     y_val = robot_info["y"][1] if len(robot_info["y"]) > 1 else None
+
     mission_time = robot_info["mission_time"]
 
     # Create RMM array
