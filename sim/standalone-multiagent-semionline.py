@@ -14,6 +14,12 @@ simulation_app = SimulationApp(CONFIG)
 
 ####################################################################################################
 
+import time
+import json
+import os
+import requests
+import socketio
+
 import argparse
 import sys
 import time
@@ -160,9 +166,69 @@ json_time = 5
 # Save each JSON as a separate file in a folder; To be used by UI team without setup
 
 # Directory to store JSON files
-output_dir = "robot_jsons"
-os.makedirs(output_dir, exist_ok=True)
+# output_dir = "robot_jsons"
+# os.makedirs(output_dir, exist_ok=True)
 
+# def generate_json(start_time, robots):
+#     data = {
+#         "simulator time": elapsed_time(start_time),
+#         "robots": {}
+#     }
+    
+#     for robot_id, robot_data in robots.items():
+#         data["robots"][robot_id] = {
+#             "plan": robot_data["plan"],
+#             "plan_index": robot_data["plan_index"],
+#             "immediate_goal": robot_data["immediate_goal"],
+#             "x": robot_data["x"],
+#             "y": robot_data["y"],
+#             "mission_time": robot_data["mission_time"],
+#             "replan_flag": robot_data["replan_flag"]
+#         }
+
+#     json_output = json.dumps(data, indent=4)
+
+#     # Find the next available index for naming the file
+#     existing_files = [int(f.split("_")[-1].split(".")[0]) for f in os.listdir(output_dir) if f.startswith("robot_data_") and f.endswith(".json")]
+#     next_index = max(existing_files) + 1 if existing_files else 1
+
+#     # Save JSON file
+#     file_path = os.path.join(output_dir, f"robot_data_{next_index}.json")
+#     with open(file_path, "w") as f:
+#         f.write(json_output)
+
+#     print(f"Saved: {file_path}")
+#     return json_output
+
+
+# Play/Stop JSON push code
+# Server URL and WebSocket URL
+server_url = "http://127.0.0.1:5211/receive_data"
+socket_server_url = "http://127.0.0.1:5211"
+
+# WebSocket Client
+sio = socketio.Client()
+is_playing = False
+
+# Initialize the socket connection
+@sio.event
+def connect():
+    print("✅ Connected to WebSocket server.")
+
+@sio.event
+def disconnect():
+    print("❌ Disconnected from WebSocket server.")
+
+@sio.on("message")
+def message(data):
+    global is_playing
+    if isinstance(data, bool):
+        is_playing = data
+        print(f"🟢 Play Status Updated: {is_playing}")
+
+sio.connect(socket_server_url)
+
+# Simulator's generate_json function (modified)
 def generate_json(start_time, robots):
     data = {
         "simulator time": elapsed_time(start_time),
@@ -180,20 +246,40 @@ def generate_json(start_time, robots):
             "replan_flag": robot_data["replan_flag"]
         }
 
+    # Convert to JSON string
     json_output = json.dumps(data, indent=4)
-
-    # Find the next available index for naming the file
-    existing_files = [int(f.split("_")[-1].split(".")[0]) for f in os.listdir(output_dir) if f.startswith("robot_data_") and f.endswith(".json")]
-    next_index = max(existing_files) + 1 if existing_files else 1
-
-    # Save JSON file
-    file_path = os.path.join(output_dir, f"robot_data_{next_index}.json")
-    with open(file_path, "w") as f:
-        f.write(json_output)
-
-    print(f"Saved: {file_path}")
     return json_output
 
+# Simulation loop (modify to generate and send data in real-time)
+print("🚀 Ready! Waiting for Play signal...")
+
+while True:
+    if is_playing:
+        print("▶️ Sending JSON data...")
+
+        # Assuming you have a running simulation where robots' data and start_time are updated in real-time
+        start_time = time.time()  # Example start time
+        robots = {}  # Replace with your robots' data from the simulation
+
+        # Generate JSON in real-time
+        json_data = generate_json(start_time, robots)
+
+        # Send JSON data to server
+        try:
+            response = requests.post(server_url, json=[json.loads(json_data)])
+
+            if response.status_code == 200:
+                print(f"✅ Sent real-time JSON data")
+            else:
+                print(f"❌ Failed to send data - Status: {response.status_code}")
+        except Exception as e:
+            print(f"❌ Error while sending data: {e}")
+
+        time.sleep(0.3)  # Adjust the frequency of sending data
+
+    else:
+        print("⏸️ Waiting for play signal...")
+        time.sleep(1)  # Prevent unnecessary CPU usage
 
 
 

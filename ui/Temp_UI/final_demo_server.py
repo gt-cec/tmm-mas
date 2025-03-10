@@ -178,15 +178,21 @@ def receive_data():
         # Skip if no data for this robot
         if robot_id not in dfs or len(dfs[robot_id]) == 0:
             continue
-            
+
+
+                        
         row = dfs[robot_id][0]
+        mission_time = row["mission_time"]
+        if mission_time < 0:
+            mission_time = 0
+            
         formatted_position = row["formatted_pos"]
         result = [
             current_index,
             formatted_position[0],
             formatted_position[1],
             row["robot_time"],
-            row["mission_time"]
+            mission_time  
         ]
         
         robot_number = robot_id.replace("robot", "")
@@ -277,8 +283,7 @@ def process(robot_id, data, tasks, plan_coordinates, plans, JSON_data, robot_num
     uncertainty_factor_pos = 0.05
     uncertainty_factor_time = 0.01
 
-    updated_hmm_array, message = dynamic_deviation_threshold_multi_logic(
-        [hmm_array], [rmm_array], update_logic_functions, uncertainty_factor_pos, uncertainty_factor_time,
+    updated_hmm_array, message = dynamic_deviation_threshold_multi_logic(JSON_data,[hmm_array], [rmm_array], update_logic_functions, uncertainty_factor_pos, uncertainty_factor_time,
         dynamic_threshold_mission_time=10, robot_id=robot_id)
 
     print(f"HMM Array for Robot {robot_id}: {hmm_array}")
@@ -342,6 +347,10 @@ def abstract_plan(robot_data):
     immediate_goal = robot_data.get("immediate_goal", [])
     mission_time = robot_data.get("mission_time", 0)
     replan_flag = robot_data.get("replan_flag", False)
+
+    # Ensure mission_time is not negative
+    if mission_time < 0:
+        mission_time = 0
 
     if plan:
         # Get the final goal position from the plan

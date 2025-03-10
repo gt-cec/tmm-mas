@@ -3,8 +3,7 @@
 import numpy as np
 import pandas as pd
 
-
-
+import ollama
 
 import re
 
@@ -280,6 +279,40 @@ def hmm_array_reformat(row_data):
 
 
 
+# def create_rmm_array(data, robot_id):
+#     """
+#     Extracts (x[0], y[1]), simulator time, and mission time for a given robot.
+
+#     :param data: Raw JSON data.
+#     :param robot_id: String ID of the robot (e.g., 'quad1', 'quad2', etc.).
+#     :return: List containing [(x[0], y[1]), simulator_time, mission_time] as RMM array.
+#     """
+#     if "simulator time" not in data or "robots" not in data:
+#         print("❌ Invalid data format!")
+#         return None
+
+#     if robot_id not in data["robots"]:
+#         print(f"❌ Robot {robot_id} not found!")
+#         return None
+
+#     robot_info = data["robots"][robot_id]
+#     simulator_time = data["simulator time"]
+
+#     # Extract first values of x and y
+#     # x_val = robot_info["x"][0] if len(robot_info["x"]) > 0 else None
+#     # y_val = robot_info["y"][1] if len(robot_info["y"]) > 1 else None
+#     # x_val = robot_info["x"][0] if len(robot_info["x"]) > 0 else None
+#     # y_val = robot_info["y"][1] if len(robot_info["y"]) > 1 else None
+#     x_val = robot_info["x"]
+#     y_val = robot_info["y"]
+#     mission_time = robot_info["mission_time"]
+
+#     # Create RMM array
+#     rmm_array = [(x_val, y_val), simulator_time, mission_time]
+
+#     return rmm_array
+
+
 def create_rmm_array(data, robot_id):
     """
     Extracts (x[0], y[1]), simulator time, and mission time for a given robot.
@@ -300,20 +333,19 @@ def create_rmm_array(data, robot_id):
     simulator_time = data["simulator time"]
 
     # Extract first values of x and y
-    # x_val = robot_info["x"][0] if len(robot_info["x"]) > 0 else None
-    # y_val = robot_info["y"][1] if len(robot_info["y"]) > 1 else None
-    # x_val = robot_info["x"][0] if len(robot_info["x"]) > 0 else None
-    # y_val = robot_info["y"][1] if len(robot_info["y"]) > 1 else None
     x_val = robot_info["x"]
     y_val = robot_info["y"]
+
+    # Extract mission_time and ensure it's not negative
     mission_time = robot_info["mission_time"]
+    if mission_time < 0:
+        mission_time = 0
+        print(f"⚠️ Mission time for Robot {robot_id} was negative. Set to 0.")
 
     # Create RMM array
     rmm_array = [(x_val, y_val), simulator_time, mission_time]
 
     return rmm_array
-
-
 
 
 
@@ -435,8 +467,20 @@ def generate_communication_message(deviation, threshold, hmm_pos1, hmm_pos2, rmm
     return messages
 
 
-def dynamic_deviation_threshold_multi_logic(hmm_arrays, rmm_arrays, update_logic_functions, uncertainty_factor_pos,
-                                            uncertainty_factor_time, dynamic_threshold_mission_time, robot_id):
+
+def generate_message_with_ollama(model, prompt):
+    """
+    Generate message using Ollama with specified model
+    """
+    try:
+        response = ollama.chat(model=model, messages=[{'role': 'user', 'content': prompt}])
+        return response['message']['content']
+    except Exception as e:
+        return f"Error with {model}: {str(e)}"
+
+
+def dynamic_deviation_threshold_multi_logic(JSON_data, hmm_arrays, rmm_arrays, update_logic_functions, uncertainty_factor_pos,
+                                           uncertainty_factor_time, dynamic_threshold_mission_time, robot_id):
     updated_hmm_array = []
     current_hmm_mission_time = hmm_arrays[0][4]  # Initial mission time from the HMM array
 
@@ -481,6 +525,11 @@ def dynamic_deviation_threshold_multi_logic(hmm_arrays, rmm_arrays, update_logic
     updated_hmm_array.append([0, int(round(updated_pos1, 0)), int(round(updated_pos2, 0)), None, updated_mission_time])
 
     return updated_hmm_array, formatted_message
+
+
+
+
+
 
 def bayesian_probabilistic_update_general(original_value, deviation, threshold, uncertainty_factor):
     expected_value = original_value + deviation
