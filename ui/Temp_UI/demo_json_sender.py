@@ -49,9 +49,9 @@ while True:
             else:
                 print(f"❌ Failed to send {file} - Status: {response.status_code}")
 
-            time.sleep(5)
+            time.sleep(0.3)
             if not is_playing:
                 print("⏸️ Play stopped. Pausing...")
                 break
-    # time.sleep(5)
+    time.sleep(5)
 

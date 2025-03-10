@@ -29,9 +29,17 @@ socketio = SocketIO(app, cors_allowed_origins="*")  # Allow CORS for UI connecti
 # }
 
 last_mission_times = {
-    "quad1": 61, 
-    "quad2": 58, 
-    "quad3": 61
+    "robot1": 61, 
+    "robot2": 58, 
+    "robot3": 61
+}
+
+# Add this with your other global variables
+# Store last known valid HMM values for each robot
+last_valid_hmm_values = {
+    "1": None,
+    "2": None,
+    "3": None
 }
 
 index_value = 0  # Keeps track of timestep across multiple requests
@@ -134,6 +142,15 @@ def receive_data():
         processed_hmm_arrays = generate_hmm_arrays(JSON_data)
         print("✅ generate_hmm_arrays called for the first JSON.",processed_hmm_arrays)
 
+
+
+        for robot_id, data in processed_hmm_arrays.items():
+            print(f"Robot {robot_id} has {len(data)} positions in HMM arrays.")
+
+        # Print the full data (optional, if needed)
+        print("Generated HMM Arrays:", json.dumps(processed_hmm_arrays, indent=2))
+
+
     if "robots" not in JSON_data:
         return jsonify({"error": "Missing 'robots' key in JSON data."}), 400
 
@@ -168,7 +185,7 @@ def receive_data():
             current_index,
             formatted_position[0],
             formatted_position[1],
-            row["interval"],
+            row["robot_time"],
             row["mission_time"]
         ]
         
@@ -215,6 +232,7 @@ def process(robot_id, data, tasks, plan_coordinates, plans, JSON_data, robot_num
     global last_mission_times
     global current_robot_states
     global previous_robot_states
+    global last_valid_hmm_values
 
     current_index, x, y, time_elapsed, steps_remaining = data
 
@@ -222,7 +240,21 @@ def process(robot_id, data, tasks, plan_coordinates, plans, JSON_data, robot_num
     jsonY = y + 1 # add 1 to y, since y = 0 is y at grid line 1 on the map
 
     hmm_array_data_preformat = select_hmm_row(processed_hmm_arrays, str(robot_id), int(current_index))
+    
     hmm_array_data = hmm_array_reformat(hmm_array_data_preformat)
+
+
+
+
+    # Check if hmm_array_data is None or empty (invalid data)
+    if hmm_array_data is None or (isinstance(hmm_array_data, (list, np.ndarray)) and not any(hmm_array_data)):
+        # Use last known valid data if available
+        if last_valid_hmm_values[robot_number] is not None:
+            print(f"⚠️ Robot {robot_id}: Using last known valid HMM data.")
+            hmm_array_data = last_valid_hmm_values[robot_number]
+    else:
+        # Update the last known valid data
+        last_valid_hmm_values[robot_number] = hmm_array_data
 
     hmm_array = [
         int(current_index),

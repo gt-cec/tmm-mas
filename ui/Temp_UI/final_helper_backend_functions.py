@@ -29,7 +29,7 @@ def extract_robot_data(data):
             {
                 "index": 0,
                 "formatted_pos": formatted_position,
-                "interval": simulator_time,
+                "robot_time": simulator_time,
                 "mission_time": mission_time
             }
         ]
@@ -69,7 +69,7 @@ def extract_robot_data(data):
 #             {
 #                 "index": 0,  # Can be incremented over time if needed
 #                 "formatted_pos": formatted_position,  # Now correctly formatted as (x, y)
-#                 "interval": simulator_time,
+#                 "robot_time": simulator_time,
 #                 "mission_time": mission_time
 #             }
 #         ]
@@ -161,9 +161,42 @@ def get_direction(current_pos, next_pos):
 #         return "Stationary"
 
 
+# def generate_hmm_arrays(data):
+#     """
+#     Processes robot data from JSON and generates HMM arrays.
+
+#     :param data: Raw JSON data.
+#     :return: Dictionary containing processed data as generated_hmm_arrays.
+#     """
+#     if "simulator time" not in data or "robots" not in data:
+#         print("❌ Invalid data format!")
+#         return None
+
+#     simulator_time = data["simulator time"]
+#     generated_hmm_arrays = {}
+
+#     # Process each robot
+#     for robot_id, robot_info in data["robots"].items():
+#         positions = robot_info["plan"]  # Use 'plan' as the positions
+
+#         # Create processed data with formatted structure
+#         generated_hmm_arrays[robot_id] = [
+#             {
+#                 "formatted_pos": f"({pos})", 
+#                 "robot_time": simulator_time, 
+#                 "mission_time": robot_info["mission_time"]
+#             }
+#             for pos in positions
+#         ]
+
+#     return generated_hmm_arrays
+
+
+
+#time value redefined based on sim estimation.
 def generate_hmm_arrays(data):
     """
-    Processes robot data from JSON and generates HMM arrays.
+    Processes robot data from JSON and generates HMM arrays with cumulative time intervals.
 
     :param data: Raw JSON data.
     :return: Dictionary containing processed data as generated_hmm_arrays.
@@ -172,25 +205,28 @@ def generate_hmm_arrays(data):
         print("❌ Invalid data format!")
         return None
 
-    simulator_time = data["simulator time"]
+    total_time = 150.03103494644165
     generated_hmm_arrays = {}
 
     # Process each robot
     for robot_id, robot_info in data["robots"].items():
-        positions = robot_info["plan"]  # Use 'plan' as the positions
+        positions = robot_info["plan"]
+        num_positions = len(positions) if positions else 1  # Avoid division by zero
+        time_step = total_time / num_positions  # Compute time difference between each position
+        
+        cumulative_time = 0  # Start from 0 and accumulate
+        generated_hmm_arrays[robot_id] = []
 
-        # Create processed data with formatted structure
-        generated_hmm_arrays[robot_id] = [
-            {
-                "formatted_pos": f"({pos})", 
-                "interval": simulator_time, 
+        for pos in positions:
+            cumulative_time += time_step  # Increment time by step size
+
+            generated_hmm_arrays[robot_id].append({
+                "formatted_pos": f"({pos[0]}, {pos[1]})", 
+                "robot_time": round(cumulative_time, 4),  # Store rounded cumulative time
                 "mission_time": robot_info["mission_time"]
-            }
-            for pos in positions
-        ]
+            })
 
     return generated_hmm_arrays
-
 
 
 
@@ -222,7 +258,7 @@ def select_hmm_row(processed_data, robot_id, row_index):
 
 def hmm_array_reformat(row_data):
     """
-    Extracts and formats 'formatted_pos', 'interval', and 'mission_time' into an HMM array.
+    Extracts and formats 'formatted_pos', 'robot_time', and 'mission_time' into an HMM array.
 
     :param row_data: The dictionary row containing robot data.
     :return: List containing formatted values for HMM processing.
@@ -236,7 +272,7 @@ def hmm_array_reformat(row_data):
     formatted_position = tuple(map(int, pos_match)) if pos_match else (None, None)
 
     # Store in list
-    hmm_array = [formatted_position, row_data["interval"], row_data["mission_time"]]
+    hmm_array = [formatted_position, row_data["robot_time"], row_data["mission_time"]]
 
     return hmm_array
 
