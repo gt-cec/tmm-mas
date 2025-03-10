@@ -3,7 +3,15 @@
 function loadCanvasImages() {
     canvasRobotImage.src = "/static/img/robot.png"
     canvasObjectiveImage.src = "/static/img/objective.png"
-    canvasMapImage.src = '/static/img/map.jpeg';
+    canvasMapImage.src = '/static/img/map.jpeg'
+    canvasTriangleUp.src = '/static/img/triangle_up.png'
+    canvasTriangleUpLeft.src = '/static/img/triangle_up_left.png'
+    canvasTriangleUpRight.src = '/static/img/triangle_up_right.png'
+    canvasTriangleLeft.src = '/static/img/triangle_left.png'
+    canvasTriangleRight.src = '/static/img/triangle_right.png'
+    canvasTriangleDownLeft.src = '/static/img/triangle_down_left.png'
+    canvasTriangleDownRight.src = '/static/img/triangle_down_right.png'
+    canvasTriangleDown.src = '/static/img/triangle_down.png';
     canvasMapImage.onload = () => {
         ctx.drawImage(canvasMapImage, 0, 0, canvas.width, canvas.height);
     };
@@ -50,7 +58,7 @@ function drawSimulationMap() {
             drawPath(element.robotPath, colorCompletedPlan)
 
             // draw the robot's current plan
-            drawPath(element.currentLocationPlan, colorCurrentPlan, false, true, true)
+            drawPath(element.currentLocationPlan, colorCurrentPlan, false, true, true, true)
 
             // draw the robot's previous plan if selected
             if (robotFilterId != -1) {
@@ -141,14 +149,14 @@ function pxToCanvas(x, y) {
     return [x * cellSize, canvas.height - (y * cellSize)]
 }
 
-function drawPath(path, color, dash=false, thick=false, roundedCorners=false) {
+function drawPath(path, color, dash=false, thick=false, roundedCorners=false, pointers=false) {
     if (path.length < 2) return
     var count = 0
 
     ctx.beginPath()
     ctx.moveTo(path[0][0] * cellSize, canvas.height - (path[0][1] * cellSize))
 
-    if (roundedCorners == true) {
+    if (roundedCorners) {
         var currentCoords = path[0]
         var nextCoords = path[0]
         var arcRadius = 0.15
@@ -170,7 +178,7 @@ function drawPath(path, color, dash=false, thick=false, roundedCorners=false) {
             }
 
             ctx.arcTo(nextCoords[0] * cellSize, canvas.height - (nextCoords[1] * cellSize), path[i][0] * cellSize, canvas.height - (path[i][1] * cellSize), arcRadius * cellSize)
-            
+
             currentCoords = nextCoords
             nextCoords = path[i]
         }
@@ -190,6 +198,45 @@ function drawPath(path, color, dash=false, thick=false, roundedCorners=false) {
     ctx.lineWidth = thick ? 4 : 2
     ctx.stroke()
     ctx.setLineDash([])
+
+    if (pointers) {
+        var currentCoords = path[0]
+        var nextCoords = path[0]
+        var arrowSize = 15
+
+        for (let i = 1; i < path.length; i++) {
+            if (currentCoords != nextCoords)
+                var topCornerX = ((currentCoords[0] + nextCoords[0]) * 0.5 * cellSize) - arrowSize * 0.5
+                var topCornerY = canvas.height - ((currentCoords[1] + nextCoords[1]) * 0.5 * cellSize) - arrowSize * 0.5
+                if (currentCoords[0] > nextCoords[0]) {
+                    if (currentCoords[1] < nextCoords[1]) {
+                        ctx.drawImage(canvasTriangleUpLeft, topCornerX, topCornerY, arrowSize, arrowSize)
+                    } else if (currentCoords[1] > nextCoords[1]) {
+                        ctx.drawImage(canvasTriangleDownLeft, topCornerX, topCornerY, arrowSize, arrowSize)
+                    } else if (currentCoords[1] = nextCoords[1]) {
+                        ctx.drawImage(canvasTriangleLeft, topCornerX, topCornerY, arrowSize, arrowSize)
+                    }
+                
+                } else if (currentCoords[0] < nextCoords[0]) {
+                    if (currentCoords[1] < nextCoords[1]) {
+                        ctx.drawImage(canvasTriangleUpRight, topCornerX, topCornerY, arrowSize, arrowSize)
+                    } else if (currentCoords[1] > nextCoords[1]) {
+                        ctx.drawImage(canvasTriangleDownRight, topCornerX, topCornerY, arrowSize, arrowSize)
+                    } else if (currentCoords[1] = nextCoords[1]) {
+                        ctx.drawImage(canvasTriangleRight, topCornerX, topCornerY, arrowSize, arrowSize)
+                    }
+                } else {
+                    if (currentCoords[1] < nextCoords[1]) {
+                        ctx.drawImage(canvasTriangleUp, topCornerX, topCornerY, arrowSize, arrowSize)
+                    } else if (currentCoords[1] > nextCoords[1]) {
+                        ctx.drawImage(canvasTriangleDown, topCornerX, topCornerY, arrowSize, arrowSize)
+                    }
+                }
+            
+            currentCoords = nextCoords
+            nextCoords = path[i]
+        }          
+    }   
 }
 
 function drawShadedCircleAroundRobot(robotId) {
