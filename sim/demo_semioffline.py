@@ -132,8 +132,8 @@ except Exception as e:
 
 # Simulator's generate_json function
 def generate_json(start_time, robots):
-    # time.sleep(1.5)  # almost perfect?
-    time.sleep(1.8)  # 500ms delay
+    time.sleep(1.5)  # almost perfect?
+    # time.sleep(1.8)  # 500ms delay
     data = {
         "simulator time": elapsed_time(start_time),
         "robots": {}
@@ -579,7 +579,7 @@ rclpy.shutdown()
 
 
 
-
+#test # bugged.
 # ###################################
 # ##### Simple Drone Simulation #####
 # #####     using Isaac Sim     #####
