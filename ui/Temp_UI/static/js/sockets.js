@@ -59,7 +59,7 @@ function createSocket() {
                 Object.keys(data.robots).forEach((robotId) => {
                     newRobotData[robotId] = data.robots[robotId]
                     newRobotData[robotId].lastSeen = data.timestamp
-                    updatePosition(robotId, {x: savedRobotData[robotId].x, y: savedRobotData[robotId].y});
+                    updatePosition(robotId, {x: savedRobotData[robotId].jsonX, y: savedRobotData[robotId].jsonY});
                 })
                 savedRobotData = data.robots
                 drawSimulationMap()

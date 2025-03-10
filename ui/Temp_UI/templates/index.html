@@ -12,7 +12,6 @@
     <script src="{{ url_for('static', filename='js/messages.js') }}"></script>
     <script src="{{ url_for('static', filename='js/plans.js') }}"></script>
     <script src="{{ url_for('static', filename='js/sockets.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/test.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 
@@ -25,10 +24,10 @@
             </div>
         </div>
     </div>
-    
+
     <div class="center-section">
         <div class="map-container">
-            <canvas id="simulationCanvas" width="700" height="700"></canvas>
+            <canvas id="simulationCanvas" width="700" height="350"></canvas>
         </div>
         <div id="statusMessage" class="connected-indicator-container">
             <div class="circle"></div>
@@ -55,7 +54,6 @@
                     <span>High</span>
                 </div>
             </div>
-            
             <div class="input-box">
                 <input class="input-box-text" type="text" placeholder="Send a message...">
                 <button class="input-box-button" type="submit">Submit</button>
@@ -75,8 +73,9 @@
         const canvasRobotImage = new Image()
         const canvasObjectiveImage = new Image()
         loadCanvasImages()
-        const gridSize = 10
-        const cellSize = canvas.width / gridSize
+        const gridSize = 7
+        const widthSize = canvas.width / gridSize // 700/7 = 100
+        const heightSize = canvas.height / gridSize // 350/7 = 50
 
         var robotFilterId = -1  // which robot ID to filter
 

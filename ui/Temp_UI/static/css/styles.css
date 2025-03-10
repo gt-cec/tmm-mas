@@ -49,8 +49,8 @@ body {
 #simulationCanvas {
     border: 1px solid #ccc;
     margin: 20px;
-    width: 80vh;
-    height: 80vh;
+    width: 90vh;
+    height: auto;
 }
 
 .right-section {

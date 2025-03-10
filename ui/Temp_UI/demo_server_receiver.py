@@ -138,7 +138,7 @@ def receive_data():
         
         robot_number = robot_id.replace("quad", "")
         robot_state = process(robot_id, result, tasks, plan_coordinates, plans, JSON_data, robot_number)
-        
+        print(result[1], result[2])
         robot_states[robot_number] = robot_state
 
     if robot_states:
@@ -181,6 +181,9 @@ def process(robot_id, data, tasks, plan_coordinates, plans, JSON_data, robot_num
     global previous_robot_states
 
     current_index, x, y, time_elapsed, steps_remaining = data
+
+    jsonX = x + 1 # add 1 to x, since x = 0 is x at grid line 1 on the map
+    jsonY = y + 1 # add 1 to y, since y = 0 is y at grid line 1 on the map
 
     hmm_array_data_preformat = select_hmm_row(processed_hmm_arrays, str(robot_id), int(current_index))
     hmm_array_data = hmm_array_reformat(hmm_array_data_preformat)
@@ -248,6 +251,8 @@ def process(robot_id, data, tasks, plan_coordinates, plans, JSON_data, robot_num
     return {
         "robot_id": robot_id,
         "rmm_array": rmm_array,
+        "jsonX": jsonX,
+        "jsonY": jsonY,
         "x": plan[0][0],
         "y": plan[0][1],
         "robotPath": [[1, 0], [0, 0], [plan[0][0], plan[0][1]]],

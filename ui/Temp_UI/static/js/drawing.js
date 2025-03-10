@@ -4,7 +4,7 @@
 function loadCanvasImages() {
     canvasRobotImage.src = "/static/img/robot.png";
     canvasObjectiveImage.src = "/static/img/objective.png";
-    canvasMapImage.src = '/static/img/map.jpeg';
+    canvasMapImage.src = '/static/img/map.png';
     canvasMapImage.onload = () => {
         ctx.drawImage(canvasMapImage, 0, 0, canvas.width, canvas.height);
     }
@@ -17,8 +17,8 @@ function drawSimulationMap() {
 
     // draw the background
     if (canvasMapImage.complete) {
-        ctx.globalAlpha = 0.4;
-        ctx.drawImage(canvasMapImage, 0, 0, canvas.width, canvas.height);
+        ctx.globalAlpha = 0.6;
+        ctx.drawImage(canvasMapImage, 6, 0, canvas.width -12, canvas.height);
         ctx.globalAlpha = 1.0;
     };
 
@@ -26,16 +26,16 @@ function drawSimulationMap() {
     drawGrid();
 
     // draw the robot indicators
-    drawRobotMessageIndicators();
+    //drawRobotMessageIndicators();
 
     // draw the robots
     if (savedRobotData) {
         Object.keys(savedRobotData).forEach((robotId) => {
             // check if the robot has not been updated for a while
             let now = Date.now() / 1000;
-            if (now - savedRobotData[robotId].lastSeen > timeoutForDelayedRobot) {
-                drawDelayedRobotIndicator(robotId);
-            }
+            //if (now - savedRobotData[robotId].lastSeen > timeoutForDelayedRobot) {
+            //    drawDelayedRobotIndicator(robotId);
+            //}
 
             // if the robot ID is not visible, ignore
             if (!isRobotIdVisible(robotId)) {
@@ -60,11 +60,11 @@ function drawSimulationMap() {
             //}
 
             // add the image
-            val = pxToCanvas(element.x, element.y);
+            val = pxToCanvas(element.jsonX, element.jsonY);
             ctx.fillStyle = robotId == 1 ? 'blue' : robotId == 2 ? 'green' : 'red';
             ctx.font = 'bold 18px Arial';
-            ctx.fillText(robotId, val[0] - 5, val[1] - 30)
-            ctx.drawImage(canvasRobotImage, val[0] - 25, val[1] - 25, 50, 50);
+            ctx.fillText(robotId, val[0] - 5, val[1] - 20)
+            ctx.drawImage(canvasRobotImage, val[0] - 15, val[1] - 15, 30, 30);
 
             // add a circle around the image if the robot is selected
             if (robotFilterId == robotId) {
@@ -84,49 +84,35 @@ function drawSimulationMap() {
     }
 
     // draw the objective markers
-    Object.keys(savedObjectives).forEach(objective => {
-        drawObjective(savedObjectives[objective].x, savedObjectives[objective].y, savedObjectives[objective].name)
-    })
+    //Object.keys(savedObjectives).forEach(objective => {
+    //    drawObjective(savedObjectives[objective].x, savedObjectives[objective].y, savedObjectives[objective].name)
+    //})
 }
 
 function drawPoints(robotId) {
-    const opactiy = 0.1
     if (previousRobotPositions[robotId] !== null) {
         const positions = previousRobotPositions[robotId];
         ctx.beginPath()
-        ctx.moveTo(positions[0].x * cellSize, canvas.height - (positions[0].y * cellSize))
-    
-        for (let i = 1; i < positions.length + 1; i++) {
+        ctx.moveTo(positions[0].x * widthSize, canvas.height - (positions[0].y * heightSize))
+        for (let i = 1; i <= positions.length; i++) {
             if (i === positions.length) {
-                ctx.lineTo(savedRobotData[robotId].x * cellSize, canvas.height - (savedRobotData[robotId].y * cellSize))
-                ctx.globalAlpha = 1;
+                ctx.lineTo(savedRobotData[robotId].jsonX * widthSize, canvas.height - (savedRobotData[robotId].jsonY * heightSize))
             } else {
-                ctx.lineTo(positions[i].x * cellSize, canvas.height - (positions[i].y * cellSize));
-                ctx.globalAlpha = opactiy * i;
+                ctx.lineTo(positions[i].x * widthSize, canvas.height - (positions[i].y * heightSize));
             }
         }
-    
-   
-    
         ctx.strokeStyle = robotId == 1 ? 'blue' : robotId == 2 ? 'green' : 'red';
         ctx.lineWidth = 2
+        ctx.setLineDash(robotId === 1 ? [5, 15] : robotId === 2 ? [6, 14] : [7, 13]);
         ctx.stroke()
 
+        for (let i = 0; i < positions.length; i++) {
+            ctx.beginPath();
+            ctx.arc(positions[i].x * widthSize, canvas.height - (positions[i].y * heightSize), 5, 0, Math.PI * 2); // Radius 5 (adjustable)
+            ctx.fillStyle = robotId == 1 ? 'blue' : robotId == 2 ? 'green' : 'red';
+            ctx.fill();
+        }
 
-/*         positions.forEach((position, index) => {
-            // Adjust the position to align with the grid
-
-            if (index > 0) {
-                let transformedPoints = pxToCanvas(position.x, position.y)
-                let oneStepAgo = pxToCanvas(positions[index - 1].x, positions[index - 1].y);
-                    ctx.beginPath();
-                    ctx.moveTo(oneStepAgo.x, oneStepAgo.y);
-                    ctx.lineTo(transformedPoints.x, transformedPoints.y);
-                    ctx.lineWidth = 2;        // Line thickness
-                    ctx.strokeStyle = 'blue'; // Line color
-                    ctx.stroke();
-            }
-        }); */
     }
 }
 
@@ -147,7 +133,7 @@ function clicked(e){
                 return;
             }
             let element = savedRobotData[robotId];
-            robotLocation = pxToCanvas(element.x, element.y);
+            robotLocation = pxToCanvas(element.jsonX, element.jsonY);
             // check to see if click is close enough to a robot
             if (Math.sqrt(dist_sq(x, y, robotLocation[0], robotLocation[1])) < 40) {
                 clickedRobotButton(robotId);
@@ -161,33 +147,34 @@ function dist_sq(x1, y1, x2, y2) {
 }
 
 function drawGrid() {
-    ctx.strokeStyle = 'rgba(128, 128, 128, 1)';
+    ctx.strokeStyle = 'rgb(255, 0, 0, 0.5)';
     ctx.lineWidth = 1;
 
     for (let i = 0; i <= gridSize; i++) {
-        const pos = i * cellSize;
+        let horizontalSpacing = i * widthSize;
+        let verticalSpacing = i * heightSize;
 
-        ctx.beginPath();
-        ctx.moveTo(pos, 0);
-        ctx.lineTo(pos, canvas.height);
-        ctx.stroke();
+        //ctx.beginPath();
+        //ctx.moveTo(horizontalSpacing, 0);
+        //ctx.lineTo(horizontalSpacing, canvas.height);
+        //ctx.stroke();
 
-        ctx.beginPath();
-        ctx.moveTo(0, pos);
-        ctx.lineTo(canvas.width, pos);
-        ctx.stroke();
+        //ctx.beginPath();
+        //ctx.moveTo(0, verticalSpacing);
+        //ctx.lineTo(canvas.width, verticalSpacing);
+        //ctx.stroke();
 
         if (i > 0 && i < gridSize) {
-            ctx.fillStyle = 'black';
+            ctx.fillStyle = 'white';
             ctx.font = '16px Arial';
-            ctx.fillText(i.toString(), 5, canvas.height - pos + 20);
-            ctx.fillText(i.toString(), pos - 20, canvas.height - 5);
+            ctx.fillText(i.toString()-1, 7, canvas.height - verticalSpacing + 5);
+            ctx.fillText(i.toString()-1, horizontalSpacing - 5, canvas.height - 5);
         }
     }
 }
 
 function pxToCanvas(x, y) {
-    return [x * cellSize, canvas.height - (y * cellSize)];
+    return [x * widthSize, canvas.height - (y * heightSize)];
 }
 
 
@@ -223,15 +210,15 @@ function drawShadedCircle(x, y) {
     ctx.fill();
 }
 
-function drawObjective(x, y, name) {
+/* function drawObjective(x, y, name) {
     val = pxToCanvas(x, y);
     ctx.drawImage(canvasObjectiveImage, val[0] - 15, val[1] - 47, 50, 50);
     ctx.fillStyle = "purple";
     ctx.font = "25px Verdana";
     ctx.fillText(name, val[0] - 9, val[1] + 25);
-}
+} */
 
-function drawRobotMessageIndicators() {
+/* function drawRobotMessageIndicators() {
     markedRobots = []
     // for each message
     Array.from(document.getElementById("messages").children).forEach(element => {
@@ -246,7 +233,7 @@ function drawRobotMessageIndicators() {
                 // add id to the marked robot ids
                 markedRobots.push(robotId)
                 // draw the indicator
-                val = pxToCanvas(savedRobotData[robotId].x, savedRobotData[robotId].y)
+                val = pxToCanvas(savedRobotData[robotId].jsonX, savedRobotData[robotId].jsonY)
                 ctx.fillStyle = "red"
                 ctx.font = "40px Verdana"
                 let robotVisible = isRobotIdVisible(robotId)
@@ -261,7 +248,7 @@ function drawRobotMessageIndicators() {
             }
         })
     })
-}
+} */
 
 function updatePosition(robot, newPosition) {
     // Check if the robot exists in the object
@@ -270,16 +257,16 @@ function updatePosition(robot, newPosition) {
     } else {
       // Add the new position to the robot's array
       previousRobotPositions[robot].push(newPosition);
-      // If the array length exceeds 3, remove the oldest position
-      if (previousRobotPositions[robot].length > 3) {
+      // If the array length exceeds 2, remove the oldest position
+      if (previousRobotPositions[robot].length > 2) {
         previousRobotPositions[robot].shift();
       }
     }
   }
 
-function drawDelayedRobotIndicator(robotId) {
+/* function drawDelayedRobotIndicator(robotId) {
     // draw the indicator
-    val = pxToCanvas(savedRobotData[robotId].x, savedRobotData[robotId].y)
+    val = pxToCanvas(savedRobotData[robotId].jsonX, savedRobotData[robotId].jsonY)
     ctx.fillStyle = "goal"
     ctx.font = "30px Verdana"
     let robotVisible = isRobotIdVisible(robotId)
@@ -291,4 +278,4 @@ function drawDelayedRobotIndicator(robotId) {
         ctx.arc(val[0], val[1], 30, 0, 2 * Math.PI);
         ctx.stroke();
     }
-}
+} */
