@@ -468,15 +468,293 @@ def generate_communication_message(deviation, threshold, hmm_pos1, hmm_pos2, rmm
 
 
 
-def generate_message_with_ollama(model, prompt):
+# def generate_message_with_ollama(model, prompt):
+#     """
+#     Generate message using Ollama with specified model
+#     """
+#     try:
+#         response = ollama.chat(model=model, messages=[{'role': 'user', 'content': prompt}])
+#         return response['message']['content']
+#     except Exception as e:
+#         return f"Error with {model}: {str(e)}"
+
+
+
+
+# def generate_communication_message_ollama(deviation, threshold, hmm_pos1, hmm_pos2, rmm_pos1, rmm_pos2, hmm_time, rmm_time, robot_number,JSON_data):
+#     messages = []
+#     if abs(deviation) > threshold:
+#         robot_number = robot_number  # Assuming robot number 1 for example
+#         X = hmm_time
+#         Y = rmm_time
+#         A = (hmm_pos1, hmm_pos2)
+#         B = (rmm_pos1, rmm_pos2)
+#         delay_message = generate_delay_message(robot_number, X, Y, A, B)
+#         # print(delay_message)
+#         messages.append(delay_message)  # Append formatted delay message to messages list
+#         # print(messages)
+#     return messages
+
+
+
+# def generate_communication_message_ollama(deviation, threshold, hmm_pos1, hmm_pos2, rmm_pos1, rmm_pos2, hmm_time, rmm_time, robot_number, JSON_data):
+#     messages = []
+#     if abs(deviation) > threshold:
+#         # Calculate position differences
+#         pos_diff_x = rmm_pos1 - hmm_pos1
+#         pos_diff_y = rmm_pos2 - hmm_pos2
+
+#         # Determine movement direction
+#         if pos_diff_x > 0:
+#             direction = "East"
+#         elif pos_diff_x < 0:
+#             direction = "West"
+#         elif pos_diff_y > 0:
+#             direction = "North"
+#         elif pos_diff_y < 0:
+#             direction = "South"
+#         else:
+#             direction = "Stationary"
+
+#         # Determine delay status
+#         if rmm_time > hmm_time:
+#             time_status = f"{rmm_time - hmm_time} seconds behind the expected time"
+#         else:
+#             time_status = f"{hmm_time - rmm_time} seconds ahead of schedule"
+
+#         # Check replan flag
+#         replan_flag = JSON_data.get('replan_flag', False)
+#         replan_message = " It has undergone replanning and has a new plan." if replan_flag else ""
+
+#         # Prepare prompt for LLM
+#         prompt = f"Robot {robot_number} is {time_status}; it has moved {direction}.{replan_message}"
+
+#         # Generate message using Ollama
+#         try:
+#             response = ollama.chat(model='mistral', messages=[{'role': 'user', 'content': prompt}])
+#             llm_message = response['message']['content'].strip()
+#         except Exception as e:
+#             llm_message = f"Error generating message: {str(e)}"
+
+#         messages.append(llm_message)
+#     return messages
+
+
+
+
+# def generate_delay_message_ollama(robot_number, hmm_time, rmm_time, hmm_pos, rmm_pos):
+#     """
+#     Generate a delay message using the Ollama model.
+#     """
+#     time_deviation = rmm_time - hmm_time
+#     pos_deviation_x = rmm_pos[0] - hmm_pos[0]
+#     pos_deviation_y = rmm_pos[1] - hmm_pos[1]
+
+#     direction = ""
+#     if pos_deviation_y > 0:
+#         direction += "North"
+#     elif pos_deviation_y < 0:
+#         direction += "South"
+#     if pos_deviation_x > 0:
+#         direction += "East"
+#     elif pos_deviation_x < 0:
+#         direction += "West"
+
+#     time_status = "ahead" if time_deviation < 0 else "behind"
+#     time_diff = abs(time_deviation)
+
+#     prompt = f"""
+# You are an AI assistant generating short mission status updates.
+# Analyze the mission data and return a concise, **2-3 line** report focusing only on key deviations:
+
+# Robot {robot_number} is {time_diff} seconds {time_status} the expected time; it has moved {direction}.
+# """
+#     try:
+#         response = ollama.chat(model='zephyr', messages=[{'role': 'user', 'content': prompt}])
+#         return response['message']['content'].strip()
+#     except Exception as e:
+#         return f"Error generating message: {str(e)}"
+
+
+# import ollama
+
+# def generate_delay_message_ollama(robot_number, hmm_time, rmm_time, hmm_pos, rmm_pos, replan_flag):
+#     """
+#     Generate a delay message in a strict format without using Ollama.
+#     """
+#     time_deviation = rmm_time - hmm_time
+#     pos_deviation_x = rmm_pos[0] - hmm_pos[0]
+#     pos_deviation_y = rmm_pos[1] - hmm_pos[1]
+
+#     direction = ""
+#     if pos_deviation_y > 0:
+#         direction += "North"
+#     elif pos_deviation_y < 0:
+#         direction += "South"
+#     if pos_deviation_x > 0:
+#         direction += "East"
+#     elif pos_deviation_x < 0:
+#         direction += "West"
+
+#     time_status = "ahead" if time_deviation < 0 else "behind"
+#     time_diff = abs(time_deviation)
+
+#     # Construct the message in the desired format
+#     message = f"Robot {robot_number} is {time_diff} seconds {time_status} the expected time; it has moved {direction}."
+#     if replan_flag:
+#         message += " It has undergone replanning and has a new plan."
+
+#     return message
+
+import ollama
+#works fine
+def generate_delay_message_ollama(robot_number, hmm_time, rmm_time, hmm_pos, rmm_pos, replan_flag=False):
     """
-    Generate message using Ollama with specified model
+    Generate a delay message with consistent formatting for robot status communication
+    using Mistral through Ollama.
+    
+    Parameters:
+    - robot_number: The identifier for the robot
+    - hmm_time: Expected/planned time
+    - rmm_time: Actual time
+    - hmm_pos: Expected/planned position as tuple (x, y)
+    - rmm_pos: Actual position as tuple (x, y)
+    - replan_flag: Boolean indicating if replanning occurred
+    
+    Returns:
+    - Formatted status message
     """
-    try:
-        response = ollama.chat(model=model, messages=[{'role': 'user', 'content': prompt}])
-        return response['message']['content']
-    except Exception as e:
-        return f"Error with {model}: {str(e)}"
+    # Calculate time difference in seconds
+    time_diff = round(rmm_time - hmm_time, 2)
+    
+    # Determine time status
+    if time_diff > 0:
+        time_status = "behind"
+    else:
+        time_status = "ahead of"
+        time_diff = abs(time_diff)  # Make positive for message
+    
+    # Determine movement direction
+    x_diff = rmm_pos[0] - hmm_pos[0]
+    y_diff = rmm_pos[1] - hmm_pos[1]
+    
+    # Create a prompt for Mistral with all the information needed to generate the message
+    prompt = f"""
+    You are a robot status reporting system.
+    
+    Robot number: {robot_number}
+    Time difference: {time_diff} seconds
+    Time status: {time_status} the expected time
+    Position difference: x={x_diff}, y={y_diff}
+    
+    Based on the position difference, determine the direction (north, northeast, east, southeast, 
+    south, southwest, west, or northwest) and create a message in exactly this format:
+    "Robot [number] is [time_diff] seconds [time_status] the expected time; it has moved [direction]."
+    
+    Only respond with the exact message format, no additional explanation.
+    """
+    
+    # Call Mistral through Ollama
+    response = ollama.chat(model='mistral', messages=[
+        {
+            'role': 'user',
+            'content': prompt
+        }
+    ])
+    
+    # Extract the generated message
+    message = response['message']['content'].strip()
+    
+    return message
+
+
+
+
+
+
+def generate_delay_message_manual(robot_number, hmm_time, rmm_time, hmm_pos, rmm_pos, replan_flag):
+    """
+    Generate a delay message with consistent formatting for robot status communication.
+    
+    Parameters:
+    - robot_number: The identifier for the robot
+    - hmm_time: Expected/planned time
+    - rmm_time: Actual time
+    - hmm_pos: Expected/planned position as tuple (x, y)
+    - rmm_pos: Actual position as tuple (x, y)
+    - replan_flag: Boolean indicating if replanning occurred
+    
+    Returns:
+    - Formatted status message
+    """
+    # Calculate time difference in seconds
+    time_diff = round(rmm_time - hmm_time, 2)
+    
+    # Determine time status
+    if time_diff > 0:
+        time_status = "behind"
+    else:
+        time_status = "ahead of"
+        time_diff = abs(time_diff)  # Make positive for message
+    
+    # Determine movement direction
+    x_diff = rmm_pos[0] - hmm_pos[0]
+    y_diff = rmm_pos[1] - hmm_pos[1]
+    
+    # Determine direction with full 8-way movement
+    if x_diff > 0 and y_diff > 0:
+        direction = "northeast"
+    elif x_diff > 0 and y_diff < 0:
+        direction = "southeast"
+    elif x_diff < 0 and y_diff > 0:
+        direction = "northwest"
+    elif x_diff < 0 and y_diff < 0:
+        direction = "southwest"
+    elif x_diff > 0:
+        direction = "east"
+    elif x_diff < 0:
+        direction = "west"
+    elif y_diff > 0:
+        direction = "north"
+    else:
+        direction = "south"
+    
+    # Create the base message in the required format
+    message = f"Robot {robot_number} is {time_diff} seconds {time_status} the expected time; it has moved {direction}."
+    
+    return message
+
+
+
+def generate_communication_message_ollama(deviation, threshold, hmm_pos1, hmm_pos2, rmm_pos1, rmm_pos2, hmm_time, rmm_time, robot_number, JSON_data):
+    """
+    Generate a communication message using the Ollama model if the deviation exceeds the threshold.
+    """
+    messages = []
+    if abs(deviation) > threshold:
+        robot_number = robot_number  # Assuming robot number is passed correctly
+        hmm_pos = (hmm_pos1, hmm_pos2)
+        rmm_pos = (rmm_pos1, rmm_pos2)
+        # print("JSON_data", JSON_data)
+        # replan_flag = JSON_data.get('replan_flag')
+        replan_flag = JSON_data['robots'][f'robot{robot_number}']['replan_flag']
+
+        # Generate delay message using Ollama
+        delay_message = generate_delay_message_ollama(robot_number, hmm_time, rmm_time, hmm_pos, rmm_pos,replan_flag)
+        # delay_message = generate_delay_message_manual(robot_number, hmm_time, rmm_time, hmm_pos, rmm_pos,replan_flag)
+
+
+        # Check replan_flag for the specific robot and append replan info if true
+        if JSON_data['robots'][f'robot{robot_number}']['replan_flag']:
+            delay_message += " It has undergone replanning and has a new plan."
+
+        messages.append(delay_message)  # Append formatted delay message to messages list
+    return messages
+
+
+
+
+
 
 
 def dynamic_deviation_threshold_multi_logic(JSON_data, hmm_arrays, rmm_arrays, update_logic_functions, uncertainty_factor_pos,
@@ -509,10 +787,19 @@ def dynamic_deviation_threshold_multi_logic(JSON_data, hmm_arrays, rmm_arrays, u
 
 
 
+    # # Generate communication message
+    # message = generate_communication_message(mission_time_deviation_value, dynamic_threshold_mission_time,
+    #                                           hmm_pos1, hmm_pos2, rmm_pos1, rmm_pos2, hmm_time, rmm_time, robot_number)
+    # formatted_message = "\n".join(message)
+
+
     # Generate communication message
-    message = generate_communication_message(mission_time_deviation_value, dynamic_threshold_mission_time,
-                                              hmm_pos1, hmm_pos2, rmm_pos1, rmm_pos2, hmm_time, rmm_time, robot_number)
+    message = generate_communication_message_ollama(mission_time_deviation_value, dynamic_threshold_mission_time,
+                                              hmm_pos1, hmm_pos2, rmm_pos1, rmm_pos2, hmm_time, rmm_time, robot_number, JSON_data)
     formatted_message = "\n".join(message)
+
+
+
 
     # Update mission time using the first update logic function
     updated_mission_time = update_logic_functions[0](current_hmm_mission_time, mission_time_deviation_value,

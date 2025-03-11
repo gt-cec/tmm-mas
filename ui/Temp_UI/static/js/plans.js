@@ -92,7 +92,7 @@ function displayPlan() {
         let robotClass = document.createElement('div')
         robotClass.classList.add("plan-info-tag")
         robotClass.style.backgroundColor = "lightgrey"
-        robotClass.innerHTML = "Ground Vehicle"
+        robotClass.innerHTML = "Quadruped robot "
         plans.append(robotClass)
 
         // last sync
