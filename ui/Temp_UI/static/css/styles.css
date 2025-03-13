@@ -220,7 +220,7 @@ input[type="range"]::-moz-range-thumb {
     border: 5px solid #ccc;
     border-radius: 10px;
     color: #fff;
-    background-color: #dda0dd;
+    background-color: #000000;
 }
 
 .message-low {
