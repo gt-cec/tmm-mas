@@ -112,7 +112,8 @@ while True:
             else:
                 print(f"❌ Failed to send {file} - Status: {response.status_code}")
 
-            time.sleep(0.3)
+            # time.sleep(0.4)
+            time.sleep(4)
 
         print("✅ All JSON files sent successfully!")
         print("⏹️ Exiting...")
@@ -121,3 +122,4 @@ while True:
     else:
         print("⏸️ Waiting for play signal...")
         time.sleep(1)  # Prevent unnecessary CPU usage
+        # time.sleep(3)  # Prevent unnecessary CPU usage
