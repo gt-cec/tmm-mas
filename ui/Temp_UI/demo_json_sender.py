@@ -113,7 +113,7 @@ while True:
                 print(f"❌ Failed to send {file} - Status: {response.status_code}")
 
             # time.sleep(0.4)
-            time.sleep(4)
+            time.sleep(1)
 
         print("✅ All JSON files sent successfully!")
         print("⏹️ Exiting...")

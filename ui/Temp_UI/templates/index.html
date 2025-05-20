@@ -1,484 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Communication Box</title>
-    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-    <script src="{{ url_for('static', filename='js/colors.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/robotButton.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/drawing.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/messages.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/plans.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/sockets.js') }}"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SWARM</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pixi.js@7/dist/pixi.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+  <script type="module" src="{{ url_for('static', filename='js/newMain.js') }}"></script>
+  <script type="module" src="{{ url_for('static', filename='js/newPixiApp.js') }}"></script>
+  <script type="module" src="{{ url_for('static', filename='js/newSocket.js') }}"></script>
 </head>
-
-<body>
-    <div class="left-section">
-        <div class="title">Plan</div>
-        <div class="communication-container">
-            <div id="robot-buttons-container-left" class="robot-buttons-container"></div>
-            <div id="plans" class="messages">
-            </div>
-        </div>
+<body class="w-screen h-screen overflow-hidden font-sans">
+  <nav class="w-full h-[8vh] absolute top-0 left-0 bg-black flex justify-between items-center px-28">
+    <h1 class="text-white text-2xl font-semibold">SWARM</h1>
+    <div class="flex space-x-6">
+      <a id="simToggleText" class="text-white">Simulator View</a>
+      <label class="cursor-pointer">
+        <input id="toggleScreenButton" type="checkbox" value="" class="sr-only peer">
+        <div class="w-11 h-6 relative bg-gray-700 rounded-full peer-checked:after:translate-x-full after:content-[''] after:w-5 after:h-5 after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:transition-all"></div>
+      </label>
+      <a id="textToggleText" class="text-gray-400">Textual Overview</a>
     </div>
+    <button id="playStopButton" class="w-24 h-10 bg-transparent text-white border border-white rounded-lg cursor-pointer">Play</button>
+  </nav>
 
-    <div class="center-section">
-        <div class="map-container">
-            <canvas id="simulationCanvas" width="700" height="350"></canvas>
-        </div>
-        <div id="statusMessage" class="connected-indicator-container">
-            <div class="circle"></div>
-            <div class="connected-text">
-                Connected
-            </div>
-        </div>
+  <div class="w-full h-full px-28 pt-[8vh]">
+    <div id="simulatorView" class="w-full h-full flex justify-between items-center">
+      <div id="pixiApp"></div>
+      <div id="infoPanel" class="w-1/4 h-[500px] flex flex-col space-y-6">
+        <h1 class="text-2xl font-bold">Robot Updates</h1>
+        <div id="robotStatus" class="space-y-6"></div>
+        <hr class="h-1 bg-gray-300 border-0">
+        <div id="robotAlerts" class="space-y-6"></div>
+      </div>
     </div>
-
-    <div class="right-section">
-        <div class="title">Communication</div>
-        <div class="communication-container">
-            <div id="robot-buttons-container-right" class="robot-buttons-container"></div>
-            <button id="playStopButton">Play</button>
-            <div id="messages" class="messages">
+    <div id="textualView" class="w-full h-full flex items-center hidden">
+      <div class="flex justify-center items-start gap-6 w-full py-8">
+        <!-- Robot A (Expanded by default) -->
+        <div class="w-[350px] border border-black rounded-lg shadow-md">
+          <div class="flex items-center justify-between p-4">
+            <h2 class="text-lg font-semibold">Robot A Status</h2>
+            <div class="flex items-center gap-2">
+              <button class="text-2xl text-gray-500 hover:text-black" onclick="togglePanel('robotA')">⤢</button>
             </div>
-            <!--
-            <div class="slider-container">
-                <label for="disparitySlider">MM Disparity:</label>
-                <input type="range" id="disparitySlider" min="0" max="2" step="1" value="0">
-                <div class="slider-labels">
-                    <span>Low</span>
-                    <span>Medium</span>
-                    <span>High</span>
-                </div>
+          </div>
+          <div id="robotA" class="p-4 space-y-6">
+            <div class="border-l-4 border-red-400 bg-red-100 p-3 rounded">
+              <p class="text-sm font-semibold">13:24 – Status: <span class="font-bold">Replanning</span> 🔁</p>
+              <p class="text-sm mt-1">Robot is in replanning mode, with an 85% probability of returning to the original path.</p>
             </div>
-            <div class="input-box">
-                <input class="input-box-text" type="text" placeholder="Send a message...">
-                <button class="input-box-button" type="submit">Submit</button>
+            <div class="border-l-4 border-blue-400 bg-blue-100 p-3 rounded">
+              <p class="text-sm font-semibold">13:14 – Status: <span class="font-bold">Delayed</span> 🕒</p>
+              <p class="text-sm mt-1">Adjustments detected, robot is likely encountering obstacles.</p>
             </div>
-            -->
+            <div class="border-l-4 border-green-400 bg-green-100 p-3 rounded">
+              <p class="text-sm font-semibold">13:00 – Status: <span class="font-bold">On Track</span> ✅</p>
+              <p class="text-sm mt-1">Robot is currently in a stable navigation state.</p>
+            </div>
+          </div>
         </div>
-    </div>
 
-    <script>
-        const statusMessage = document.getElementById('statusMessage')
-        const playStopButton = document.getElementById('playStopButton')
-        const disparitySlider = document.getElementById('disparitySlider')
-        const canvas = document.getElementById('simulationCanvas')
-        canvas.addEventListener("mousedown", clicked, false)  // click listener for the canvas
-        const ctx = canvas.getContext('2d')
-        const canvasMapImage = new Image()
-        const canvasRobotImage = new Image()
-        const canvasObjectiveImage = new Image()
-        loadCanvasImages()
-        const gridSize = 7
-        const widthSize = canvas.width / gridSize // 700/7 = 100
-        const heightSize = canvas.height / gridSize // 350/7 = 50
+        <!-- Robot B -->
+        <div class="w-[350px] border border-black rounded-lg shadow-md">
+          <div class="flex items-center justify-between p-4">
+            <h2 class="text-lg font-semibold">Robot B Status</h2>
+            <button class="text-2xl text-gray-500 hover:text-black" onclick="togglePanel('robotB')">⤢</button>
+          </div>
+          <div id="robotB" class="p-4 space-y-3">
+            <span class="text-sm inline-block bg-green-600 text-white px-3 py-1 rounded-full">On Track</span>
+            <div class="flex items-center justify-between text-gray-700 text-xl mt-2">
+              <span>📦</span>
+              <div class="flex-1 h-1 bg-gray-300 mx-2 rounded">
+                <div class="h-1 bg-green-500 w-1/3 rounded"></div>
+              </div>
+              <span>🏁</span>
+            </div>
+          </div>
+        </div>
 
-        var robotFilterId = -1  // which robot ID to filter
-
-        let socket = createSocket()
-        let isPlaying = false
-
-        var numRobots = -1  // number of robots in the simulation
-        var newRobotData = {}  // new robot data that has not been updated to user map yet (requires user to click the message)
-        var initialRobotdata = {}
-        var savedRobotData = {}  // last copy of all the robot data, for re-draws
-        var shadedRobotIds = []  // robot IDs to shade because of a recently selected message
-
-        var newObjectives = {}  // new objectives that may have not been sent
-        var savedObjectives = {}  // objectives for the robot
-
-        var previousRobotPositions = {
-            1: null,
-            2: null,
-            3: null,
-        } // previous robot positions
-        var timeoutForDelayedRobot = 10  // threshold for when the timer icon appears by the robot
-
-        playStopButton.addEventListener("click", () => {
-            isPlaying = !isPlaying
-            if (isPlaying) {
-                playStopButton.textContent = 'Stop'
-            }
-            else {
-                playStopButton.textContent = 'Play'
-            }
-            socket.send(isPlaying)
-        })
-
-        // Initial draw
-        drawGrid()
-    </script>
+        <!-- Robot C -->
+        <div class="w-[350px] border border-black rounded-lg shadow-md">
+          <div class="flex items-center justify-between p-4">
+            <h2 class="text-lg font-semibold">Robot C Status</h2>
+            <button class="text-2xl text-gray-500 hover:text-black" onclick="togglePanel('robotC')">⤢</button>
+          </div>
+          <div id="robotC" class="p-4 space-y-3">
+            <span class="text-sm inline-block bg-green-600 text-white px-3 py-1 rounded-full">On Track</span>
+            <div class="flex items-center justify-between text-gray-700 text-xl mt-2">
+              <span>📦</span>
+              <div class="flex-1 h-1 bg-gray-300 mx-2 rounded">
+                <div class="h-1 bg-green-500 w-1/2 rounded"></div>
+              </div>
+              <span>🏁</span>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
 </body>
-
 </html>
-
-
-
-
-
-
-
-
-<!-- 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Communication Box</title>
-    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-    <script src="{{ url_for('static', filename='js/colors.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/robotButton.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/drawing.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/messages.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/plans.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/sockets.js') }}"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-</head>
-
-<body>
-    <div class="left-section">
-        <div class="title">Plan</div>
-        <div class="communication-container">
-            <div id="robot-buttons-container-left" class="robot-buttons-container"></div>
-            <div id="plans" class="messages">
-            </div>
-        </div>
-    </div>
-    
-    <div class="center-section">
-        <div class="map-container">
-            <canvas id="simulationCanvas" width="700" height="700"></canvas>
-        </div>
-        <div id="statusMessage" class="connected-indicator-container">
-            <div class="circle"></div>
-            <div class="connected-text">
-                Connected
-            </div>
-        </div>
-    </div>
-
-    <div class="right-section">
-        <div class="title">Communication</div>
-        <div class="communication-container">
-            <div id="robot-buttons-container-right" class="robot-buttons-container"></div>
-            <button id="playStopButton">Play</button>
-            <div id="messages" class="messages">
-            </div>
-            <div class="slider-container">
-                <label for="disparitySlider">MM Disparity:</label>
-                <input type="range" id="disparitySlider" min="0" max="2" step="1" value="0">
-                <div class="slider-labels">
-                    <span>Low</span>
-                    <span>Medium</span>
-                    <span>High</span>
-                </div>
-            </div>
-            
-            <div class="input-box">
-                <input class="input-box-text" type="text" placeholder="Send a message...">
-                <button class="input-box-button" type="submit">Submit</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const statusMessage = document.getElementById('statusMessage')
-        const playStopButton = document.getElementById('playStopButton')
-        const disparitySlider = document.getElementById('disparitySlider')
-        const canvas = document.getElementById('simulationCanvas')
-        canvas.addEventListener("mousedown", clicked, false)  // click listener for the canvas
-        const ctx = canvas.getContext('2d')
-        const canvasMapImage = new Image()
-        const canvasRobotImage = new Image()
-        const canvasObjectiveImage = new Image()
-        loadCanvasImages()
-        const gridSize = 10
-        const cellSize = canvas.width / gridSize
-
-        var robotFilterId = -1  // which robot ID to filter
-
-        let socket = createSocket()
-        let isPlaying = false
-
-        var numRobots = -1  // number of robots in the simulation
-        var newRobotData = {}  // new robot data that has not been updated to user map yet (requires user to click the message)
-        var initialRobotdata = {}
-        var savedRobotData = {}  // last copy of all the robot data, for re-draws
-        var shadedRobotIds = []  // robot IDs to shade because of a recently selected message
-
-        var newObjectives = {}  // new objectives that may have not been sent
-        var savedObjectives = {}  // objectives for the robot
-
-        var timeoutForDelayedRobot = 10  // threshold for when the timer icon appears by the robot
-
-        playStopButton.addEventListener("click", () => {
-            isPlaying = !isPlaying
-            if (isPlaying) {
-                playStopButton.textContent = 'Stop'
-                // Emit play status to the server
-                socket.emit('play_status', true)
-            }
-            else {
-                playStopButton.textContent = 'Play'
-                // Emit stop status to the server
-                socket.emit('play_status', false)
-            }
-        })
-
-        // Initial draw
-        drawGrid()
-    </script>
-</body>
-
-</html> -->
-
-
-
-
-
-<!-- FAILED TESTS -->
-<!-- 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Communication Box</title>
-    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-    <script src="{{ url_for('static', filename='js/colors.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/robotButton.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/drawing.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/messages.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/plans.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/sockets.js') }}"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-</head>
-
-<body>
-    <div class="left-section">
-        <div class="title">Plans</div>
-        <div class="communication-container">
-            <div id="robot-buttons-container-left" class="robot-buttons-container"></div>
-            <div id="robot-1-plan" class="messages">
-                <div class="robot-plan-title">Robot 1 Plan</div>
-            </div>
-            <div id="robot-2-plan" class="messages">
-                <div class="robot-plan-title">Robot 2 Plan</div>
-            </div>
-            <div id="robot-3-plan" class="messages">
-                <div class="robot-plan-title">Robot 3 Plan</div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="center-section">
-        <div class="map-container">
-            <canvas id="simulationCanvas" width="700" height="700"></canvas>
-        </div>
-        <div id="statusMessage" class="connected-indicator-container">
-            <div class="circle"></div>
-            <div class="connected-text">
-                Connected
-            </div>
-        </div>
-    </div>
-
-    <div class="right-section">
-        <div class="title">Communication</div>
-        <div class="communication-container">
-            <div id="robot-buttons-container-right" class="robot-buttons-container"></div>
-            <button id="playStopButton">Play</button>
-            <div id="messages" class="messages">
-            </div>
-            <div class="slider-container">
-                <label for="disparitySlider">MM Disparity:</label>
-                <input type="range" id="disparitySlider" min="0" max="2" step="1" value="0">
-                <div class="slider-labels">
-                    <span>Low</span>
-                    <span>Medium</span>
-                    <span>High</span>
-                </div>
-            </div>
-            
-            <div class="input-box">
-                <input class="input-box-text" type="text" placeholder="Send a message...">
-                <button class="input-box-button" type="submit">Submit</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const statusMessage = document.getElementById('statusMessage')
-        const playStopButton = document.getElementById('playStopButton')
-        const disparitySlider = document.getElementById('disparitySlider')
-        const canvas = document.getElementById('simulationCanvas')
-        canvas.addEventListener("mousedown", clicked, false)  // click listener for the canvas
-        const ctx = canvas.getContext('2d')
-        const canvasMapImage = new Image()
-        const canvasRobotImage = new Image()
-        const canvasObjectiveImage = new Image()
-        loadCanvasImages()
-        const gridSize = 10
-        const cellSize = canvas.width / gridSize
-
-        var robotFilterId = -1  // which robot ID to filter
-
-        let socket = createSocket()
-        let isPlaying = false
-
-        var numRobots = -1  // number of robots in the simulation
-        var newRobotData = {}  // new robot data that has not been updated to user map yet (requires user to click the message)
-        var initialRobotdata = {}
-        var savedRobotData = {}  // last copy of all the robot data, for re-draws
-        var shadedRobotIds = []  // robot IDs to shade because of a recently selected message
-
-        var newObjectives = {}  // new objectives that may have not been sent
-        var savedObjectives = {}  // objectives for the robot
-
-        var timeoutForDelayedRobot = 10  // threshold for when the timer icon appears by the robot
-
-        playStopButton.addEventListener("click", () => {
-            isPlaying = !isPlaying
-            if (isPlaying) {
-                playStopButton.textContent = 'Stop'
-            }
-            else {
-                playStopButton.textContent = 'Play'
-            }
-            socket.send(isPlaying)
-        })
-
-        // Initial draw
-        drawGrid()
-    </script>
-</body>
-
-</html> -->
-<!-- 
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Communication Box</title>
-    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-    <script src="{{ url_for('static', filename='js/colors.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/robotButton.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/drawing.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/messages.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/plans.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/sockets.js') }}"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-</head>
-
-<body>
-    <div class="left-section">
-        <div class="title">Plan</div>
-        <div class="communication-container">
-            <div id="robot-buttons-container-left" class="robot-buttons-container"></div>
-            <div id="plans" class="messages">
-            </div>
-        </div>
-    </div>
-    
-    <div class="center-section">
-        <div class="map-container">
-            <canvas id="simulationCanvas" width="700" height="700"></canvas>
-        </div>
-        <div id="statusMessage" class="connected-indicator-container">
-            <div class="circle"></div>
-            <div class="connected-text">
-                Connected
-            </div>
-        </div>
-    </div>
-
-    <div class="right-section">
-        <div class="title">Communication</div>
-        <div class="communication-container">
-            <div id="robot-buttons-container-right" class="robot-buttons-container"></div>
-            <button id="playStopButton">Play</button>
-            
-            <div id="robot-1-communication" class="messages">
-                <div class="robot-communication-title">Robot 1 Communication</div>
-            </div>
-            <div id="robot-2-communication" class="messages">
-                <div class="robot-communication-title">Robot 2 Communication</div>
-            </div>
-            <div id="robot-3-communication" class="messages">
-                <div class="robot-communication-title">Robot 3 Communication</div>
-            </div>
-            
-            <div class="slider-container">
-                <label for="disparitySlider">MM Disparity:</label>
-                <input type="range" id="disparitySlider" min="0" max="2" step="1" value="0">
-                <div class="slider-labels">
-                    <span>Low</span>
-                    <span>Medium</span>
-                    <span>High</span>
-                </div>
-            </div>
-            
-            <div class="input-box">
-                <input class="input-box-text" type="text" placeholder="Send a message...">
-                <button class="input-box-button" type="submit">Submit</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const statusMessage = document.getElementById('statusMessage')
-        const playStopButton = document.getElementById('playStopButton')
-        const disparitySlider = document.getElementById('disparitySlider')
-        const canvas = document.getElementById('simulationCanvas')
-        canvas.addEventListener("mousedown", clicked, false)  // click listener for the canvas
-        const ctx = canvas.getContext('2d')
-        const canvasMapImage = new Image()
-        const canvasRobotImage = new Image()
-        const canvasObjectiveImage = new Image()
-        loadCanvasImages()
-        const gridSize = 10
-        const cellSize = canvas.width / gridSize
-
-        var robotFilterId = -1  // which robot ID to filter
-
-        let socket = createSocket()
-        let isPlaying = false
-
-        var numRobots = -1  // number of robots in the simulation
-        var newRobotData = {}  // new robot data that has not been updated to user map yet (requires user to click the message)
-        var initialRobotdata = {}
-        var savedRobotData = {}  // last copy of all the robot data, for re-draws
-        var shadedRobotIds = []  // robot IDs to shade because of a recently selected message
-
-        var newObjectives = {}  // new objectives that may have not been sent
-        var savedObjectives = {}  // objectives for the robot
-
-        var timeoutForDelayedRobot = 10  // threshold for when the timer icon appears by the robot
-
-        playStopButton.addEventListener("click", () => {
-            isPlaying = !isPlaying
-            if (isPlaying) {
-                playStopButton.textContent = 'Stop'
-            }
-            else {
-                playStopButton.textContent = 'Play'
-            }
-            socket.send(isPlaying)
-        })
-
-        // Initial draw
-        drawGrid()
-    </script>
-</body>
-
-</html> -->
