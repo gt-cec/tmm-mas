@@ -1,26 +1,49 @@
-import { initPixiApp, widthSize, heightSize, width, height } from './newPixiApp.js';
-import { loadRobotTexture, updateRobots } from './newRobotManager.js';
+import { renderMapRobotStatus, renderMapRobotAlert} from './newInfoPanel.js';
+import { initPixiMap, mapHeight, cellWidth, cellHeight } from './newPixiApp.js';
+import { loadRobotImage, updateRobotsOnMap, activeRobotID } from './newRobotManager.js';
 import { createSocket } from './newSocket.js';
-import { renderRobotStatus, renderPlaceholderRobots, renderRobotAlert} from './newInfoPanel.js';
+import { onFileReceived, renderRobotStatus1, renderRobotAlert1 } from './newText.js';
+import { robotAlerts, renderRobotSpecificAlerts } from './newInfoPanel.js';
 
 let socket = null;
-let app = initPixiApp();
-renderPlaceholderRobots();
-renderRobotAlert({
-  time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-  robotName: "Robot 1",
-  status: "Replanning",
-  message: "Robot has replanned 5 times in the last minute, suggesting a persistent blockage."
-});
+let app = initPixiMap();
 
+loadRobotImage().then(() => {
+  socket = createSocket(processAndSendData);
+})
 
-loadRobotTexture().then(() => {
-  socket = createSocket((data) => {
-    updateRobots(app, data.robots, widthSize, heightSize, width, height);
-    renderRobotStatus(data.robots);
-    console.log(data.robots[3].message);
+function processAndSendData(data) {
+  const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  updateRobotsOnMap(app, data.robots, cellWidth, cellHeight, mapHeight);
+  renderMapRobotStatus(data.robots);
+  renderRobotStatus1(data.robots);
+  Object.entries(data.robots).forEach(([id, robot]) => {
+    if (robot.message.length > 0) {
+      const alertData = {
+        time: currentTime,
+        robotName: `Robot ${id}`,
+        status: getRobotStatus(robot.message),
+        message: robot.message,
+        robotId: id
+      };
+      renderMapRobotAlert(alertData);
+      renderRobotAlert1(alertData);
+      if (!robotAlerts[id]) robotAlerts[id] = [];
+      robotAlerts[id].unshift(alertData);
+      if (robotAlerts[id].length > 2) robotAlerts[id].pop();
+      if (activeRobotID && activeRobotID == id) {
+        renderRobotSpecificAlerts(id);
+      }
+    }
   });
-});
+  Object.keys(data.robots).forEach(robotId => onFileReceived(`bar${robotId}`));
+}
+
+function getRobotStatus(message) {
+  if (message.includes("replanning")) return "Replanning";
+  if (message.includes("behind")) return "Delay";
+  return "On Track";
+}
 
 let isPlaying = false;
 const playStopButton = document.getElementById('playStopButton');
@@ -32,17 +55,20 @@ playStopButton.addEventListener("click", () => {
 })
 
 const toggleScreenButton = document.getElementById('toggleScreenButton');
-const simToggleText = document.getElementById('simToggleText');
-const textToggleText = document.getElementById('textToggleText');
-const simView = document.getElementById('simulatorView');
-const textualView = document.getElementById('textualView');
+const toggleLabelSimulator = document.getElementById('toggleLabelSimulator');
+const toggleLabelTextual = document.getElementById('toggleLabelTextual');
+const simulatorScreen = document.getElementById('simulatorScreen');
+const overviewScreen = document.getElementById('overviewScreen');
 
 toggleScreenButton.addEventListener("click", function () {
-  const isChecked = this.checked;
-  simToggleText.classList.toggle('text-white', !isChecked);
-  simToggleText.classList.toggle('text-gray-400', isChecked);
-  textToggleText.classList.toggle('text-white', isChecked);
-  textToggleText.classList.toggle('text-gray-400', !isChecked);
-  simView.classList.toggle('hidden', isChecked);
-  textualView.classList.toggle('hidden', !isChecked);
-});
+  onToggle(this.checked);
+})
+
+function onToggle(isChecked) {
+  toggleLabelSimulator.classList.toggle('text-white', !isChecked);
+  toggleLabelSimulator.classList.toggle('text-gray-400', isChecked);
+  toggleLabelTextual.classList.toggle('text-white', isChecked);
+  toggleLabelTextual.classList.toggle('text-gray-400', !isChecked);
+  simulatorScreen.classList.toggle('hidden', isChecked);
+  overviewScreen.classList.toggle('hidden', !isChecked);
+}

@@ -1,9 +1,8 @@
 const gridSize = 6;
-const width = 800;
-const height = 500;
-const widthSize = width / gridSize;
-const heightSize = height / gridSize;
-
+const mapWidth = 800;
+const mapHeight = 500;
+const cellWidth = mapWidth / gridSize;
+const cellHeight = mapHeight / gridSize;
 const staticWalls = [
   { x: 0, y: 0, dir: "right" },
   { x: 0, y: 1, dir: "top" },
@@ -24,43 +23,80 @@ const staticWalls = [
   { x: 5, y: 5, dir: "left" }
 ];
 
-export { gridSize, width, height, widthSize, heightSize, drawGridWall };
+export { gridSize, mapHeight, cellWidth, cellHeight };
 
-// Utility to split visible/hidden walls
-function splitWalls(walls, visibleRatio = 0.6) {
-  const shuffled = [...walls].sort(() => Math.random() - 0.5);
-  const cutoff = Math.floor(walls.length * visibleRatio);
-  return {
-    visibleWalls: shuffled.slice(0, cutoff),
-    hiddenWalls: shuffled.slice(cutoff)
-  };
+export function initPixiMap() {
+  const app = new PIXI.Application({
+    width: mapWidth,
+    height: mapHeight,
+    backgroundColor: 0xB6B0AD
+  });
+
+  const appContainer = document.getElementById("pixiMap");
+  if (!appContainer) {
+    console.error("Cannot find the corresponding div to attach PixiJS canvas");
+    return null;
+  }
+
+  appContainer.appendChild(app.view);
+
+  // Draw grid
+  // const grid = new PIXI.Graphics();
+  // grid.lineStyle(1, 0xA3A3A3);
+  // for (let i = 0; i <= gridSize; i++) {
+  //   grid.moveTo(i * cellWidth, 0);
+  //   grid.lineTo(i * cellWidth, height);
+  //   grid.moveTo(0, i * cellHeight);
+  //   grid.lineTo(mapWidth, i * cellHeight);
+  // }
+  // app.stage.addChild(grid);
+
+  const wallLayer = new PIXI.Container();
+  app.stage.addChild(wallLayer);
+
+  const mapBorders = new PIXI.Graphics();
+  mapBorders.lineStyle(20, 0x000000);
+  mapBorders.moveTo(0, 0);
+  mapBorders.lineTo(mapWidth, 0);
+  mapBorders.lineTo(mapWidth, mapHeight);
+  mapBorders.lineTo(0, mapHeight);
+  mapBorders.lineTo(0, 0);
+  wallLayer.addChild(mapBorders);
+
+  const { visibleWalls, hiddenWalls } = splitWalls(staticWalls, 0.5);
+  visibleWalls.forEach(({ x, y, dir, isDoor }) => {
+    drawWall(wallLayer, x, y, dir, isDoor);
+  });
+
+  app._wallLayer = wallLayer;
+  app._hiddenWalls = hiddenWalls;
+
+  return app;
 }
 
-// Reusable wall drawer
-function drawGridWall(wallLayer, gridX, gridY, direction, isDoor = false, widthSize, heightSize) {
-  const x = gridX * widthSize;
-  const y = (gridSize - gridY - 1) * heightSize;  // Adjust y for the robot grid
+export function drawWall(wallLayer, gridX, gridY, direction, isDoor = false) {
+  const x = gridX * cellWidth;
+  const y = (gridSize - gridY - 1) * cellHeight;
 
   const wall = new PIXI.Graphics();
-  isDoor ? wall.lineStyle(10, 0xD3D3D3) : wall.lineStyle(10, 0x000000); // Wall thickness
+  isDoor ? wall.lineStyle(10, 0xD3D3D3) : wall.lineStyle(10, 0x000000);
 
-  // Draw the wall based on the direction
   switch (direction) {
     case 'left':
-      wall.moveTo(x + 5, y); // Add offset to center the line
-      wall.lineTo(x + 5, y + heightSize);
+      wall.moveTo(x + 5, y);
+      wall.lineTo(x + 5, y + cellHeight);
       break;
     case 'right':
-      wall.moveTo(x + widthSize - 5, y);
-      wall.lineTo(x + widthSize - 5, y + heightSize);
+      wall.moveTo(x + cellWidth - 5, y);
+      wall.lineTo(x + cellWidth - 5, y + cellHeight);
       break;
     case 'top':
-      wall.moveTo(x, y + 5); // Add offset to center the line
-      wall.lineTo(x + widthSize, y + 5);
+      wall.moveTo(x, y + 5);
+      wall.lineTo(x + cellWidth, y + 5);
       break;
     case 'bottom':
-      wall.moveTo(x, y + heightSize - 5);
-      wall.lineTo(x + widthSize, y + heightSize - 5);
+      wall.moveTo(x, y + cellHeight - 5);
+      wall.lineTo(x + cellWidth, y + cellHeight - 5);
       break;
     default:
       console.warn(`Invalid wall direction: ${direction}`);
@@ -70,56 +106,11 @@ function drawGridWall(wallLayer, gridX, gridY, direction, isDoor = false, widthS
   wallLayer.addChild(wall);
 }
 
-
-export function initPixiApp() {
-  const app = new PIXI.Application({
-    width: width,
-    height: height,
-    backgroundColor: 0xB6B0AD
-  });
-
-  const appContainer = document.getElementById("pixiApp");
-  if (!appContainer) {
-    console.error("❌ Could not find the #pixiApp div to attach PixiJS canvas");
-    return null;
-  }
-
-  appContainer.appendChild(app.view);
-
-  // Draw grid
-  const grid = new PIXI.Graphics();
-  grid.lineStyle(1, 0xA3A3A3);
-  for (let i = 0; i <= gridSize; i++) {
-    grid.moveTo(i * widthSize, 0);
-    grid.lineTo(i * widthSize, height);
-    grid.moveTo(0, i * heightSize);
-    grid.lineTo(width, i * heightSize);
-  }
-  app.stage.addChild(grid);
-
-  // Wall container
-  const wallLayer = new PIXI.Container();
-  app.stage.addChild(wallLayer);
-
-  // Map border
-  const wall = new PIXI.Graphics();
-  wall.lineStyle(20, 0x000000);
-  wall.moveTo(0, 0);
-  wall.lineTo(width, 0);
-  wall.lineTo(width, height);
-  wall.lineTo(0, height);
-  wall.lineTo(0, 0);
-  wallLayer.addChild(wall);
-
-  // Show only 60% walls
-  const { visibleWalls, hiddenWalls } = splitWalls(staticWalls, 1.0);
-  visibleWalls.forEach(({ x, y, dir, isDoor }) => {
-    drawGridWall(wallLayer, x, y, dir, isDoor, widthSize, heightSize);
-  });
-
-  // Save references for robotManager to access
-  app._wallLayer = wallLayer;
-  app._hiddenWalls = hiddenWalls;
-
-  return app;
+function splitWalls(walls, visibleRatio = 0.6) {
+  const shuffled = [...walls].sort(() => Math.random() - 0.5);
+  const cutoff = Math.floor(walls.length * visibleRatio);
+  return {
+    visibleWalls: shuffled.slice(0, cutoff),
+    hiddenWalls: shuffled.slice(cutoff)
+  };
 }
