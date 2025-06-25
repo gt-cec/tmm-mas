@@ -822,7 +822,91 @@ import ollama
 #     return response['message']['content'].strip()
 
 
-import ollama
+
+
+
+# import ollama
+
+# system_prompt = """
+# You are a robot status reporting system.
+
+# Based on the provided data, output exactly one line in one of these formats:
+
+# 1. Robot {robot_number} is stationary.
+# 2. Robot {robot_number} is {time_diff} seconds {time_status}; it has moved {direction}.
+# 3. Robot {robot_number} has moved {direction}.
+
+# No other text or formatting.
+# """
+
+# def generate_delay_message_ollama(
+#     robot_number, hmm_time, rmm_time, hmm_pos, rmm_pos, replan_flag=False,
+#     model_name='mistral'
+# ):
+#     """
+#     Generate a delay message via Ollama using streamlined prompts for speed.
+
+#     Parameters:
+#     - robot_number: identifier for the robot
+#     - hmm_time: expected/planned time
+#     - rmm_time: actual time
+#     - hmm_pos: expected position tuple (x, y)
+#     - rmm_pos: actual position tuple (x, y)
+#     - replan_flag: boolean flag (unused in messaging)
+#     - model_name: Ollama model to call
+
+#     Returns:
+#     - Single-line status message per system instructions
+#     """
+#     # Compute raw time difference and round
+#     raw_diff = rmm_time - hmm_time
+#     time_diff = abs(round(raw_diff))
+#     report_time = time_diff > 5
+#     time_status = 'behind' if raw_diff > 0 else 'ahead of'
+
+#     # Compute position difference
+#     x_diff = rmm_pos[0] - hmm_pos[0]
+#     y_diff = rmm_pos[1] - hmm_pos[1]
+
+#     # Handle stationary case manually
+#     if x_diff == 0 and y_diff == 0:
+#         return f"Robot {robot_number} is stationary."
+
+#     # Determine direction: diagonal abbreviations or cardinal words
+#     if x_diff != 0 and y_diff != 0:
+#         if x_diff > 0 and y_diff > 0:
+#             direction = 'NE'
+#         elif x_diff < 0 and y_diff > 0:
+#             direction = 'NW'
+#         elif x_diff > 0 and y_diff < 0:
+#             direction = 'SE'
+#         else:
+#             direction = 'SW'
+#     else:
+#         if y_diff != 0:
+#             direction = 'North' if y_diff > 0 else 'South'
+#         else:
+#             direction = 'East' if x_diff > 0 else 'West'
+
+#     # Build minimal payload for Ollama
+#     user_payload = (
+#         f"robot_number={robot_number},"
+#         f"time_diff={time_diff},"
+#         f"report_time={report_time},"
+#         f"time_status={time_status},"
+#         f"direction={direction}"
+#     )
+
+#     # Invoke Ollama with system + user messages
+#     response = ollama.chat(
+#         model=model_name,
+#         messages=[
+#             {'role': 'system', 'content': system_prompt},
+#             {'role': 'user', 'content': user_payload}
+#         ]
+#     )
+#     return response['message']['content'].strip()
+
 import ollama
 
 # Preload static instructions to speed up prompt processing
@@ -883,11 +967,15 @@ def generate_delay_message_ollama(
             direction = 'SW'
     else:
         if y_diff != 0:
-            direction = 'North' if y_diff > 0 else 'South'
+            direction = 'north' if y_diff > 0 else 'south'
         else:
-            direction = 'East' if x_diff > 0 else 'West'
+            direction = 'east' if x_diff > 0 else 'west'
 
-    # Build minimal payload for Ollama
+    # If within threshold, skip time reporting and return movement-only
+    if not report_time:
+        return f"Robot {robot_number} has moved {direction}."
+
+    # Build minimal payload for Ollama when time needs to be reported
     user_payload = (
         f"robot_number={robot_number},"
         f"time_diff={time_diff},"
@@ -896,7 +984,7 @@ def generate_delay_message_ollama(
         f"direction={direction}"
     )
 
-    # Invoke Ollama with system + user messages
+    # Invoke Ollama with system + user messages for time-reporting cases
     response = ollama.chat(
         model=model_name,
         messages=[
@@ -905,7 +993,6 @@ def generate_delay_message_ollama(
         ]
     )
     return response['message']['content'].strip()
-
 
 
 # if ollama fails/too slow
