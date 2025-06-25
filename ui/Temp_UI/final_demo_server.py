@@ -283,8 +283,12 @@ def process(robot_id, data, tasks, plan_coordinates, plans, JSON_data, robot_num
     uncertainty_factor_pos = 0.05
     uncertainty_factor_time = 0.01
 
+    # updated_hmm_array, message = dynamic_deviation_threshold_multi_logic(JSON_data,[hmm_array], [rmm_array], update_logic_functions, uncertainty_factor_pos, uncertainty_factor_time,
+    #     dynamic_threshold_mission_time=10, robot_id=robot_id)
+
     updated_hmm_array, message = dynamic_deviation_threshold_multi_logic(JSON_data,[hmm_array], [rmm_array], update_logic_functions, uncertainty_factor_pos, uncertainty_factor_time,
-        dynamic_threshold_mission_time=10, robot_id=robot_id)
+        dynamic_threshold_mission_time=1, robot_id=robot_id)
+
 
     print(f"HMM Array for Robot {robot_id}: {hmm_array}")
     print(f"RMM Array for Robot {robot_id}: {rmm_array}")

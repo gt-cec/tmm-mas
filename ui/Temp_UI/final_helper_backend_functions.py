@@ -608,65 +608,348 @@ def generate_communication_message(deviation, threshold, hmm_pos1, hmm_pos2, rmm
 
 import ollama
 #works fine
-def generate_delay_message_ollama(robot_number, hmm_time, rmm_time, hmm_pos, rmm_pos, replan_flag=False):
-    """
-    Generate a delay message with consistent formatting for robot status communication
-    using Mistral through Ollama.
+
+
+# def generate_delay_message_ollama(robot_number, hmm_time, rmm_time, hmm_pos, rmm_pos, replan_flag=False):
+#     """
+#     Generate a delay message with consistent formatting for robot status communication
+#     using Mistral through Ollama.
     
+#     Parameters:
+#     - robot_number: The identifier for the robot
+#     - hmm_time: Expected/planned time
+#     - rmm_time: Actual time
+#     - hmm_pos: Expected/planned position as tuple (x, y)
+#     - rmm_pos: Actual position as tuple (x, y)
+#     - replan_flag: Boolean indicating if replanning occurred
+    
+#     Returns:
+#     - Formatted status message
+#     """
+#     # Calculate time difference in seconds
+#     time_diff = round(rmm_time - hmm_time, 2)
+    
+#     # Determine time status
+#     if time_diff > 0:
+#         time_status = "behind"
+#     else:
+#         time_status = "ahead of"
+#         time_diff = abs(time_diff)  # Make positive for message
+    
+#     # Determine movement direction
+#     x_diff = rmm_pos[0] - hmm_pos[0]
+#     y_diff = rmm_pos[1] - hmm_pos[1]
+    
+#     # Create a prompt for Mistral with all the information needed to generate the message
+#     prompt = f"""
+#     You are a robot status reporting system.
+    
+#     Robot number: {robot_number}
+#     Time difference: {time_diff} seconds
+#     Time status: {time_status} the expected time
+#     Position difference: x={x_diff}, y={y_diff}
+    
+#     Based on the position difference, determine the direction (north, northeast, east, southeast, 
+#     south, southwest, west, or northwest) and create a message in exactly this format:
+#     "Robot [number] is [time_diff] seconds [time_status] the expected time; it has moved [direction]."
+    
+#     Only respond with the exact message format, no additional explanation.
+#     """
+    
+#     # Call Mistral through Ollama
+#     response = ollama.chat(model='mistral', messages=[
+#         {
+#             'role': 'user',
+#             'content': prompt
+#         }
+#     ])
+    
+#     # Extract the generated message
+#     message = response['message']['content'].strip()
+    
+#     return message
+
+
+import ollama
+
+# def generate_delay_message_ollama(robot_number, hmm_time, rmm_time, hmm_pos, rmm_pos, replan_flag=False):
+#     """
+#     Generate a delay message with consistent formatting for robot status communication
+#     using Mistral through Ollama.
+    
+#     Parameters:
+#     - robot_number: The identifier for the robot
+#     - hmm_time: Expected/planned time
+#     - rmm_time: Actual time
+#     - hmm_pos: Expected/planned position as tuple (x, y)
+#     - rmm_pos: Actual position as tuple (x, y)
+#     - replan_flag: Boolean indicating if replanning occurred
+
+#     Returns:
+#     - Formatted status message via Mistral
+#     """
+#     # Calculate raw time difference and round
+#     raw_diff = rmm_time - hmm_time
+#     time_diff = abs(round(raw_diff))
+#     report_time = time_diff > 5
+#     time_status = "behind" if raw_diff > 0 else "ahead of"
+
+#     # Calculate position difference
+#     x_diff = rmm_pos[0] - hmm_pos[0]
+#     y_diff = rmm_pos[1] - hmm_pos[1]
+
+#     # Determine compass abbreviation
+#     vert = "N" if y_diff > 0 else "S" if y_diff < 0 else ""
+#     hor = "E" if x_diff > 0 else "W" if x_diff < 0 else ""
+#     direction = vert + hor
+
+#     # Build prompt for Ollama / Mistral
+#     prompt = f"""
+# You are a robot status reporting system.
+
+# Robot number: {robot_number}
+# Rounded time difference (s): {time_diff}
+# Report time? {report_time}
+# Time status: {time_status}
+# Position difference: x={x_diff}, y={y_diff}
+# Direction abbreviation: {direction}
+
+# Follow these rules exactly:
+# 1. If both x and y differences are zero, output exactly:
+#    Robot {robot_number} is stationary.
+# 2. Otherwise:
+#    - Use the provided compass abbreviation for movement.
+#    - If Report time? is True, include "is {time_diff} seconds {time_status} the expected time;" else omit time.
+#    - When including time, format:
+#      Robot {robot_number} is {time_diff} seconds {time_status} the expected time; it has moved {direction}.
+#    - When omitting time, format:
+#      Robot {robot_number} has moved {direction}.
+# 3. Do not include any additional text or formatting.
+# """
+
+#     # Invoke Mistral via Ollama
+#     response = ollama.chat(
+#         model='mistral',
+#         messages=[{'role': 'user', 'content': prompt}]
+#     )
+#     # Extract and return the generated message
+#     return response['message']['content'].strip()
+
+
+#ollama
+
+
+
+# def generate_delay_message_ollama(robot_number, hmm_time, rmm_time, hmm_pos, rmm_pos, replan_flag=False):
+#     """
+#     Generate a delay message with consistent formatting for robot status communication
+#     using Mistral through Ollama.
+    
+#     Parameters:
+#     - robot_number: The identifier for the robot
+#     - hmm_time: Expected/planned time
+#     - rmm_time: Actual time
+#     - hmm_pos: Expected/planned position as tuple (x, y)
+#     - rmm_pos: Actual position as tuple (x, y)
+#     - replan_flag: Boolean indicating if replanning occurred
+
+#     Returns:
+#     - Formatted status message via Mistral
+#     """
+#     # Calculate raw time difference and round
+#     raw_diff = rmm_time - hmm_time
+#     time_diff = abs(round(raw_diff))
+#     report_time = time_diff > 5
+#     time_status = "behind" if raw_diff > 0 else "ahead of"
+
+#     # Calculate position difference
+#     x_diff = rmm_pos[0] - hmm_pos[0]
+#     y_diff = rmm_pos[1] - hmm_pos[1]
+
+#     # Check for stationary
+#     if x_diff == 0 and y_diff == 0:
+#         # Directly handle stationary case via Ollama
+#         prompt = f"Robot {robot_number} is stationary."
+#         return prompt
+
+#     # Determine direction: cardinal words or diagonal abbreviations
+#     if x_diff != 0 and y_diff != 0:
+#         # Diagonal: NE, NW, SE, SW
+#         if y_diff > 0 and x_diff > 0:
+#             direction = "NE"
+#         elif y_diff > 0 and x_diff < 0:
+#             direction = "NW"
+#         elif y_diff < 0 and x_diff > 0:
+#             direction = "SE"
+#         else:
+#             direction = "SW"
+#     else:
+#         # Cardinal: north, south, east, west
+#         if y_diff != 0:
+#             direction = "north" if y_diff > 0 else "south"
+#         else:
+#             direction = "east" if x_diff > 0 else "west"
+
+#     # Build prompt for Ollama / Mistral
+#     prompt = f"""
+# You are a robot status reporting system.
+
+# Robot number: {robot_number}
+# Rounded time difference (s): {time_diff}
+# Report time? {report_time}
+# Time status: {time_status}
+# Position difference: x={x_diff}, y={y_diff}
+# Direction: {direction}
+
+# Follow these rules exactly:
+# 1. Use the provided direction for movement.
+# 2. If Report time? is True, include the phrase:
+#    is {time_diff} seconds {time_status};
+#    otherwise omit any time mention.
+# 3. When including time, the full output must be exactly:
+#    Robot {robot_number} is {time_diff} seconds {time_status}; it has moved {direction}.
+# 4. When omitting time, the full output must be exactly:
+#    Robot {robot_number} has moved {direction}.
+# 5. Do not output any additional text or formatting.
+# """
+
+#     # Invoke Mistral via Ollama
+#     response = ollama.chat(
+#         model='mistral',
+#         messages=[{'role': 'user', 'content': prompt}]
+#     )
+#     # Extract and return the generated message
+#     return response['message']['content'].strip()
+
+
+import ollama
+import ollama
+
+# Preload static instructions to speed up prompt processing
+system_prompt = """
+You are a robot status reporting system.
+
+Based on the provided data, output exactly one line in one of these formats:
+
+1. Robot {robot_number} is stationary.
+2. Robot {robot_number} is {time_diff} seconds {time_status}; it has moved {direction}.
+3. Robot {robot_number} has moved {direction}.
+
+No other text or formatting.
+"""
+
+def generate_delay_message_ollama(
+    robot_number, hmm_time, rmm_time, hmm_pos, rmm_pos, replan_flag=False,
+    model_name='mistral'
+):
+    """
+    Generate a delay message via Ollama using streamlined prompts for speed.
+
     Parameters:
-    - robot_number: The identifier for the robot
-    - hmm_time: Expected/planned time
-    - rmm_time: Actual time
-    - hmm_pos: Expected/planned position as tuple (x, y)
-    - rmm_pos: Actual position as tuple (x, y)
-    - replan_flag: Boolean indicating if replanning occurred
-    
+    - robot_number: identifier for the robot
+    - hmm_time: expected/planned time
+    - rmm_time: actual time
+    - hmm_pos: expected position tuple (x, y)
+    - rmm_pos: actual position tuple (x, y)
+    - replan_flag: boolean flag (unused in messaging)
+    - model_name: Ollama model to call
+
     Returns:
-    - Formatted status message
+    - Single-line status message per system instructions
     """
-    # Calculate time difference in seconds
-    time_diff = round(rmm_time - hmm_time, 2)
-    
-    # Determine time status
-    if time_diff > 0:
-        time_status = "behind"
-    else:
-        time_status = "ahead of"
-        time_diff = abs(time_diff)  # Make positive for message
-    
-    # Determine movement direction
+    # Compute raw time difference and round
+    raw_diff = rmm_time - hmm_time
+    time_diff = abs(round(raw_diff))
+    report_time = time_diff > 5
+    time_status = 'behind' if raw_diff > 0 else 'ahead of'
+
+    # Compute position difference
     x_diff = rmm_pos[0] - hmm_pos[0]
     y_diff = rmm_pos[1] - hmm_pos[1]
-    
-    # Create a prompt for Mistral with all the information needed to generate the message
-    prompt = f"""
-    You are a robot status reporting system.
-    
-    Robot number: {robot_number}
-    Time difference: {time_diff} seconds
-    Time status: {time_status} the expected time
-    Position difference: x={x_diff}, y={y_diff}
-    
-    Based on the position difference, determine the direction (north, northeast, east, southeast, 
-    south, southwest, west, or northwest) and create a message in exactly this format:
-    "Robot [number] is [time_diff] seconds [time_status] the expected time; it has moved [direction]."
-    
-    Only respond with the exact message format, no additional explanation.
-    """
-    
-    # Call Mistral through Ollama
-    response = ollama.chat(model='mistral', messages=[
-        {
-            'role': 'user',
-            'content': prompt
-        }
-    ])
-    
-    # Extract the generated message
-    message = response['message']['content'].strip()
-    
-    return message
 
+    # Handle stationary case manually
+    if x_diff == 0 and y_diff == 0:
+        return f"Robot {robot_number} is stationary."
+
+    # Determine direction: diagonal abbreviations or cardinal words
+    if x_diff != 0 and y_diff != 0:
+        if x_diff > 0 and y_diff > 0:
+            direction = 'NE'
+        elif x_diff < 0 and y_diff > 0:
+            direction = 'NW'
+        elif x_diff > 0 and y_diff < 0:
+            direction = 'SE'
+        else:
+            direction = 'SW'
+    else:
+        if y_diff != 0:
+            direction = 'North' if y_diff > 0 else 'South'
+        else:
+            direction = 'East' if x_diff > 0 else 'West'
+
+    # Build minimal payload for Ollama
+    user_payload = (
+        f"robot_number={robot_number},"
+        f"time_diff={time_diff},"
+        f"report_time={report_time},"
+        f"time_status={time_status},"
+        f"direction={direction}"
+    )
+
+    # Invoke Ollama with system + user messages
+    response = ollama.chat(
+        model=model_name,
+        messages=[
+            {'role': 'system', 'content': system_prompt},
+            {'role': 'user', 'content': user_payload}
+        ]
+    )
+    return response['message']['content'].strip()
+
+
+
+# if ollama fails/too slow
+
+def generate_delay_message_manual_v2(robot_number, hmm_time, rmm_time, hmm_pos, rmm_pos, replan_flag=False):
+    """
+    Manually generate the same delay message without using Ollama.
+    """
+    raw_diff = rmm_time - hmm_time
+    time_diff = abs(round(raw_diff))
+    report_time = time_diff > 5
+    time_status = "behind" if raw_diff > 0 else "ahead of"
+
+    x_diff = rmm_pos[0] - hmm_pos[0]
+    y_diff = rmm_pos[1] - hmm_pos[1]
+
+    # Stationary check
+    if x_diff == 0 and y_diff == 0:
+        return f"Robot {robot_number} is stationary."
+
+    # Determine direction
+    if x_diff != 0 and y_diff != 0:
+        if y_diff > 0 and x_diff > 0:
+            direction = "NE"
+        elif y_diff > 0 and x_diff < 0:
+            direction = "NW"
+        elif y_diff < 0 and x_diff > 0:
+            direction = "SE"
+        else:
+            direction = "SW"
+    else:
+        if y_diff != 0:
+            direction = "north" if y_diff > 0 else "south"
+        else:
+            direction = "east" if x_diff > 0 else "west"
+
+    # Build message manually
+    if report_time:
+        return (
+            f"Robot {robot_number} is {time_diff} seconds {time_status}; "
+            f"it has moved {direction}."
+        )
+    else:
+        return f"Robot {robot_number} has moved {direction}."
 
 
 
@@ -746,7 +1029,7 @@ def generate_communication_message_ollama(deviation, threshold, hmm_pos1, hmm_po
 
         # Check replan_flag for the specific robot and append replan info if true
         if JSON_data['robots'][f'robot{robot_number}']['replan_flag']:
-            delay_message += " It has undergone replanning and has a new plan."
+            delay_message += " It has has a new plan/target."
 
         messages.append(delay_message)  # Append formatted delay message to messages list
     return messages
