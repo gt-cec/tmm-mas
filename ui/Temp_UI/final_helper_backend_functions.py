@@ -1116,7 +1116,7 @@ def generate_communication_message_ollama(deviation, threshold, hmm_pos1, hmm_po
 
         # Check replan_flag for the specific robot and append replan info if true
         if JSON_data['robots'][f'robot{robot_number}']['replan_flag']:
-            delay_message += " It has has a new plan/target."
+            delay_message += " It has a new plan/target."
 
         messages.append(delay_message)  # Append formatted delay message to messages list
     return messages
