@@ -919,7 +919,7 @@ Based on the provided data, output exactly one line in one of these formats:
 2. Robot {robot_number} is {time_diff} seconds {time_status}; it has moved {direction}.
 3. Robot {robot_number} has moved {direction}.
 
-No other text or formatting.
+No other text or formatting. Do not hallucniate. stick to the given options.
 """
 
 def generate_delay_message_ollama(
@@ -945,7 +945,7 @@ def generate_delay_message_ollama(
     raw_diff = rmm_time - hmm_time
     time_diff = abs(round(raw_diff))
     report_time = time_diff > 5
-    time_status = 'behind' if raw_diff > 0 else 'ahead of'
+    time_status = 'behind' if raw_diff > 0 else 'ahead'
 
     # Compute position difference
     x_diff = rmm_pos[0] - hmm_pos[0]
