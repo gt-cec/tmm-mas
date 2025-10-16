@@ -1,0 +1,59 @@
+
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+/* View Toggle Buttons */
+#map-view-btn, #text-view-btn, #with-framework-btn, #without-framework-btn { 
+    background-color: #555; 
+    color: white; 
+    border: 1px solid #777; 
+    padding: 5px 10px; 
+    cursor: pointer; 
+}
+#map-view-btn.active-view, #text-view-btn.active-view, #with-framework-btn.active-view, #without-framework-btn.active-view { 
+    background-color: #007bff; 
+    color: white; 
+    border-color: #007bff; 
+}
+/* Text View Card Structure */
+.robot-column { display: flex; flex-direction: column; gap: 15px; flex: 1; }
+.robot-card-top {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    padding: 10px 20px;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.robot-card-bottom { background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 0.5rem; padding: 15px; display: flex; flex-direction: column; }
+.message-box {
+    height: 750px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+.divider { text-align: center; color: #aaa; font-size: 0.9em; margin: 15px 0; }
+.divider::before, .divider::after { content: ' ― '; }
+/* Progress Bar Slider in Text View */
+.robot-card-top .rc-slider-track { background-color: #007bff !important; height: 12px;}
+.robot-card-top .rc-slider-rail { background-color: #e9ecef !important; height: 12px;}
+.robot-card-top .rc-slider-mark-text { color: #555; font-weight: bold; }
+.robot-card-top .rc-slider-disabled .rc-slider-handle { display: none; }
+/* --- NEW CSS FOR THE RED REPLAN BUTTON --- */
+.replan-message-container {
+    background-color: #ffdede; /* Red background for the whole box */
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 13px;
+    border: 1px solid #ddd;
+    color: #212529;
+}
+/* Style the summary line to make it look like a header/button */
+.replan-message-container summary {
+    cursor: pointer;
+    outline: none; /* Removes the default outline on click */
+    display: block; /* Ensures it takes up the full width */
+}
+/* Hides the default dropdown arrow icon from the browser */
+.replan-message-container summary::-webkit-details-marker {
+  display: none;
+}
+        
