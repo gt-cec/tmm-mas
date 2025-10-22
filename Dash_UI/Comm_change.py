@@ -457,7 +457,13 @@ app.layout = html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'fo
                     html.H3(f'Robot {i} Status', style={'textAlign': 'center', 'color': '#333'}),
                     html.Div(id=f'robot-{i}-messages', className='message-box')
                 ])
-            ]) for i in range(1, 4)]
+            ]) for i in range(1, 4)],
+            dcc.Graph(
+                id='simulation-map-snapshot',
+                figure=initial_figure,  # initialize empty or same figure
+                config={'staticPlot': True, 'displayModeBar': False},
+                style={'width': '300px', 'height': '200px', 'border': '1px solid #666'}
+            )
         ]),
     ]),
 
@@ -601,6 +607,36 @@ def reset_histories_and_load_initial_hmms(scenario_id, n_restarts):
             'robot3': HMM_Robot_3
         }
     return *cleared_messages, initial_hmms
+
+
+@app.callback(
+    Output('simulation-map-snapshot', 'figure'),
+    Input('simulation-graph', 'figure')
+)
+def update_snapshot(main_fig):
+    snapshot_fig = go.Figure(main_fig)
+
+    # Scale down markers, lines, and fonts for the smaller view
+    for trace in snapshot_fig.data:
+        if hasattr(trace, 'marker') and trace.marker is not None:
+            trace.marker.size = (
+                [s * 0.5 for s in trace.marker.size]
+                if isinstance(trace.marker.size, (list, tuple))
+                else trace.marker.size * 0.5
+                if trace.marker.size
+                else 5
+            )
+        if hasattr(trace, 'line') and trace.line is not None:
+            trace.line.width = trace.line.width * 0.5 if trace.line.width else 1
+
+    snapshot_fig.update_layout(
+        margin=dict(l=0, r=0, t=20, b=0),
+        showlegend=False,
+        title=None,
+        font=dict(size=8),  # smaller font for axis and annotations
+    )
+    return snapshot_fig
+
 
 
 @app.callback(
