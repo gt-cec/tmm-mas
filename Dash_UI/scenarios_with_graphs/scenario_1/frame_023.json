@@ -431,9 +431,9 @@
             "mission_time": 81,
             "replan_flag": false,
             "replan_count": 5,
-            "Current_weather": "1",
-            "Battery_status": "1",
-            "Momentarily_offline": "0"
+            "Current_weather": "0",
+            "Battery_status": "0",
+            "Momentarily_offline": "1"
         },
         "robot3": {
             "state": "moving",
@@ -1285,7 +1285,7 @@
             "mission_time": 197,
             "replan_flag": true,
             "replan_count": 5,
-            "Current_weather": "1",
+            "Current_weather": "0",
             "Battery_status": "1",
             "Momentarily_offline": "0"
         },
@@ -1615,7 +1615,7 @@
             "mission_time": 51,
             "replan_flag": false,
             "replan_count": 3,
-            "Current_weather": "1",
+            "Current_weather": "0",
             "Battery_status": "1",
             "Momentarily_offline": "0"
         }
