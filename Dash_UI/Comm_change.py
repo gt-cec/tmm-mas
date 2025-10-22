@@ -446,8 +446,14 @@ app.layout = html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'fo
         html.Div(id='map-view-container', style={'display': 'flex', 'flexDirection': 'row', 'gap': '20px', 'height': '100%'}, children=[
             html.Div(style={'width': '70%', 'height': '100%'}, children=[dcc.Graph(id='simulation-graph', figure=initial_figure, style={'height': '100%', 'width': '100%'})]),
             html.Div(style={'width': '30%', 'height': '100%', 'display': 'flex', 'flexDirection': 'column', 'gap': '10px'}, children=[
-                html.H3("Simulation Log", style={'color': '#00ff88', 'textAlign': 'center'}),
-                html.Pre(id='text-ui-output', style={'backgroundColor': '#1a1a1a', 'border': '1px solid #666', 'padding': '15px', 'overflowY': 'auto', 'whiteSpace': 'pre-wrap', 'color': '#ddd', 'fontSize': '12px', 'borderRadius': '3px', 'flexGrow': 1})
+                html.Div(style={'flex': '1', 'display': 'flex', 'flexDirection': 'column', 'overflow': 'hidden'}, children=[
+                    html.H3("Simulation Log", style={'color': '#00ff88', 'textAlign': 'center', 'flexShrink': 0}),
+                    html.Pre(id='text-ui-output', style={'backgroundColor': '#1a1a1a', 'border': '1px solid #666', 'padding': '15px', 'overflowY': 'auto', 'whiteSpace': 'pre-wrap', 'color': '#ddd', 'fontSize': '12px', 'borderRadius': '3px', 'flexGrow': 1})
+                ]),
+                html.Div(style={'flex': '1', 'display': 'flex', 'flexDirection': 'column', 'overflow': 'hidden', 'backgroundColor': '#fff', 'borderRadius': '5px'}, children=[
+                    html.H3("All Messages", style={'color': '#333', 'textAlign': 'center', 'flexShrink': 0, 'paddingTop': '10px'}),
+                    html.Div(id='all-messages-feed', className='message-box', style={'padding': '0 15px 15px 15px'})
+                ])
             ])
         ]),
         html.Div(id='text-view-container', style={'display': 'none', 'flexDirection': 'row', 'gap': '20px', 'height': '100%'}, children=[
@@ -473,6 +479,7 @@ app.layout = html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'fo
     dcc.Store(id='current-frame-store', data=0),
     dcc.Store(id='is-playing-store', data=False),
     dcc.Store(id='hmm-data-store'),
+    dcc.Store(id='all-messages-store', data=[]),
     dcc.Store(id='framework-mode-store', data='with_framework'),    
     dcc.Interval(id='animation-interval', interval=UPDATE_INTERVAL_MS, n_intervals=0, disabled=True)
 ])
@@ -587,6 +594,7 @@ def switch_framework_mode(with_clicks, without_clicks):
 @app.callback(
     [Output(f'robot-{i}-messages', 'children', allow_duplicate=True) for i in range(1, 4)],
     Output('hmm-data-store', 'data'),
+    Output('all-messages-store', 'data', allow_duplicate=True),
     Input('scenario-dropdown', 'value'), 
     Input('restart-button', 'n_clicks'),
     prevent_initial_call='initial_duplicate'
@@ -606,7 +614,37 @@ def reset_histories_and_load_initial_hmms(scenario_id, n_restarts):
             'robot2': HMM_Robot_2,
             'robot3': HMM_Robot_3
         }
-    return *cleared_messages, initial_hmms
+    return *cleared_messages, initial_hmms, []
+
+
+@app.callback(
+    Output('simulation-map-snapshot', 'figure'),
+    Input('simulation-graph', 'figure')
+)
+def update_snapshot(main_fig):
+    snapshot_fig = go.Figure(main_fig)
+
+    # Scale down markers, lines, and fonts for the smaller view
+    for trace in snapshot_fig.data:
+        if hasattr(trace, 'marker') and trace.marker is not None:
+            trace.marker.size = (
+                [s * 0.5 for s in trace.marker.size]
+                if isinstance(trace.marker.size, (list, tuple))
+                else trace.marker.size * 0.5
+                if trace.marker.size
+                else 5
+            )
+        if hasattr(trace, 'line') and trace.line is not None:
+            trace.line.width = trace.line.width * 0.5 if trace.line.width else 1
+
+    snapshot_fig.update_layout(
+        margin=dict(l=0, r=0, t=20, b=0),
+        showlegend=False,
+        title=None,
+        font=dict(size=8),  # smaller font for axis and annotations
+    )
+    return snapshot_fig
+
 
 
 @app.callback(
@@ -676,6 +714,8 @@ def update_open_messages_state(open_states, current_open_ids):
     Output('text-ui-output', 'children'),
     [Output(f'robot-{i}-messages', 'children') for i in range(1, 4)],
     Output('hmm-data-store', 'data', allow_duplicate=True),
+    Output('all-messages-feed', 'children'),
+    Output('all-messages-store', 'data'),
     Output('animation-interval', 'interval'),
     Input('current-frame-store', 'data'),
     State('scenario-dropdown', 'value'),
@@ -683,13 +723,14 @@ def update_open_messages_state(open_states, current_open_ids):
     State('hmm-data-store', 'data'),
     State('framework-mode-store', 'data'),
     [State(f'robot-{i}-messages', 'children') for i in range(1, 4)],
-    State('open-messages-store', 'data'),
+    State('open-messages-store', 'data'), 
+    State('all-messages-store', 'data'),
     prevent_initial_call=True
 )
-def update_all_outputs(frame_idx, scenario_id, scenario_data, hmm_data, framework_mode, hist1, hist2, hist3, open_message_ids):
+def update_all_outputs(frame_idx, scenario_id, scenario_data, hmm_data, framework_mode, hist1, hist2, hist3, open_message_ids, all_messages_history):
     global current_frame_data
     if not all([scenario_data, hmm_data, scenario_id, framework_mode]) or frame_idx is None or frame_idx >= len(scenario_data):
-        return initial_figure, "Select a scenario and press Play.", [], [], [], no_update, UPDATE_INTERVAL_MS
+        return initial_figure, "Select a scenario and press Play.", [], [], [], no_update, no_update, no_update, UPDATE_INTERVAL_MS
     
     current_hmms = hmm_data.copy()
     current_frame_data = scenario_data[frame_idx]
@@ -708,18 +749,19 @@ def update_all_outputs(frame_idx, scenario_id, scenario_data, hmm_data, framewor
         for r_id, r_data in robots_dict.items():
             state, x, y = r_data.get('state', '?'), r_data.get('x', 0), r_data.get('y', 0)
             log_text += f"- {r_id}: {state.upper()} @ ({x:.1f}, {y:.1f})\n"
-    log_text += "\n📦 PACKAGES:\n" + "-"*20 + "\n"
-    if not packages:
-        log_text += "(No package data)\n"
-    else:
-        for p in packages:
-            status = f"CARRIED by {p['carried_by']}" if p.get('carried_by') else f"ON GROUND @ ({p.get('x', 0):.1f}, {p.get('y', 0):.1f})"
-            log_text += f"- {p['id']}: {status}\n"
+    # log_text += "\n📦 PACKAGES:\n" + "-"*20 + "\n"
+    # if not packages:
+    #     log_text += "(No package data)\n"
+    # else:
+    #     for p in packages:
+    #         status = f"CARRIED by {p['carried_by']}" if p.get('carried_by') else f"ON GROUND @ ({p.get('x', 0):.1f}, {p.get('y', 0):.1f})"
+    #         log_text += f"- {p['id']}: {status}\n"
     
     histories = [hist1, hist2, hist3]
     new_messages = []
     sim_time = current_frame_data.get('simulator time', 0)
     any_sync_occurred = False
+    newly_generated_messages = []
     
     for i in range(1, 4):
         robot_id = f'robot{i}'
@@ -765,6 +807,7 @@ def update_all_outputs(frame_idx, scenario_id, scenario_data, hmm_data, framewor
                         selected_robot_rmm_array,
                         scenario_id
                     )
+                    newly_generated_messages.append(new_message_div)
                     
                     updated_history = [new_message_div]
                     if histories[i-1]:
@@ -778,9 +821,14 @@ def update_all_outputs(frame_idx, scenario_id, scenario_data, hmm_data, framewor
         else:
             new_messages.append(histories[i-1])
     
+    # Update the aggregated message feed
+    updated_all_messages = newly_generated_messages + all_messages_history
+    # Limit the total number of messages to avoid performance issues
+    updated_all_messages = updated_all_messages[:100]
+    
     new_interval = 2000 if any_sync_occurred else UPDATE_INTERVAL_MS
     
-    return fig, log_text, *new_messages, current_hmms, new_interval
+    return fig, log_text, *new_messages, current_hmms, updated_all_messages, updated_all_messages, new_interval
 
 
 # --- Main Execution ---
