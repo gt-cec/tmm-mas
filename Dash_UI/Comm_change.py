@@ -648,36 +648,6 @@ def update_snapshot(main_fig):
 
 
 @app.callback(
-    Output('simulation-map-snapshot', 'figure'),
-    Input('simulation-graph', 'figure')
-)
-def update_snapshot(main_fig):
-    snapshot_fig = go.Figure(main_fig)
-
-    # Scale down markers, lines, and fonts for the smaller view
-    for trace in snapshot_fig.data:
-        if hasattr(trace, 'marker') and trace.marker is not None:
-            trace.marker.size = (
-                [s * 0.5 for s in trace.marker.size]
-                if isinstance(trace.marker.size, (list, tuple))
-                else trace.marker.size * 0.5
-                if trace.marker.size
-                else 5
-            )
-        if hasattr(trace, 'line') and trace.line is not None:
-            trace.line.width = trace.line.width * 0.5 if trace.line.width else 1
-
-    snapshot_fig.update_layout(
-        margin=dict(l=0, r=0, t=20, b=0),
-        showlegend=False,
-        title=None,
-        font=dict(size=8),  # smaller font for axis and annotations
-    )
-    return snapshot_fig
-
-
-
-@app.callback(
     Output('open-messages-store', 'data'),
     Input({'type': 'replan-message', 'id': ALL}, 'open'),
     State('open-messages-store', 'data'),
