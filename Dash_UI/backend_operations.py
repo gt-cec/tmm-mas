@@ -1,105 +1,6 @@
 
 
 
-# import numpy as np
-# import pandas as pd
-
-# import ollama
-
-# import re
-
-
-
-
-# def calculate_l1_norm(array1, array2):
-#     norm = (np.array(array2) - np.array(array1))
-#     # norm_1 = np.abs(np.array(array2) - np.array(array1))
-    
-#     return norm
-
-
-
-
-# def bayesian_probabilistic_update(original_value, deviation, threshold):
-#     expected_value = original_value + deviation
-#     updated_value = expected_value if abs(deviation) > threshold else original_value
-#     return updated_value
-
-
-
-
-
-
-# # --- Placeholder for Your Custom Logic ---
-# # You will need to define this function or import it from another file.
-# def dynamic_deviation_threshold_multi_logic(hmm_array, rmm_array, update_logic_functions, uncertainty_factor_pos, uncertainty_factor_time, dynamic_threshold_mission_time, robot_id):
-
-#     print(f"hmm_array{hmm_array}...")
-#     print(f"rmm_array{rmm_array}...")
-
-#     updated_hmm_array = hmm_array.copy()
-#     # print(f"updated_hmm_array{updated_hmm_array}...")
-    
-    
-#     current_hmm_mission_time = hmm_array['mission_time']
-#     rmm_mission_time = rmm_array['mission_time'] 
-
-
-
-
-#     mission_time_deviation = calculate_l1_norm([current_hmm_mission_time], [rmm_mission_time])
-#     mission_time_deviation_value = mission_time_deviation[0]    
-
-
-    
-#     print(f"mission_time_deviation_value{mission_time_deviation_value}...")
-#     print(f"dynamic_threshold_mission_time{dynamic_threshold_mission_time}...")
-    
-    
-
-
-
-#     # Update mission time using the first update logic function
-#     updated_mission_time = bayesian_probabilistic_update(current_hmm_mission_time, mission_time_deviation_value,
-#                                                       dynamic_threshold_mission_time)
-
-#     print(f"updated_mission_time{updated_mission_time}...")
-
-#     # Update the current_hmm_mission_time with the new updated_mission_time
-#     current_hmm_mission_time = updated_mission_time    
-#     updated_hmm_array['mission_time'] = updated_mission_time
-
-#     print(f"updated_hmm_array{updated_hmm_array}...")
-    
-#     return updated_hmm_array
-    
-    
-    
-    
-    
-    
-#     # print(f"dynamic_threshold_mission_time {dynamic_threshold_mission_time}...")
-#     # print(f"hmm_array {hmm_array}...")
-#     # print(f"rmm_array {rmm_array}...")
-    
-#     # # print(f"Updating HMM for {robot_id}...")
-#     # # message = "HMM Updated"
-    
-    
-    
-    
-    
-    
-    
-#     # # In your real code, this would be the newly calculated HMM based on your logic
-#     # updated_hmm = hmm_array 
-#     # return updated_hmm, message
-
-
-
-
-
-
 
 
 
@@ -170,7 +71,7 @@ def dynamic_deviation_threshold_multi_logic(hmm_array, rmm_array, update_logic_f
     # 3. Check if the Bayesian function decided an update was needed.
     #    An update occurred if the returned value is different from the original value.
     if updated_mission_time != current_hmm_mission_time:
-        print(f"✅ Deviation threshold exceeded for {robot_id}, New Mission time is {updated_mission_time}. Syncing HMM with RMM state.")
+        print(f"✅ Deviation threshold exceeded for {robot_id} at plan_index { rmm_array['plan_index'] }. New Mission time is {updated_mission_time}. Syncing HMM with RMM state.")
         communication_triggered = True     
         # --- This is the key part ---
         # Since the time was updated, now sync ALL other relevant data from the RMM array.
