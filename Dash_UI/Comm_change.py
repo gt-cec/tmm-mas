@@ -858,5 +858,5 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
   display: none;
 }
         """)
-    app.run(debug=True, host='0.0.0.0', port=7020)
+    app.run(debug=True, host='0.0.0.0', port=7070)
 
