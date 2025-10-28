@@ -336,12 +336,12 @@ def create_rich_status_message(robot_data, sim_time, all_packages, open_message_
         html.Div([
             html.Span(status_info['icon'], style={'marginRight': '10px', 'fontSize': '1.5em'}),
             html.Strong(f"{robot_id.title()}: {status_info['text']}")
-        ], style={'display': 'flex', 'alignItems': 'center', 'fontSize': '1.2em'})
+        ], style={'display': 'flex', 'alignItems': 'center', 'fontSize': '1.0em'})
     )
 
     details_content = html.Div([
         html.P(time_str, style={'fontSize': '0.9em', 'color': '#555', 'margin': '10px 0 5px 0'}),
-        html.P(details_msg, style={'fontSize': '1.1em', 'margin': '5px 0 0 0'})
+        html.P(details_msg, style={'fontSize': '0.8em', 'margin': '5px 0 0 0'})
     ], style={'paddingLeft': '45px', 'paddingTop': '10px'})
 
     return html.Details([summary, details_content],
@@ -551,7 +551,7 @@ def post_study_questionnaire():
 def create_simulation_layout():
     return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'fontFamily': 'Arial', 'height': '100vh', 'display': 'flex', 'flexDirection': 'column'}, children=[
         html.H1("Multi-Agent Task Planner Simulation",
-                style={'textAlign': 'center', 'padding': '10px 0', 'color': '#00ff88', 'flexShrink': 0}),
+                style={'textAlign': 'center', 'color': '#00ff88', 'flexShrink': 0}),
 
         html.Div(id='study-context-header', style={'textAlign': 'center', 'padding': '5px', 'backgroundColor': '#2b2b2b', 'borderBottom': '2px solid #444'}),
 
@@ -560,18 +560,13 @@ def create_simulation_layout():
 
             # MAP VIEW
             html.Div(id='map-view-container', style={'display': 'flex', 'flexDirection': 'row', 'gap': '20px', 'height': '100%'}, children=[
-                html.Div(style={'width': '70%', 'height': '100%'}, children=[
-                    dcc.Graph(id='simulation-graph', figure=initial_figure, style={'height': '100%', 'width': '100%'})
-                ]),
-                html.Div(style={'width': '30%', 'height': '100%', 'display': 'flex', 'flexDirection': 'column', 'gap': '10px'}, children=[
-                    html.Div(style={'flex': '1', 'display': 'flex', 'flexDirection': 'column', 'overflow': 'hidden'}, children=[
-                        html.H3("Simulation Log", style={'color': '#00ff88', 'textAlign': 'center', 'flexShrink': 0}),
-                        html.Pre(id='text-ui-output', style={'backgroundColor': '#1a1a1a', 'border': '1px solid #666', 'padding': '15px', 'overflowY': 'auto', 'whiteSpace': 'pre-wrap', 'color': '#ddd', 'fontSize': '12px', 'borderRadius': '3px', 'flexGrow': 1})
+                html.Div(style={'width': 'auto', 'height': '100%'}, children=[dcc.Graph(id='simulation-graph', figure=initial_figure, style={'height': '100%', 'width': '100%'})]),
+                html.Div(style={'width': '30%', 'height': '100%', 'display': 'flex', 'flexDirection': 'column', 'gap': '10px', 'overflow': 'hidden'}, children=[
+                    html.Div(style={'flex': '1', 'overflowY': 'auto', 'backgroundColor': '#1a1a1a', 'border': '1px solid #666', 'borderRadius': '3px', 'padding': '15px'}, children=[
+                        html.H3("Message Logs", style={'color': '#00ff88', 'textAlign': 'center', 'flexShrink': 0}),
+                        html.Pre(id='text-ui-output', style={'whiteSpace': 'pre-wrap', 'color': '#ddd', 'fontSize': '12px', 'marginBottom': '20px'}),
+                        html.Div(id='all-messages-feed', className='message-box-dark-theme')
                     ]),
-                    html.Div(style={'flex': '1', 'display': 'flex', 'flexDirection': 'column', 'overflow': 'hidden', 'backgroundColor': '#fff', 'borderRadius': '5px'}, children=[
-                        html.H3("All Messages", style={'color': '#333', 'textAlign': 'center', 'flexShrink': 0, 'paddingTop': '10px'}),
-                        html.Div(id='all-messages-feed', className='message-box', style={'padding': '0 15px 15px 15px'})
-                    ])
                 ])
             ]),
 
@@ -965,16 +960,16 @@ def update_simulation_views(frame_idx, message_opens, study_state, # Added study
     robots_dict = current_frame_data.get('robots', {})
     packages = current_frame_data.get('packages', [])
 
-    log_text = f"🎬 Frame: {frame_idx} / {len(scenario_data)-1}\n"
-    log_text += f"⏰ Timestamp: {current_frame_data.get('simulator time', 'N/A'):.2f}s\n" + "="*30 + "\n\n"
-    log_text += "🤖 ROBOTS:\n" + "-"*20 + "\n"
-    if not robots_dict:
-        log_text += "(No robot data)\n"
-    else:
-        for r_id, r_data in robots_dict.items():
-            state, x, y = r_data.get('state', '?'), r_data.get('x', 0), r_data.get('y', 0)
-            log_text += f"- {r_id}: {state.upper()} @ ({x:.1f}, {y:.1f})\n"
-
+    # log_text = f"🎬 Frame: {frame_idx} / {len(scenario_data)-1}\n"
+    # log_text += f"⏰ Timestamp: {current_frame_data.get('simulator time', 'N/A'):.2f}s\n" + "="*30 + "\n\n"
+    # log_text += "🤖 ROBOTS:\n" + "-"*20 + "\n"
+    # if not robots_dict:
+    #     log_text += "(No robot data)\n"
+    # else:
+    #     for r_id, r_data in robots_dict.items():
+    #         state, x, y = r_data.get('state', '?'), r_data.get('x', 0), r_data.get('y', 0)
+    #         log_text += f"- {r_id}: {state.upper()} @ ({x:.1f}, {y:.1f})\n"
+    log_text = ""
     histories = [hist1, hist2, hist3]
     # Initialize with current histories or empty lists
     new_robot_message_outputs = [histories[0] or [], histories[1] or [], histories[2] or []]
