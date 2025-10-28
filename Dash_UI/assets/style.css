@@ -1,6 +1,18 @@
 
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-.robot-column { display: flex; flex-direction: column; gap: 15px; flex: 1; height: 100%; }
+#map-view-btn, #text-view-btn, #with-framework-btn, #without-framework-btn { 
+    background-color: #555; 
+    color: white; 
+    border: 1px solid #777; 
+    padding: 5px 10px; 
+    cursor: pointer; 
+}
+#map-view-btn.active-view, #text-view-btn.active-view, #with-framework-btn.active-view, #without-framework-btn.active-view { 
+    background-color: #007bff; 
+    color: white; 
+    border-color: #007bff; 
+}
+.robot-column { display: flex; flex-direction: column; gap: 15px; flex: 1; }
 .robot-card-top {
     background-color: #ffffff;
     border: 1px solid #dee2e6;
@@ -9,23 +21,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
     width: 90%;
     margin-left: auto;
     margin-right: auto;
-    flex-shrink: 0;
 }
-.robot-card-bottom {
-    background-color: #ffffff;
-    border: 1px solid #dee2e6;
-    border-radius: 0.5rem;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    min-height: 0;
-}
+.robot-card-bottom { background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 0.5rem; padding: 15px; display: flex; flex-direction: column; }
 .message-box {
-    height: 100%;
+    height: 750px;
     overflow-y: auto;
     padding-right: 10px;
-    flex-grow: 1;
 }
 .divider { text-align: center; color: #aaa; font-size: 0.9em; margin: 15px 0; }
 .divider::before, .divider::after { content: ' ― '; }
@@ -34,15 +35,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 .robot-card-top .rc-slider-mark-text { color: #555; font-weight: bold; }
 .robot-card-top .rc-slider-disabled .rc-slider-handle { display: none; }
 
-/* --- MODIFIED CSS START --- */
-/* Base style for all message containers */
+/* MODIFIED: Replaced .replan-message-container with .message-container-details */
 .message-container-details {
+    /* background-color is now set inline via style prop */
     padding: 15px;
     border-radius: 5px;
     margin-bottom: 13px;
     border: 1px solid #ddd;
     color: #212529;
-    /* Background color set by specific class below */
 }
 .message-container-details summary {
     cursor: pointer;
@@ -50,18 +50,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
     display: block;
 }
 .message-container-details summary::-webkit-details-marker {
-    display: none;
+  display: none;
 }
-
-/* Specific background colors via classes */
-.message-container-details.replan {
-    background-color: #ffdede; /* Red for replan */
-}
-.message-container-details.on-track {
-    background-color: #e0f5e1; /* Green for on-track */
-}
-.message-container-details.stationary {
-    background-color: #fff9c4; /* Yellow for stationary */
-}
-/* --- MODIFIED CSS END --- */
         

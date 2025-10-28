@@ -143,9 +143,26 @@ def create_figure_for_frame(static_data, frame_data):
             hoverinfo='none'
         ))
     
+    # edge_x, edge_y = [], []
+    # for edge in edges_data:
+    #     edge_x.extend([edge['x0'], edge['x1'], None]); edge_y.extend([edge['y0'], edge['y1'], None])
+        
+        
+        
     edge_x, edge_y = [], []
     for edge in edges_data:
-        edge_x.extend([edge['x0'], edge['x1'], None]); edge_y.extend([edge['y0'], edge['y1'], None])
+        # Handle both old format (x0, y0, x1, y1) and new format (start_pos, end_pos)
+        if 'start_pos' in edge and 'end_pos' in edge:
+            # New format
+            edge_x.extend([edge['start_pos'][0], edge['end_pos'][0], None])
+            edge_y.extend([edge['start_pos'][1], edge['end_pos'][1], None])
+        elif 'x0' in edge:
+            # Old format (backwards compatibility)
+            edge_x.extend([edge['x0'], edge['x1'], None])
+            edge_y.extend([edge['y0'], edge['y1'], None])
+        
+        
+        
     if edge_x:
         fig.add_trace(go.Scatter(x=edge_x, y=edge_y, mode='lines', line=dict(width=0.5, color='rgba(50, 50, 50, 0.75)'), hoverinfo='none'))
     if nodes_data:
@@ -858,5 +875,5 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
   display: none;
 }
         """)
-    app.run(debug=True, host='0.0.0.0', port=7070)
+    app.run(debug=True, host='0.0.0.0', port=7047)
 

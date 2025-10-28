@@ -43,12 +43,12 @@ THRESHOLD_VALUES = {
 }
 
 SCENARIO_CONFIG = {
-    1: {'total_time': 406.0, 'total_steps': 242},
-    2: {'total_time': 240.0, 'total_steps': 150},
-    3: {'total_time': 190.0, 'total_steps': 180},
-    4: {'total_time': 220.0, 'total_steps': 160},
-    5: {'total_time': 300.0, 'total_steps': 200},
-    6: {'total_time': 280.0, 'total_steps': 190}
+    1: {'total_time': 332.0, 'total_steps': 236},
+    2: {'total_time': 307.0, 'total_steps': 212},
+    3: {'total_time': 362.0, 'total_steps': 417},
+    4: {'total_time': 358.0, 'total_steps': 373},
+    5: {'total_time': 363.0, 'total_steps': 399},
+    6: {'total_time': 398.0, 'total_steps': 441}
 }
 
 PAUSE_POINTS = {
@@ -191,13 +191,35 @@ def create_figure_for_frame(static_data, frame_data):
         fig.add_trace(go.Scatter(x=zone_x, y=zone_y, fill="toself", fillcolor=color_str,
                                 line=dict(width=0), mode='lines', hoverinfo='none'))
 
+
+
+
+    # edge_x, edge_y = [], []
+    # for edge in edges_data:
+    #     # Handle both old format (x0, y0, x1, y1) and new format (start_pos, end_pos)
+    #     if 'start_pos' in edge and 'end_pos' in edge:
+    #         # New format
+    #         edge_x.extend([edge['start_pos'][0], edge['end_pos'][0], None])
+    #         edge_y.extend([edge['start_pos'][1], edge['end_pos'][1], None])
+    #     elif 'x0' in edge:
+    #         # Old format (backwards compatibility)
+    #         edge_x.extend([edge['x0'], edge['x1'], None])
+    #         edge_y.extend([edge['y0'], edge['y1'], None])
+
+        
+        
+    # if edge_x:
+    #     fig.add_trace(go.Scatter(x=edge_x, y=edge_y, mode='lines',
+    #                             line=dict(width=0.5, color='rgba(50, 50, 50, 0.75)'), hoverinfo='none'))
+    
+    
     edge_x, edge_y = [], []
     for edge in edges_data:
-        edge_x.extend([edge['x0'], edge['x1'], None])
-        edge_y.extend([edge['y0'], edge['y1'], None])
-    if edge_x:
-        fig.add_trace(go.Scatter(x=edge_x, y=edge_y, mode='lines',
-                                line=dict(width=0.5, color='rgba(50, 50, 50, 0.75)'), hoverinfo='none'))
+        edge_x.extend([edge['x0'], edge['x1'], None]); edge_y.extend([edge['y0'], edge['y1'], None])
+        
+                
+            
+    
     if nodes_data:
         node_x = [node[0] for node in nodes_data]
         node_y = [node[1] for node in nodes_data]
@@ -1289,4 +1311,4 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
         """)
     # Use debug=False for actual study deployment
     # app.run(debug=True, host='0.0.0.0', port=1091) # Keep debug=True for testing
-    app.run(debug=False, host='0.0.0.0', port=1092)
+    app.run(debug=False, host='0.0.0.0', port=1039)

@@ -1,22 +1,8 @@
 {
-    "simulator time": 10.184453964233398,
+    "simulator time": 12.473483085632324,
     "robots": {
-        "robot1": {
-            "state": "waiting",
-            "plan": [],
-            "plan_index": 0,
-            "immediate_goal": null,
-            "x": 9.0,
-            "y": 10.0,
-            "mission_time": 0,
-            "replan_flag": false,
-            "replan_count": 0,
-            "Current_weather": "1",
-            "Battery_status": "1",
-            "Momentarily_offline": "0"
-        },
         "robot3": {
-            "state": "waiting",
+            "state": "moving",
             "plan": [],
             "plan_index": 0,
             "immediate_goal": null,
@@ -29,8 +15,22 @@
             "Battery_status": "1",
             "Momentarily_offline": "0"
         },
+        "robot1": {
+            "state": "moving",
+            "plan": [],
+            "plan_index": 0,
+            "immediate_goal": null,
+            "x": 9.0,
+            "y": 10.0,
+            "mission_time": 0,
+            "replan_flag": false,
+            "replan_count": 0,
+            "Current_weather": "1",
+            "Battery_status": "1",
+            "Momentarily_offline": "0"
+        },
         "robot2": {
-            "state": "waiting",
+            "state": "moving",
             "plan": [],
             "plan_index": 0,
             "immediate_goal": null,
@@ -100,13 +100,22 @@
             "Discovered": 1
         },
         {
-            "id": "d1",
-            "x": 4.5,
-            "y": 8.5,
+            "id": "p16",
+            "x": 9.0,
+            "y": 4.5,
             "carried_by": "Null",
             "state": "On Ground",
             "Quadrant": "SW",
-            "Discovered": 0
+            "Discovered": 1
+        },
+        {
+            "id": "p17",
+            "x": 6.5,
+            "y": 19.0,
+            "carried_by": "Null",
+            "state": "On Ground",
+            "Quadrant": "NW",
+            "Discovered": 1
         },
         {
             "id": "d2",
@@ -119,11 +128,11 @@
         },
         {
             "id": "d3",
-            "x": 15.5,
-            "y": 3.0,
+            "x": 8.0,
+            "y": 19.0,
             "carried_by": "Null",
             "state": "On Ground",
-            "Quadrant": "SE",
+            "Quadrant": "NW",
             "Discovered": 0
         },
         {
@@ -137,11 +146,11 @@
         },
         {
             "id": "d5",
-            "x": 19.0,
-            "y": 5.5,
+            "x": 8.0,
+            "y": 1.0,
             "carried_by": "Null",
             "state": "On Ground",
-            "Quadrant": "SE",
+            "Quadrant": "SW",
             "Discovered": 0
         },
         {
@@ -316,12 +325,12 @@
         {
             "x0": 10.0,
             "y0": 15.2,
-            "x1": 16.0,
+            "x1": 14.0,
             "y1": 15.2,
-            "x2": 16.0,
-            "y2": 16.0,
+            "x2": 14.0,
+            "y2": 16.2,
             "x3": 10.0,
-            "y3": 16.0,
+            "y3": 16.2,
             "color": "(173, 216, 230)"
         },
         {

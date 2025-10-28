@@ -1,8 +1,36 @@
 {
-    "simulator time": 5.183971405029297,
+    "simulator time": 7.212378263473511,
     "robots": {
+        "robot2": {
+            "state": "moving",
+            "plan": [],
+            "plan_index": 0,
+            "immediate_goal": null,
+            "x": 11.0,
+            "y": 10.0,
+            "mission_time": 0,
+            "replan_flag": false,
+            "replan_count": 0,
+            "Current_weather": "1",
+            "Battery_status": "1",
+            "Momentarily_offline": "0"
+        },
+        "robot3": {
+            "state": "moving",
+            "plan": [],
+            "plan_index": 0,
+            "immediate_goal": null,
+            "x": 10.0,
+            "y": 10.0,
+            "mission_time": 0,
+            "replan_flag": false,
+            "replan_count": 0,
+            "Current_weather": "1",
+            "Battery_status": "1",
+            "Momentarily_offline": "0"
+        },
         "robot1": {
-            "state": "waiting",
+            "state": "moving",
             "plan": [],
             "plan_index": 0,
             "immediate_goal": null,
@@ -16,7 +44,161 @@
             "Momentarily_offline": "0"
         }
     },
-    "packages": {},
+    "packages": [
+        {
+            "id": "d8",
+            "x": 1.0,
+            "y": 0.5,
+            "carried_by": "Null",
+            "state": "On Ground",
+            "Quadrant": "SW",
+            "Discovered": 0
+        },
+        {
+            "id": "p3",
+            "x": 1.0,
+            "y": 2.0,
+            "carried_by": "Null",
+            "state": "On Ground",
+            "Quadrant": "SW",
+            "Discovered": 1
+        },
+        {
+            "id": "p1",
+            "x": 3.0,
+            "y": 3.5,
+            "carried_by": "Null",
+            "state": "On Ground",
+            "Quadrant": "SW",
+            "Discovered": 1
+        },
+        {
+            "id": "d1",
+            "x": 9.0,
+            "y": 3.0,
+            "carried_by": "Null",
+            "state": "On Ground",
+            "Quadrant": "SW",
+            "Discovered": 0
+        },
+        {
+            "id": "p17",
+            "x": 9.0,
+            "y": 4.5,
+            "carried_by": "Null",
+            "state": "On Ground",
+            "Quadrant": "SW",
+            "Discovered": 1
+        },
+        {
+            "id": "d6",
+            "x": 11.5,
+            "y": 3.3,
+            "carried_by": "Null",
+            "state": "On Ground",
+            "Quadrant": "SE",
+            "Discovered": 0
+        },
+        {
+            "id": "d7",
+            "x": 19.0,
+            "y": 5.5,
+            "carried_by": "Null",
+            "state": "On Ground",
+            "Quadrant": "SE",
+            "Discovered": 0
+        },
+        {
+            "id": "d5",
+            "x": 5.0,
+            "y": 19.0,
+            "carried_by": "Null",
+            "state": "On Ground",
+            "Quadrant": "NW",
+            "Discovered": 0
+        },
+        {
+            "id": "p4",
+            "x": 8.5,
+            "y": 19.0,
+            "carried_by": "Null",
+            "state": "On Ground",
+            "Quadrant": "NW",
+            "Discovered": 1
+        },
+        {
+            "id": "d4",
+            "x": 3.5,
+            "y": 6.5,
+            "carried_by": "Null",
+            "state": "On Ground",
+            "Quadrant": "SW",
+            "Discovered": 0
+        },
+        {
+            "id": "p2",
+            "x": 4.0,
+            "y": 9.5,
+            "carried_by": "Null",
+            "state": "On Ground",
+            "Quadrant": "SW",
+            "Discovered": 1
+        },
+        {
+            "id": "p16",
+            "x": 1.0,
+            "y": 11.0,
+            "carried_by": "Null",
+            "state": "On Ground",
+            "Quadrant": "NW",
+            "Discovered": 1
+        },
+        {
+            "id": "d2",
+            "x": 1.5,
+            "y": 15.0,
+            "carried_by": "Null",
+            "state": "On Ground",
+            "Quadrant": "NW",
+            "Discovered": 0
+        },
+        {
+            "id": "p5",
+            "x": 2.0,
+            "y": 15.0,
+            "carried_by": "Null",
+            "state": "On Ground",
+            "Quadrant": "NW",
+            "Discovered": 1
+        },
+        {
+            "id": "d3",
+            "x": 8.8,
+            "y": 15.0,
+            "carried_by": "Null",
+            "state": "On Ground",
+            "Quadrant": "NW",
+            "Discovered": 0
+        },
+        {
+            "id": "d9",
+            "x": 1.0,
+            "y": 16.5,
+            "carried_by": "Null",
+            "state": "On Ground",
+            "Quadrant": "NW",
+            "Discovered": 0
+        },
+        {
+            "id": "p6",
+            "x": 6.0,
+            "y": 19.0,
+            "carried_by": "Null",
+            "state": "On Ground",
+            "Quadrant": "NW",
+            "Discovered": 1
+        }
+    ],
     "walls": [
         {
             "x0": 0,
@@ -152,12 +334,12 @@
         {
             "x0": 10.0,
             "y0": 15.2,
-            "x1": 16.0,
+            "x1": 14.0,
             "y1": 15.2,
-            "x2": 16.0,
-            "y2": 16.0,
+            "x2": 14.0,
+            "y2": 16.2,
             "x3": 10.0,
-            "y3": 16.0,
+            "y3": 16.2,
             "color": "(173, 216, 230)"
         },
         {

@@ -24,28 +24,23 @@ UPDATE_INTERVAL_MS = 1000
 
 # --- Threshold values for each scenario and framework mode ---
 THRESHOLD_VALUES = {
-    'with_framework': {
-        1: 5,
-        2: 12,
-        3: 15,
-        4: 9
-    },
-    'without_framework': {
-        1: 1,
-        2: 1,
-        3: 1,
-        4: 1
-    }
+    'with_framework': {1: 5, 2: 12, 3: 15, 4: 9, 5: 10, 6: 11},
+    'without_framework': {1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}
 }
+
 
 
 # --- Total Expected Times and Steps for Each Scenario ---
 SCENARIO_CONFIG = {
-    1: {'total_time': 406.0, 'total_steps': 242},
-    2: {'total_time': 240.0, 'total_steps': 150},
-    3: {'total_time': 190.0, 'total_steps': 180},
-    4: {'total_time': 220.0, 'total_steps': 160}
+    1: {'total_time': 332.0, 'total_steps': 236},
+    2: {'total_time': 307.0, 'total_steps': 212},
+    3: {'total_time': 362.0, 'total_steps': 417},
+    4: {'total_time': 358.0, 'total_steps': 373},
+    5: {'total_time': 363.0, 'total_steps': 399},
+    6: {'total_time': 398.0, 'total_steps': 441}
 }
+
+
 
 
 # --- HMM Data Loading ---
@@ -144,11 +139,55 @@ def create_figure_for_frame(static_data, frame_data):
             hoverinfo='none'
         ))
     
+
+    # edge_x, edge_y = [], []
+    # for edge in edges_data:
+    #     # Handle both old format (x0, y0, x1, y1) and new format (start_pos, end_pos)
+    #     if 'start_pos' in edge and 'end_pos' in edge:
+    #         # New format
+    #         edge_x.extend([edge['start_pos'][0], edge['end_pos'][0], None])
+    #         edge_y.extend([edge['start_pos'][1], edge['end_pos'][1], None])
+    #     elif 'x0' in edge:
+    #         # Old format (backwards compatibility)
+    #         edge_x.extend([edge['x0'], edge['x1'], None])
+    #         edge_y.extend([edge['y0'], edge['y1'], None])
+
+        
+        
+        
+    #     fig.add_trace(go.Scatter(x=edge_x, y=edge_y, mode='lines', line=dict(width=0.5, color='rgba(50, 50, 50, 0.75)'), hoverinfo='none'))
+        
+        
+    # edge_x, edge_y = [], []
+    # for edge in edges_data:
+    #     # Handle both old format (x0, y0, x1, y1) and new format (start_pos, end_pos)
+    #     if 'start_pos' in edge and 'end_pos' in edge:
+    #         # New format
+    #         edge_x.extend([edge['start_pos'][0], edge['end_pos'][0], None])
+    #         edge_y.extend([edge['start_pos'][1], edge['end_pos'][1], None])
+    #     elif 'x0' in edge:
+    #         # Old format (backwards compatibility)
+    #         edge_x.extend([edge['x0'], edge['x1'], None])
+    #         edge_y.extend([edge['y0'], edge['y1'], None])
+
+        
+        
+    # # --- THIS IS THE FIX ---
+    # # 1. Moved fig.add_trace() OUTSIDE the for loop.
+    # # 2. Added an 'if edge_x:' check so it only runs if edges exist.
+    # if edge_x:
+    #     fig.add_trace(go.Scatter(x=edge_x, y=edge_y, mode='lines', line=dict(width=0.5, color='rgba(50, 50, 50, 0.75)'), hoverinfo='none'))
+        
+        
+   
     edge_x, edge_y = [], []
     for edge in edges_data:
         edge_x.extend([edge['x0'], edge['x1'], None]); edge_y.extend([edge['y0'], edge['y1'], None])
-    if edge_x:
-        fig.add_trace(go.Scatter(x=edge_x, y=edge_y, mode='lines', line=dict(width=0.5, color='rgba(50, 50, 50, 0.75)'), hoverinfo='none'))
+        
+                
+        
+                
+        
     if nodes_data:
         node_x = [node[0] for node in nodes_data]; node_y = [node[1] for node in nodes_data]
         fig.add_trace(go.Scatter(x=node_x, y=node_y, mode='markers', marker=dict(size=4, color='rgba(50, 50, 150, 0.8)'), hoverinfo='none'))
@@ -336,7 +375,7 @@ app.layout = html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'fo
     html.Div(style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center', 'gap': '20px', 'padding': '10px', 'backgroundColor': '#2b2b2b', 'borderTop': '2px solid #444', 'borderBottom': '2px solid #444'}, children=[
         html.Div(style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center'}, children=[
             html.Label("Scenario:", style={'marginRight': '10px', 'color': '#00ff88'}),
-            dcc.Dropdown(id='scenario-dropdown', options=[{'label': f'Scenario {i}', 'value': i} for i in range(1, 5)], value=1, style={'width': '150px', 'color': 'black', 'display': 'inline-block'})
+            dcc.Dropdown(id='scenario-dropdown', options=[{'label': f'Scenario {i}', 'value': i} for i in range(1, 7)], value=1, style={'width': '150px', 'color': 'black', 'display': 'inline-block'})
         ]),
         html.Div([
             html.Button('▶️ Play/Pause', id='play-pause-button', n_clicks=0, style={'marginRight': '10px'}),
@@ -759,4 +798,4 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
   display: none;
 }
         """)
-    app.run(debug=True, host='0.0.0.0', port=6050)
+    app.run(debug=True, host='0.0.0.0', port=6039)
