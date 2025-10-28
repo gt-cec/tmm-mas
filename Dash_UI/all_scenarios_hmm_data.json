@@ -174,15 +174,93 @@
             "target_package_id": "package1",
             "robot_time": 12.5
         }
+    
+    },
+
+    "scenario_5": {
+        "HMM_Robot_1": {
+            "state": "moving",
+            "plan_index": 25,
+            "x": 8.191563016389242,
+            "y": 16.910235655614024,
+            "mission_time": 30,
+            "Current_weather": 1,
+            "Battery_status": 1,
+            "Momentarily_offline": 0,
+            "Replan_flag": 0,
+            "target_package_id": "package1",
+            "robot_time": 12.5
+        },
+        "HMM_Robot_2": {
+            "state": "moving",
+            "plan_index": 25,
+            "x": 19.770845009820086,
+            "y": 7.99922644093353,
+            "mission_time": 20,
+            "Current_weather": 1,
+            "Battery_status": 1,
+            "Momentarily_offline": 0,
+            "Replan_flag": 0,
+            "target_package_id": "package2",
+            "robot_time": 12.5
+        },
+        "HMM_Robot_3": {
+            "state": "moving",
+            "plan_index": 25,
+            "x": 8.191563016389242,
+            "y": 16.910235655614024,
+            "mission_time": 20,
+            "Current_weather": 1,
+            "Battery_status": 1,
+            "Momentarily_offline": 0,
+            "Replan_flag": 0,
+            "target_package_id": "package1",
+            "robot_time": 12.5
+        }
+
+    },    
+    
+    "scenario_6": {
+        "HMM_Robot_1": {
+            "state": "moving",
+            "plan_index": 25,
+            "x": 8.191563016389242,
+            "y": 16.910235655614024,
+            "mission_time": 30,
+            "Current_weather": 1,
+            "Battery_status": 1,
+            "Momentarily_offline": 0,
+            "Replan_flag": 0,
+            "target_package_id": "package1",
+            "robot_time": 12.5
+        },
+        "HMM_Robot_2": {
+            "state": "moving",
+            "plan_index": 25,
+            "x": 19.770845009820086,
+            "y": 7.99922644093353,
+            "mission_time": 20,
+            "Current_weather": 1,
+            "Battery_status": 1,
+            "Momentarily_offline": 0,
+            "Replan_flag": 0,
+            "target_package_id": "package2",
+            "robot_time": 12.5
+        },
+        "HMM_Robot_3": {
+            "state": "moving",
+            "plan_index": 25,
+            "x": 8.191563016389242,
+            "y": 16.910235655614024,
+            "mission_time": 20,
+            "Current_weather": 1,
+            "Battery_status": 1,
+            "Momentarily_offline": 0,
+            "Replan_flag": 0,
+            "target_package_id": "package1",
+            "robot_time": 12.5
+        }
     }
-
-
-
-
-
-
-
-
 
 
 
