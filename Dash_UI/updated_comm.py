@@ -305,12 +305,12 @@ def create_rich_status_message(robot_data, sim_time, all_packages, open_message_
         html.Div([
             html.Span(status_info['icon'], style={'marginRight': '10px', 'fontSize': '1.5em'}),
             html.Strong(f"{robot_id.title()}: {status_info['text']}")
-        ], style={'display': 'flex', 'alignItems': 'center', 'fontSize': '1.0em'})
+        ], style={'display': 'flex', 'alignItems': 'center', 'fontSize': '1.2em'})
     )
     
     details_content = html.Div([
         html.P(time_str, style={'fontSize': '0.9em', 'color': '#555', 'margin': '10px 0 5px 0'}),
-        html.P(details_msg, style={'fontSize': '0.8em', 'margin': '5px 0 0 0'})
+        html.P(details_msg, style={'fontSize': '1.1em', 'margin': '5px 0 0 0'})
     ], style={'paddingLeft': '45px', 'paddingTop': '10px'})
     
     return html.Details([summary, details_content],
@@ -354,7 +354,7 @@ app.layout = html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'fo
     
     html.Div(id='main-content-area', style={'flexGrow': 1, 'overflow': 'hidden', 'padding': '20px'}, children=[
         html.Div(id='map-view-container', style={'display': 'flex', 'flexDirection': 'row', 'gap': '20px', 'height': '100%'}, children=[
-            html.Div(style={'width': 'auto', 'height': '100%'}, children=[dcc.Graph(id='simulation-graph', figure=initial_figure, style={'height': '100%', 'width': '100%'})]),
+            html.Div(style={'width': '70%', 'height': '100%'}, children=[dcc.Graph(id='simulation-graph', figure=initial_figure)]),
             html.Div(style={'width': '30%', 'height': '100%', 'display': 'flex', 'flexDirection': 'column', 'gap': '10px', 'overflow': 'hidden'}, children=[
                 html.Div(style={'flex': '1', 'overflowY': 'auto', 'backgroundColor': '#1a1a1a', 'border': '1px solid #666', 'borderRadius': '3px', 'padding': '15px'}, children=[
                     html.H3("Message Logs", style={'color': '#00ff88', 'textAlign': 'center', 'flexShrink': 0}),
