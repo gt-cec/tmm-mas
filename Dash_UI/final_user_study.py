@@ -163,13 +163,10 @@ def save_study_data(participant_data, responses, interactions):
 def create_figure_for_frame(static_data, frame_data):
     fig = go.Figure()
     fig.update_layout(
-        xaxis=dict(range=[0, GRID_WIDTH], autorange=False, showgrid=True,
-                   gridcolor='rgba(100,100,100,0.3)', zeroline=False, dtick=10,
-                   scaleanchor="y", scaleratio=1),
-        yaxis=dict(range=[0, GRID_HEIGHT], autorange=False, showgrid=True,
-                   gridcolor='rgba(100,100,100,0.3)', zeroline=False),
-        plot_bgcolor='#ffffff', paper_bgcolor='#f5f5f5', font=dict(color='black'),
-        showlegend=False, margin=dict(l=20, r=20, t=20, b=20), uirevision='constant'
+        xaxis=dict(range=[0, GRID_WIDTH], autorange=True, showgrid=True, gridcolor='rgba(100,100,100,0.3)', zeroline=False, dtick=10),
+        yaxis=dict(range=[0, GRID_HEIGHT], autorange=True, showgrid=True, gridcolor='rgba(100,100,100,0.3)', zeroline=False),
+        plot_bgcolor='#ffffff', paper_bgcolor='#ffffff', font=dict(color='black'),
+        showlegend=False, margin=dict(l=0, r=0, t=0, b=0), uirevision='constant'
     )
 
     walls_data = frame_data.get('walls', []) if frame_data else static_data.get('walls', [])
@@ -560,7 +557,7 @@ def create_simulation_layout():
 
             # MAP VIEW
             html.Div(id='map-view-container', style={'display': 'flex', 'flexDirection': 'row', 'gap': '20px', 'height': '100%'}, children=[
-                html.Div(style={'width': '70%', 'height': '100%'}, children=[dcc.Graph(id='simulation-graph', figure=initial_figure, style={'height': '100%', 'width': '100%'})]),
+                html.Div(style={'width': '70%', 'height': '100%'}, children=[dcc.Graph(id='simulation-graph', figure=initial_figure)]),
                 html.Div(style={'width': '30%', 'height': '100%', 'display': 'flex', 'flexDirection': 'column', 'gap': '10px', 'overflow': 'hidden'}, children=[
                     html.Div(style={'flex': '1', 'overflowY': 'auto', 'backgroundColor': '#1a1a1a', 'border': '1px solid #666', 'borderRadius': '3px', 'padding': '15px'}, children=[
                         html.H3("Message Logs", style={'color': '#00ff88', 'textAlign': 'center', 'flexShrink': 0}),
