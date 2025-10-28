@@ -1,4 +1,6 @@
 
+# This study script resets the messages after every set of questions. testing in progress.
+# Please remove white space, maybe add flash/animation to new message, remove simulation log and bring messages to full right view, ty!!
 
 import dash
 from dash import dcc, html, Input, Output, State, callback_context, no_update
@@ -11,6 +13,8 @@ from datetime import datetime
 import hashlib
 import csv
 from dash.exceptions import PreventUpdate
+import time # Import time for interaction timing
+
 
 # Assuming backend_operations.py exists in the same directory
 try:
@@ -21,8 +25,11 @@ except ImportError:
     def dynamic_deviation_threshold_multi_logic(**kwargs):
         print("Warning: Using dummy backend function.")
         hmm_array = kwargs.get('hmm_array', {})
-        hmm_array['replan_flag'] = False
-        return hmm_array, False
+        rmm_array = kwargs.get('rmm_array', {}) # Get RMM too
+        # Simple dummy logic: Sync if replan flag is true
+        sync_occurred = rmm_array.get('Replan_flag', False)
+        # Return the RMM on sync, HMM otherwise, consistent with real logic
+        return rmm_array if sync_occurred else hmm_array, sync_occurred
 
 # --- Constants ---
 GRID_WIDTH = 20
@@ -89,7 +96,7 @@ def load_scenario_frames(scenario_id):
     if not os.path.isdir(folder):
         print(f"Error: Scenario folder not found at {folder}")
         return frames
-    frame_files = sorted(glob.glob(os.path.join(folder, "frame_*.json")), 
+    frame_files = sorted(glob.glob(os.path.join(folder, "frame_*.json")),
                        key=lambda x: int(os.path.basename(x).split('_')[1].split('.')[0]))
     for frame_file in frame_files:
         try:
@@ -114,27 +121,27 @@ def generate_participant_id(name):
 def save_study_data(participant_data, responses, interactions):
     os.makedirs('study_data', exist_ok=True)
     participant_id = participant_data['id']
-    
+
     with open(f'study_data/{participant_id}_responses.json', 'w') as f:
         json.dump(responses, f, indent=2)
-    
+
     with open(f'study_data/{participant_id}_interactions.json', 'w') as f:
         json.dump(interactions, f, indent=2)
-    
+
     csv_file = 'study_data/master_data.csv'
     file_exists = os.path.isfile(csv_file)
-    
+
     with open(csv_file, 'a', newline='') as f:
         writer = csv.writer(f)
         if not file_exists:
             writer.writerow([
-                'ParticipantID', 'Name', 'ParticipantStartTime', 'Scenario', 'ConditionIndex', 
+                'ParticipantID', 'Name', 'ParticipantStartTime', 'Scenario', 'ConditionIndex',
                 'ViewType', 'Framework', 'QuestionSet', 'SegmentStartTime', 'ResponseTimestamp',
                 'Q1_MentalDemand', 'Q2_PhysicalDemand', 'Q3_TemporalDemand', 'Q4_Performance',
                 'Q5_Effort', 'Q6_Frustration', 'Q7_SitAwareness', 'Q8_ReplanCount',
                 'Q9_CognitiveLoad', 'Q10_OpenResponse'
             ])
-        
+
         for resp in responses:
             if resp.get('type') == 'post_study': continue
             q_answers = resp.get('answers', [None]*10)
@@ -156,15 +163,15 @@ def save_study_data(participant_data, responses, interactions):
 def create_figure_for_frame(static_data, frame_data):
     fig = go.Figure()
     fig.update_layout(
-        xaxis=dict(range=[0, GRID_WIDTH], autorange=False, showgrid=True, 
-                   gridcolor='rgba(100,100,100,0.3)', zeroline=False, dtick=10, 
+        xaxis=dict(range=[0, GRID_WIDTH], autorange=False, showgrid=True,
+                   gridcolor='rgba(100,100,100,0.3)', zeroline=False, dtick=10,
                    scaleanchor="y", scaleratio=1),
-        yaxis=dict(range=[0, GRID_HEIGHT], autorange=False, showgrid=True, 
+        yaxis=dict(range=[0, GRID_HEIGHT], autorange=False, showgrid=True,
                    gridcolor='rgba(100,100,100,0.3)', zeroline=False),
         plot_bgcolor='#ffffff', paper_bgcolor='#f5f5f5', font=dict(color='black'),
         showlegend=False, margin=dict(l=20, r=20, t=20, b=20), uirevision='constant'
     )
-    
+
     walls_data = frame_data.get('walls', []) if frame_data else static_data.get('walls', [])
     zones_data = frame_data.get('zones', []) if frame_data else static_data.get('zones', [])
     nodes_data = frame_data.get('nodes', []) if frame_data else static_data.get('nodes', [])
@@ -186,18 +193,18 @@ def create_figure_for_frame(static_data, frame_data):
         zone_y = [v for k, v in zone_coords if k.startswith('y')]
         fig.add_trace(go.Scatter(x=zone_x, y=zone_y, fill="toself", fillcolor=color_str,
                                 line=dict(width=0), mode='lines', hoverinfo='none'))
-    
+
     edge_x, edge_y = [], []
     for edge in edges_data:
         edge_x.extend([edge['x0'], edge['x1'], None])
         edge_y.extend([edge['y0'], edge['y1'], None])
     if edge_x:
-        fig.add_trace(go.Scatter(x=edge_x, y=edge_y, mode='lines', 
+        fig.add_trace(go.Scatter(x=edge_x, y=edge_y, mode='lines',
                                 line=dict(width=0.5, color='rgba(50, 50, 50, 0.75)'), hoverinfo='none'))
     if nodes_data:
         node_x = [node[0] for node in nodes_data]
         node_y = [node[1] for node in nodes_data]
-        fig.add_trace(go.Scatter(x=node_x, y=node_y, mode='markers', 
+        fig.add_trace(go.Scatter(x=node_x, y=node_y, mode='markers',
                                 marker=dict(size=4, color='rgba(50, 50, 150, 0.8)'), hoverinfo='none'))
 
     if frame_data:
@@ -211,9 +218,9 @@ def create_figure_for_frame(static_data, frame_data):
                 traces['texts'].append(r['id'][-1])
                 traces['hovers'].append(f"{r['id']} State: {r['state']} Pos: ({r['x']:.1f}, {r['y']:.1f})")
                 traces['colors'].append({'moving': 'red', 'carrying': 'orange', 'waiting': 'blue'}.get(r['state'], 'grey'))
-            fig.add_trace(go.Scatter(x=traces['x'], y=traces['y'], mode='markers+text', 
+            fig.add_trace(go.Scatter(x=traces['x'], y=traces['y'], mode='markers+text',
                                      marker=dict(size=30, color=traces['colors'], line=dict(width=2, color='white')),
-                                     text=traces['texts'], textposition='middle center', 
+                                     text=traces['texts'], textposition='middle center',
                                      textfont=dict(color='white', size=12, family="Arial Black"),
                                      hovertext=traces['hovers'], hoverinfo='text'))
         if packages:
@@ -225,56 +232,49 @@ def create_figure_for_frame(static_data, frame_data):
                 traces['y'].append(py)
                 traces['texts'].append(p['id'][-1])
                 traces['hovers'].append(f"Package {p['id']}, {'Carried' if p.get('carried_by') else 'On Ground'}")
-            fig.add_trace(go.Scatter(x=traces['x'], y=traces['y'], mode='markers+text', 
+            fig.add_trace(go.Scatter(x=traces['x'], y=traces['y'], mode='markers+text',
                                      marker=dict(size=20, color='gold', symbol='square', line=dict(width=1, color='black')),
-                                     text=traces['texts'], textposition='middle center', 
+                                     text=traces['texts'], textposition='middle center',
                                      textfont=dict(color='black', size=10, family="Arial Black"),
                                      hovertext=traces['hovers'], hoverinfo='text'))
     return fig
 
-
-
-
-
-
-
-
+# MODIFIED: Refactored to always return html.Details and use generic ID/class
 def create_rich_status_message(robot_data, sim_time, all_packages, open_message_ids, selected_robot_hmm_array, selected_robot_rmm_array, scenario_id):
     if open_message_ids is None:
         open_message_ids = []
-    
+
     time_str = datetime.now().strftime('%I:%M:%S %p')
     robot_id = robot_data.get('id', 'N/A')
     x, y = float(robot_data.get('x', 0)), float(robot_data.get('y', 0))
     state = robot_data.get('state')
-    message_id = f"{robot_id}-{sim_time}" # Unique ID for all messages
-    
+    message_id = f"{robot_id}-{sim_time:.2f}" # Use sim_time with decimals for uniqueness
+
     status_map = {
-        'replan': {'text': 'REPLANNING', 'color': '#ffdede', 'icon': '🔄', 'className': 'replan-message-container'},
-        'on_track': {'text': 'ON TRACK', 'color': '#e0f5e1', 'icon': '✅', 'className': 'status-message-container on-track'},
-        'stationary': {'text': 'STATIONARY', 'color': '#fff9c4', 'icon': '⏸️', 'className': 'status-message-container stationary'}
+        'replan': {'text': 'REPLANNING', 'color': '#ffdede', 'icon': '🔄', 'class_suffix': 'replan'},
+        'on_track': {'text': 'ON TRACK', 'color': '#e0f5e1', 'icon': '✅', 'class_suffix': 'on-track'},
+        'stationary': {'text': 'STATIONARY', 'color': '#fff9c4', 'icon': '⏸️', 'class_suffix': 'stationary'}
     }
-    
+
     # --- Calculate Time Difference ---
     plan_index = selected_robot_rmm_array.get('plan_index', 0)
     scenario_config = SCENARIO_CONFIG.get(scenario_id, {'total_time': 300.0, 'total_steps': 100})
     total_expected_time = scenario_config['total_time']
     total_steps = scenario_config['total_steps']
-    
+
     time_per_step = total_expected_time / total_steps if total_steps > 0 else 0
     time_difference = (plan_index * time_per_step) - sim_time if plan_index > 0 else 0
-    
+
     time_status_text = ""
     if abs(time_difference) > 0.1:
         time_status_text = f"Robot is {int(abs(time_difference))} seconds {'ahead' if time_difference > 0 else 'behind'} of schedule."
-    
+
     # --- Calculate Feature Alerts ---
     feature_alerts = []
     hmm_weather = int(selected_robot_hmm_array.get('Current_weather', 1)) if selected_robot_hmm_array else 1
     rmm_weather = int(selected_robot_rmm_array.get('Current_weather', 1))
     if hmm_weather != rmm_weather:
-        if rmm_weather == 0: feature_alerts.append("Weather has turned bad.")
-        elif rmm_weather == 1: feature_alerts.append("Weather has improved.")
+        feature_alerts.append("Weather has turned bad." if rmm_weather == 0 else "Weather has improved.")
 
     hmm_battery = int(selected_robot_hmm_array.get('Battery_status', 1)) if selected_robot_hmm_array else 1
     rmm_battery = int(selected_robot_rmm_array.get('Battery_status', 1))
@@ -286,15 +286,14 @@ def create_rich_status_message(robot_data, sim_time, all_packages, open_message_
     hmm_offline = int(selected_robot_hmm_array.get('Momentarily_offline', 0)) if selected_robot_hmm_array else 0
     rmm_offline = int(selected_robot_rmm_array.get('Momentarily_offline', 0))
     if hmm_offline != rmm_offline:
-        if rmm_offline == 1: feature_alerts.append("Robot is momentarily offline.")
-        elif rmm_offline == 0: feature_alerts.append("Robot is back online.")
+        feature_alerts.append("Robot is momentarily offline." if rmm_offline == 1 else "Robot is back online.")
 
-    feature_text = " ".join(feature_alerts) if feature_alerts else ""
-    
+    feature_text = " ".join(feature_alerts)
+
     # --- Determine Status and Details Text ---
-    status_key = 'on_track' # Default
+    status_key = 'stationary' # Default
     details_msg = ""
-    
+
     time_and_features = []
     if time_status_text: time_and_features.append(time_status_text)
     if feature_text: time_and_features.append(feature_text)
@@ -302,65 +301,55 @@ def create_rich_status_message(robot_data, sim_time, all_packages, open_message_
 
     if robot_data.get('replan_flag') == True:
         status_key = 'replan'
-        if state == 'moving':
-            details_msg = f"Route recalculated. Heading to Position (X{x:.0f}, Y{y:.0f}). {combined_info}".strip()
-        elif state == 'waiting':
-            details_msg = f"Route recalculated. Waiting at Position (X{x:.0f}, Y{y:.0f}). {combined_info}".strip()
-        elif state == 'carrying':
-            pkg_id = next((p['id'] for p in all_packages if p.get('carried_by') == robot_id), "N/A")
-            details_msg = f"Route recalculated. Carrying {pkg_id} to Position (X{x:.0f}, Y{y:.0f}). {combined_info}".strip()
-        else:
-            details_msg = f"Route recalculated. Status: {state} at Position (X{x:.0f}, Y{y:.0f}). {combined_info}".strip()
-    
-    else: # Not a replan, just a regular status update
+        pkg_id_text = ""
         if state == 'carrying':
-            status_key = 'on_track'
-            pkg_id = next((p['id'] for p in all_packages if p.get('carried_by') == robot_id), "N/A")
-            plan = robot_data.get('plan', [])
-            dest_x, dest_y = (plan[-1][0], plan[-1][1]) if plan else (x, y)
-            details_msg = f"Transporting {pkg_id} to Position (X{dest_x:.0f}, Y{dest_y:.0f}). Currently at Position (X{x:.0f}, Y{y:.0f}). {feature_text}".strip()
-        
-        elif state == 'moving':
-            status_key = 'on_track'
-            pkg_id = robot_data.get('target_package_id', "package")
-            goal_x, goal_y = robot_data.get('immediate_goal_x', x), robot_data.get('immediate_goal_y', y)
-            details_msg = f"Moving to acquire {pkg_id} at Position (X{goal_x:.0f}, Y{goal_y:.0f}). {feature_text}".strip()
-        
-        elif state == 'waiting':
-            status_key = 'stationary'
-            details_msg = f"Robot is awaiting task at Position (X{x:.0f}, Y{y:.0f}). {combined_info}".strip()
-        
-        else: # Default case for other states
-            status_key = 'on_track'
-            details_msg = f"Robot in state '{state}' at Position (X{x:.0f}, Y{y:.0f}). {feature_text}".strip()
+             pkg_id = next((p['id'] for p in all_packages if p.get('carried_by') == robot_id), "N/A")
+             pkg_id_text = f" Carrying {pkg_id}."
+        details_msg = f"Route recalculated.{pkg_id_text} Current Position (X{x:.0f}, Y{y:.0f}). {combined_info}".strip()
+
+    elif state == 'carrying':
+        status_key = 'on_track'
+        pkg_id = next((p['id'] for p in all_packages if p.get('carried_by') == robot_id), "N/A")
+        plan = robot_data.get('plan', [])
+        dest_x, dest_y = (plan[-1][0], plan[-1][1]) if plan else (x, y)
+        details_msg = f"Transporting {pkg_id} to Position (X{dest_x:.0f}, Y{dest_y:.0f}). Currently at Position (X{x:.0f}, Y{y:.0f}). {feature_text}".strip()
+
+    elif state == 'moving':
+        status_key = 'on_track'
+        pkg_id = robot_data.get('target_package_id', "package")
+        goal_x, goal_y = robot_data.get('immediate_goal_x', x), robot_data.get('immediate_goal_y', y)
+        details_msg = f"Moving to acquire {pkg_id} at Position (X{goal_x:.0f}, Y{goal_y:.0f}). {feature_text}".strip()
+
+    elif state == 'waiting':
+        status_key = 'stationary'
+        details_msg = f"Robot is awaiting task at Position (X{x:.0f}, Y{y:.0f}). {combined_info}".strip()
+
+    else: # Fallback for unknown states
+        status_key = 'stationary' # Treat unknown as stationary
+        details_msg = f"Robot in unknown state '{state}' at Position (X{x:.0f}, Y{y:.0f}). {combined_info}".strip()
 
     # --- Build Component ---
     status_info = status_map[status_key]
-    
+    component_class = f"message-container-details {status_info['class_suffix']}" # Generic class + specific class
+
     summary = html.Summary(
         html.Div([
             html.Span(status_info['icon'], style={'marginRight': '10px', 'fontSize': '1.5em'}),
             html.Strong(f"{robot_id.title()}: {status_info['text']}")
         ], style={'display': 'flex', 'alignItems': 'center', 'fontSize': '1.2em'})
     )
-    
+
     details_content = html.Div([
         html.P(time_str, style={'fontSize': '0.9em', 'color': '#555', 'margin': '10px 0 5px 0'}),
         html.P(details_msg, style={'fontSize': '1.1em', 'margin': '5px 0 0 0'})
     ], style={'paddingLeft': '45px', 'paddingTop': '10px'})
-    
+
     return html.Details([summary, details_content],
-                        className=status_info['className'],
-                        id={'type': 'replan-message', 'id': message_id}, # Use same pattern-matching ID
-                        open=(message_id in open_message_ids))
-
-
-
-
-
-
-
-
+                        className=component_class, # Use combined class
+                        id={'type': 'status-message', 'id': message_id}, # Use generic type
+                        open=(message_id in open_message_ids),
+                        # Background color is now handled by CSS
+                       )
 
 # --- App Initialization ---
 app = dash.Dash(__name__, update_title=None, suppress_callback_exceptions=True)
@@ -368,25 +357,24 @@ server = app.server
 static_map_data = load_static_data('static_map_data.json')
 initial_figure = create_figure_for_frame(static_map_data, None)
 
-
-
 # --- Study Screen Layouts ---
+# ... (welcome_screen, briefing_screen, question_screen, post_study_questionnaire remain unchanged) ...
 def welcome_screen():
-    return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh', 
-                           'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center', 
+    return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh',
+                           'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center',
                            'justifyContent': 'center', 'fontFamily': 'Arial'}, children=[
         html.H1("Multi-Agent Task Planner User Study", style={'color': '#00ff88', 'marginBottom': '30px'}),
-        html.Div(style={'backgroundColor': '#2b2b2b', 'padding': '40px', 'borderRadius': '10px', 
+        html.Div(style={'backgroundColor': '#2b2b2b', 'padding': '40px', 'borderRadius': '10px',
                         'maxWidth': '500px', 'width': '100%'}, children=[
             html.H3("Welcome!", style={'marginBottom': '20px'}),
-            html.P("Thank you for participating in this study. Please enter your full name to begin.", 
+            html.P("Thank you for participating in this study. Please enter your full name to begin.",
                    style={'marginBottom': '30px'}),
-            dcc.Input(id='participant-name-input', type='text', placeholder='Enter your name', 
-                      style={'width': '100%', 'padding': '10px', 'marginBottom': '20px', 
+            dcc.Input(id='participant-name-input', type='text', placeholder='Enter your name',
+                      style={'width': '100%', 'padding': '10px', 'marginBottom': '20px',
                              'fontSize': '16px', 'borderRadius': '5px', 'border': '1px solid #444'}),
-            html.Button('Start Study', id='start-study-btn', n_clicks=0, 
-                        style={'width': '100%', 'padding': '15px', 'fontSize': '18px', 
-                               'backgroundColor': '#00ff88', 'color': '#1e1e1e', 'border': 'none', 
+            html.Button('Start Study', id='start-study-btn', n_clicks=0,
+                        style={'width': '100%', 'padding': '15px', 'fontSize': '18px',
+                               'backgroundColor': '#00ff88', 'color': '#1e1e1e', 'border': 'none',
                                'borderRadius': '5px', 'cursor': 'pointer', 'fontWeight': 'bold'}),
             html.Div(id='name-error', style={'color': '#ff4444', 'marginTop': '10px'})
         ])
@@ -397,34 +385,34 @@ def welcome_screen():
 def briefing_screen(scenario_num, view_type, framework_mode):
     view_name = "Simulator View (Map + Log)" if view_type == 'map' else "Textual Overview"
     framework_name = "WITH Communication Framework" if framework_mode == 'with_framework' else "WITHOUT Communication Framework"
-    
+
     briefing_text = f"""
     You are about to begin a segment for Scenario {scenario_num}.
-    
+
     You will be using the:
     - {view_name}
     - {framework_name}
-    
+
     In this scenario, you will monitor three robots delivering packages.
     The simulation will pause automatically at several points to ask you questions.
-    
+
     Please pay close attention to all robot activities and system messages.
-    
+
     Click "Begin Scenario" when you're ready to start.
     """
-    
-    return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh', 
-                           'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center', 
+
+    return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh',
+                           'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center',
                            'justifyContent': 'center', 'fontFamily': 'Arial'}, children=[
-        html.Div(style={'backgroundColor': '#2b2b2b', 'padding': '40px', 'borderRadius': '10px', 
+        html.Div(style={'backgroundColor': '#2b2b2b', 'padding': '40px', 'borderRadius': '10px',
                         'maxWidth': '800px', 'width': '90%'}, children=[
-            html.H2(f"Scenario {scenario_num} - Briefing", 
+            html.H2(f"Scenario {scenario_num} - Briefing",
                     style={'color': '#00ff88', 'marginBottom': '30px'}),
-            html.Pre(briefing_text, style={'whiteSpace': 'pre-wrap', 'lineHeight': '1.8', 
+            html.Pre(briefing_text, style={'whiteSpace': 'pre-wrap', 'lineHeight': '1.8',
                                            'fontSize': '16px'}),
-            html.Button('Begin Scenario', id='begin-scenario-btn', n_clicks=0, 
-                        style={'padding': '15px 40px', 'fontSize': '18px', 
-                               'backgroundColor': '#00ff88', 'color': '#1e1e1e', 'border': 'none', 
+            html.Button('Begin Scenario', id='begin-scenario-btn', n_clicks=0,
+                        style={'padding': '15px 40px', 'fontSize': '18px',
+                               'backgroundColor': '#00ff88', 'color': '#1e1e1e', 'border': 'none',
                                'borderRadius': '5px', 'cursor': 'pointer', 'fontWeight': 'bold', 'marginTop': '30px'})
         ])
     ])
@@ -455,12 +443,12 @@ def question_screen(scenario_num, question_num):
         {'text': '9. Cognitive Load: How difficult was it to keep track of all three robots simultaneously?', 'type': 'scale', 'id': 'cognitive-load', 'options': ['1 - Very Easy', '2 - Easy', '3 - Moderate', '4 - Difficult', '5 - Very Difficult']},
         {'text': '10. Please describe any challenges, observations, or notable events from this segment:', 'type': 'open', 'id': 'open-response'}
     ]
-    
-    return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh', 
+
+    return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh',
                            'padding': '40px', 'fontFamily': 'Arial', 'overflowY': 'auto'}, children=[
-        html.Div(style={'backgroundColor': '#2b2b2b', 'padding': '40px', 'borderRadius': '10px', 
+        html.Div(style={'backgroundColor': '#2b2b2b', 'padding': '40px', 'borderRadius': '10px',
                         'maxWidth': '1000px', 'margin': '0 auto'}, children=[
-            html.H2(f"Scenario {scenario_num} - Questionnaire #{question_num}", 
+            html.H2(f"Scenario {scenario_num} - Questionnaire #{question_num}",
                     style={'color': '#00ff88', 'marginBottom': '40px'}),
             html.Div([
                 html.Div([
@@ -476,16 +464,16 @@ def question_screen(scenario_num, question_num):
                             style={'marginBottom': '20px'}
                         ) if q['type'] in ['scale', 'mcq'] else dcc.Textarea(
                             id={'type': 'question', 'id': q['id']}, placeholder='Type your response here...',
-                            style={'width': '100%', 'minHeight': '100px', 'padding': '10px', 'fontSize': '14px', 
-                                   'borderRadius': '5px', 'marginBottom': '20px', 'border': '1px solid #444', 
+                            style={'width': '100%', 'minHeight': '100px', 'padding': '10px', 'fontSize': '14px',
+                                   'borderRadius': '5px', 'marginBottom': '20px', 'border': '1px solid #444',
                                    'backgroundColor': '#1a1a1a', 'color': 'white'}
                         )
                     )
                 ], style={'marginBottom': '20px'}) for q in questions
             ]),
-            html.Button('Continue', id='submit-questions-btn', n_clicks=0, 
-                        style={'padding': '15px 40px', 'fontSize': '18px', 'backgroundColor': '#00ff88', 
-                               'color': '#1e1e1e', 'border': 'none', 'borderRadius': '5px', 
+            html.Button('Continue', id='submit-questions-btn', n_clicks=0,
+                        style={'padding': '15px 40px', 'fontSize': '18px', 'backgroundColor': '#00ff88',
+                               'color': '#1e1e1e', 'border': 'none', 'borderRadius': '5px',
                                'cursor': 'pointer', 'fontWeight': 'bold', 'marginTop': '30px'})
         ])
     ])
@@ -513,13 +501,13 @@ def post_study_questionnaire():
         {'text': '8. What improvements would you suggest for the monitoring interface?', 'type': 'open', 'id': 'improvements'},
         {'text': '9. Any additional comments or feedback about the study:', 'type': 'open', 'id': 'additional-comments'}
     ]
-    
-    return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh', 
+
+    return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh',
                            'padding': '40px', 'fontFamily': 'Arial', 'overflowY': 'auto'}, children=[
-        html.Div(style={'backgroundColor': '#2b2b2b', 'padding': '40px', 'borderRadius': '10px', 
+        html.Div(style={'backgroundColor': '#2b2b2b', 'padding': '40px', 'borderRadius': '10px',
                         'maxWidth': '1000px', 'margin': '0 auto'}, children=[
             html.H2("Final Questionnaire", style={'color': '#00ff88', 'marginBottom': '20px'}),
-            html.P("Thank you for completing all scenarios! Please answer these final questions about your overall experience.", 
+            html.P("Thank you for completing all scenarios! Please answer these final questions about your overall experience.",
                    style={'marginBottom': '40px', 'fontSize': '16px'}),
             html.Div([
                 html.Div([
@@ -535,16 +523,16 @@ def post_study_questionnaire():
                             style={'marginBottom': '20px'}
                         ) if q['type'] in ['scale', 'mcq'] else dcc.Textarea(
                             id={'type': 'post-question', 'id': q['id']}, placeholder='Type your response here...',
-                            style={'width': '100%', 'minHeight': '100px', 'padding': '10px', 'fontSize': '14px', 
-                                   'borderRadius': '5px', 'marginBottom': '20px', 'border': '1px solid #444', 
+                            style={'width': '100%', 'minHeight': '100px', 'padding': '10px', 'fontSize': '14px',
+                                   'borderRadius': '5px', 'marginBottom': '20px', 'border': '1px solid #444',
                                    'backgroundColor': '#1a1a1a', 'color': 'white'}
                         )
                     )
                 ], style={'marginBottom': '20px'}) for q in questions
             ]),
-            html.Button('Submit and Complete Study', id='submit-final-btn', n_clicks=0, 
-                        style={'padding': '15px 40px', 'fontSize': '18px', 'backgroundColor': '#00ff88', 
-                               'color': '#1e1e1e', 'border': 'none', 'borderRadius': '5px', 
+            html.Button('Submit and Complete Study', id='submit-final-btn', n_clicks=0,
+                        style={'padding': '15px 40px', 'fontSize': '18px', 'backgroundColor': '#00ff88',
+                               'color': '#1e1e1e', 'border': 'none', 'borderRadius': '5px',
                                'cursor': 'pointer', 'fontWeight': 'bold', 'marginTop': '30px'})
         ])
     ])
@@ -560,17 +548,16 @@ def post_study_questionnaire():
 
 
 
-
 def create_simulation_layout():
     return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'fontFamily': 'Arial', 'height': '100vh', 'display': 'flex', 'flexDirection': 'column'}, children=[
-        html.H1("Multi-Agent Task Planner Simulation", 
+        html.H1("Multi-Agent Task Planner Simulation",
                 style={'textAlign': 'center', 'padding': '10px 0', 'color': '#00ff88', 'flexShrink': 0}),
-        
+
         html.Div(id='study-context-header', style={'textAlign': 'center', 'padding': '5px', 'backgroundColor': '#2b2b2b', 'borderBottom': '2px solid #444'}),
-        
+
         html.Div(id='main-content-area', style={'flexGrow': 1, 'overflow': 'hidden', 'padding': '20px'}, children=[
             html.Div(id='simulation-layout-loaded-signal', style={'display': 'none'}),
-            
+
             # MAP VIEW
             html.Div(id='map-view-container', style={'display': 'flex', 'flexDirection': 'row', 'gap': '20px', 'height': '100%'}, children=[
                 html.Div(style={'width': '70%', 'height': '100%'}, children=[
@@ -587,7 +574,7 @@ def create_simulation_layout():
                     ])
                 ])
             ]),
-            
+
             # TEXT VIEW
             html.Div(id='text-view-container', style={'display': 'none', 'flexDirection': 'row', 'gap': '20px', 'height': '100%'}, children=[
                 *[html.Div(className='robot-column', children=[
@@ -608,14 +595,14 @@ def create_simulation_layout():
     ])
 
 def thank_you_screen():
-    return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh', 
-                           'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center', 
+    return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh',
+                           'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center',
                            'justifyContent': 'center', 'fontFamily': 'Arial'}, children=[
         html.H1("Thank You!", style={'color': '#00ff88', 'marginBottom': '30px'}),
-        html.Div(style={'backgroundColor': '#2b2b2b', 'padding': '40px', 'borderRadius': '10px', 
+        html.Div(style={'backgroundColor': '#2b2b2b', 'padding': '40px', 'borderRadius': '10px',
                         'maxWidth': '600px', 'textAlign': 'center'}, children=[
             html.H3("Study Complete", style={'marginBottom': '20px'}),
-            html.P("Thank you for participating in this study. Your responses have been recorded.", 
+            html.P("Thank you for participating in this study. Your responses have been recorded.",
                    style={'fontSize': '18px', 'lineHeight': '1.6'}),
             html.P("You may now close this window.", style={'marginTop': '30px', 'color': '#888'})
         ])
@@ -625,7 +612,7 @@ def thank_you_screen():
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content', children=welcome_screen()),
-    
+
     # Stores
     dcc.Store(id='participant-store', data={}),
     dcc.Store(id='study-state-store', data={}),
@@ -636,6 +623,8 @@ app.layout = html.Div([
     dcc.Store(id='all-messages-store', data=[]),
     dcc.Store(id='responses-store', data=[]),
     dcc.Store(id='interaction-log-store', data=[]),
+    # MODIFIED: Add store for message appearance timestamps
+    dcc.Store(id='message-timestamps-store', data={}),
     dcc.Interval(id='animation-interval', interval=UPDATE_INTERVAL_MS, n_intervals=0, disabled=True)
 ])
 
@@ -652,17 +641,17 @@ app.layout = html.Div([
 def start_study(n_clicks, name):
     if not name or len(name.strip()) < 2:
         return no_update, no_update, no_update, "Please enter your full name."
-    
+
     participant_id = generate_participant_id(name)
     assigned_scenarios = assign_participant_scenarios(name)
-    
+
     participant_data = {
         'id': participant_id,
         'name': name,
         'scenarios': assigned_scenarios,
         'start_time': datetime.now().isoformat()
     }
-    
+
     study_state = {
         'current_scenario_idx': 0,
         'current_condition_idx': 0,
@@ -670,8 +659,9 @@ def start_study(n_clicks, name):
         'phase': 'briefing',
         'segment_start_time': None
     }
-    
+
     scenario_num = assigned_scenarios[0]
+    # Start with first condition (map, with framework)
     return briefing_screen(scenario_num, 'map', 'with_framework'), participant_data, study_state, ""
 
 @app.callback(
@@ -685,14 +675,15 @@ def start_study(n_clicks, name):
 def begin_scenario(n_clicks, study_state, participant_data):
     if n_clicks == 0 or not study_state or not participant_data:
         raise PreventUpdate
-    
+
     # Create a new copy to trigger the store update
     new_study_state = study_state.copy()
     new_study_state['phase'] = 'simulation'
     new_study_state['segment_start_time'] = datetime.now().isoformat()
-    
+
     return create_simulation_layout(), new_study_state
 
+# MODIFIED: Added Outputs to reset message stores
 @app.callback(
     Output('scenario-data-store', 'data'),
     Output('hmm-data-store', 'data'),
@@ -703,6 +694,9 @@ def begin_scenario(n_clicks, study_state, participant_data):
     Output('robot-1-timeline', 'marks'),
     Output('robot-2-timeline', 'marks'),
     Output('robot-3-timeline', 'marks'),
+    Output('all-messages-store', 'data', allow_duplicate=True), # <-- Added Reset
+    Output('open-messages-store', 'data', allow_duplicate=True), # <-- Added Reset
+    Output('message-timestamps-store', 'data', allow_duplicate=True), # <-- Added Reset
     Input('simulation-layout-loaded-signal', 'children'),
     State('study-state-store', 'data'),
     State('participant-store', 'data'),
@@ -716,24 +710,26 @@ def load_data_and_start_simulation(layout_signal, study_state, participant_data)
 
     scenario_num = participant_data['scenarios'][study_state['current_scenario_idx']]
     frames = load_scenario_frames(scenario_num)
-    
+
     HMM_Robot_1, HMM_Robot_2, HMM_Robot_3 = get_hmms_for_active_scenario(scenario_num)
     hmms = {
         'robot1': HMM_Robot_1,
         'robot2': HMM_Robot_2,
         'robot3': HMM_Robot_3
     }
-    
+
     start_frame = 0
-    pause_points = PAUSE_POINTS.get(scenario_num, [100, 200, 300]) 
+    pause_points = PAUSE_POINTS.get(scenario_num, [100, 200, 300])
     if study_state['current_question_idx'] > 0:
+        # Resume from *after* the last pause point
         start_frame = pause_points[study_state['current_question_idx'] - 1] + 1
-    
+
     max_frames = len(frames) - 1 if frames else 0
     mid_point = max_frames // 2
     marks = {0: 'Start', mid_point: 'Midpoint', max_frames: 'End'}
-    
-    return frames, hmms, start_frame, max_frames, max_frames, max_frames, marks, marks, marks
+
+    # Return empty lists/dict to reset message stores
+    return frames, hmms, start_frame, max_frames, max_frames, max_frames, marks, marks, marks, [], [], {}
 
 @app.callback(
     Output('animation-interval', 'disabled'),
@@ -760,25 +756,37 @@ def control_animation(study_state):
 def update_frame_and_check_pause(n_intervals, current_frame, scenario_data, study_state, participant_data):
     if not study_state or study_state.get('phase') != 'simulation' or not participant_data or not scenario_data:
         raise PreventUpdate
-    
+
+    next_frame = current_frame + 1 # Calculate potential next frame
+    max_frames = len(scenario_data) - 1
+
+    # Stop if past the end
+    if current_frame >= max_frames:
+        # This will be handled by the submit_questions logic after the last question pause
+        # Need to ensure the interval stops
+        new_state = study_state.copy()
+        new_state['phase'] = 'paused_at_end' # Use a temporary state to stop interval
+        print("Reached end of frames, pausing.")
+        return no_update, no_update, new_state
+
+
     scenario_num = participant_data['scenarios'][study_state['current_scenario_idx']]
-    pause_points = PAUSE_POINTS.get(scenario_num, [100, 200, 300]) 
-    
+    pause_points = PAUSE_POINTS.get(scenario_num, [100, 200, 300])
+
     if study_state['current_question_idx'] < len(pause_points):
         current_pause_point = pause_points[study_state['current_question_idx']]
-        
-        if current_frame >= current_pause_point:
+
+        # Check if the *current* frame is the pause point (pause happens *after* rendering the pause frame)
+        if current_frame == current_pause_point:
+            # PAUSE!
             new_study_state = study_state.copy()
             new_study_state['phase'] = 'questions'
+            # Update frame to the pause point, then change page and state
+            print(f"Pausing at frame {current_frame} for question set {study_state['current_question_idx'] + 1}")
+            # Don't update frame here, stay on the pause frame
             return no_update, question_screen(scenario_num, study_state['current_question_idx'] + 1), new_study_state
-    
-    max_frames = len(scenario_data) - 1 if scenario_data else 0
-    
-    if current_frame >= max_frames:
-        # This will be handled by the submit_questions logic, but good to have a stop
-        return no_update, no_update, no_update
 
-    next_frame = current_frame + 1
+    # No pause, just advance the frame
     return next_frame, no_update, no_update
 
 @app.callback(
@@ -791,35 +799,38 @@ def update_frame_and_check_pause(n_intervals, current_frame, scenario_data, stud
 def programmatically_switch_view(study_state, participant_data):
     if not study_state or not participant_data:
          return {'display': 'none'}, {'display': 'none'}, ""
-    
+
     if study_state.get('phase') != 'simulation':
+        # Keep layout hidden if not in simulation phase
         return {'display': 'none'}, {'display': 'none'}, ""
 
     condition_idx = study_state['current_condition_idx']
     scenario_num = participant_data['scenarios'][study_state['current_scenario_idx']]
-    
+
     map_style = {'display': 'flex', 'flexDirection': 'row', 'gap': '20px', 'height': '100%'}
     text_style = {'display': 'flex', 'flexDirection': 'row', 'gap': '20px', 'height': '100%'}
-    
+
     view_name, framework_name = "", ""
-    
-    if condition_idx < 2:
+
+    if condition_idx < 2: # Conditions 0 and 1 are Map view
         view_name = "Simulator View (Map + Log)"
-        map_style, text_style = map_style, {'display': 'none'}
-    else:
+        map_style['display'] = 'flex'
+        text_style['display'] = 'none'
+    else: # Conditions 2 and 3 are Text view
         view_name = "Textual Overview"
-        map_style, text_style = {'display': 'none'}, text_style
-    
-    if condition_idx % 2 == 0:
+        map_style['display'] = 'none'
+        text_style['display'] = 'flex'
+
+    if condition_idx % 2 == 0: # Conditions 0 and 2 are With Framework
         framework_name = "WITH Communication Framework"
-    else:
+    else: # Conditions 1 and 3 are Without Framework
         framework_name = "WITHOUT Communication Framework"
-        
+
     header_text = f"Scenario: {scenario_num} | View: {view_name} | Framework: {framework_name}"
-    
+
     return map_style, text_style, header_text
 
-# Separate callback for simulation updates that only runs when in simulation phase
+# MODIFIED: Changed Input for clicks, added Input for study_state
 @app.callback(
     Output('simulation-graph', 'figure'),
     Output('text-ui-output', 'children'),
@@ -835,92 +846,125 @@ def programmatically_switch_view(study_state, participant_data):
     Output('animation-interval', 'interval'),
     Output('interaction-log-store', 'data'),
     Output('open-messages-store', 'data'),
+    Output('message-timestamps-store', 'data'), # Added output for timestamps
     Input('current-frame-store', 'data'),
-    Input({'type': 'replan-message', 'id': ALL}, 'open'),
+    Input({'type': 'status-message', 'id': ALL}, 'open'), # MODIFIED: Listen to generic type
+    Input('study-state-store', 'data'), # MODIFIED: Added Input
     State('scenario-data-store', 'data'),
     State('hmm-data-store', 'data'),
-    State('study-state-store', 'data'),
+    # State('study-state-store', 'data'), # Now an Input
     State('participant-store', 'data'),
     [State(f'robot-{i}-messages', 'children') for i in range(1, 4)],
     State('open-messages-store', 'data'),
     State('all-messages-store', 'data'),
     State('interaction-log-store', 'data'),
+    State('message-timestamps-store', 'data'), # Added state for timestamps
     prevent_initial_call=True
 )
-def update_simulation_views(frame_idx, message_opens, scenario_data, hmm_data, study_state, 
-                            participant_data, hist1, hist2, hist3, 
-                            open_message_ids, all_messages_history, interactions):
-    
-    ### --- MODIFICATION START --- ###
-    # This guard clause fixes the "Nonexistent object" error.
-    # When the layout changes to the question screen, `study_state` becomes 'questions'.
-    # A callback triggered just before the change (with stale state) will run
-    # and try to update components that no longer exist.
-    # `raise PreventUpdate` doesn't stop Dash's frontend, but returning
-    # `no_update` for all outputs does.
+def update_simulation_views(frame_idx, message_opens, study_state, # Added study_state
+                            scenario_data, hmm_data,
+                            participant_data, hist1, hist2, hist3,
+                            open_message_ids, all_messages_history, interactions,
+                            message_timestamps): # Added message_timestamps
+
+    # Guard clause: Only run if in simulation phase
     if not study_state or study_state.get('phase') != 'simulation':
-        return (
-            no_update, no_update, no_update, no_update, no_update, 
-            no_update, no_update, no_update, no_update, no_update, 
-            no_update, no_update, no_update, no_update
-        )
-    ### --- MODIFICATION END --- ###
+        # Return no_update for all outputs to prevent errors
+        return (no_update,) * 15 # Match number of outputs
 
     triggered = callback_context.triggered
     new_open_message_ids = set(open_message_ids) if open_message_ids else set()
+    new_message_timestamps = message_timestamps.copy() if message_timestamps else {} # Handle initial state
 
+    # Handle message click interactions
     if triggered:
         for item in triggered:
             prop_id = item['prop_id']
-            if 'open' in prop_id:
+            # Check if the trigger was a message being opened/closed
+            if '.open' in prop_id:
                 try:
                     component_id_str = prop_id.split('.')[0]
                     component_id_dict = json.loads(component_id_str)
-                    message_id = component_id_dict['id']
-                    is_open = item['value']
-                    
-                    action = "opened" if is_open else "closed"
-                    
-                    interaction_entry = {
-                        'timestamp': datetime.now().isoformat(),
-                        'type': 'message_click',
-                        'message_id': message_id,
-                        'action': action,
-                        'frame': frame_idx,
-                        'participant': participant_data.get('id'),
-                        'scenario': participant_data['scenarios'][study_state['current_scenario_idx']],
-                        'condition': study_state['current_condition_idx']
-                    }
-                    interactions.append(interaction_entry)
-                    
-                    if is_open:
-                        new_open_message_ids.add(message_id)
-                    else:
-                        new_open_message_ids.discard(message_id)
+
+                    # Check if it's the right type
+                    if component_id_dict.get('type') == 'status-message':
+                        message_id = component_id_dict['id']
+                        is_open = item['value']
+                        action = "opened" if is_open else "closed"
+                        click_time = time.time()
+                        appear_time = new_message_timestamps.get(message_id)
+                        time_to_click = (click_time - appear_time) if appear_time else -1.0
+
+
+                        interaction_entry = {
+                            'timestamp_iso': datetime.now().isoformat(),
+                            'timestamp_unix': click_time,
+                            'participant': participant_data.get('id'),
+                            'scenario': participant_data['scenarios'][study_state['current_scenario_idx']],
+                            'condition': study_state['current_condition_idx'],
+                            'frame': frame_idx,
+                            'type': 'message_click',
+                            'message_id': message_id,
+                            'action': action,
+                            'time_since_appear_s': time_to_click
+                        }
+                        # Make sure interactions is a list
+                        if interactions is None: interactions = []
+                        interactions.append(interaction_entry)
+
+                        if is_open:
+                            new_open_message_ids.add(message_id)
+                        else:
+                            new_open_message_ids.discard(message_id)
                 except Exception as e:
                     print(f"Error parsing interaction: {e}, prop_id: {prop_id}")
-    
+
     open_message_ids = list(new_open_message_ids)
 
-    if not all([scenario_data, hmm_data, study_state, participant_data]):
-        return initial_figure, "Loading...", no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, UPDATE_INTERVAL_MS, interactions, open_message_ids
+    # --- Standard Simulation Update Logic ---
 
+    if not all([scenario_data, hmm_data, study_state, participant_data]):
+         # This should ideally not happen due to the guard clause, but added robustness
+         print("Warning: Missing data in update_simulation_views")
+         return (no_update,) * 15
+
+
+    # Handle potential race condition where frame_idx is updated before scenario_data
     if frame_idx is None or frame_idx >= len(scenario_data):
-        return initial_figure, "Waiting for scenario...", no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, UPDATE_INTERVAL_MS, interactions, open_message_ids
+         print(f"Warning: frame_idx ({frame_idx}) out of bounds or None for scenario_data length ({len(scenario_data)})")
+         # Try returning current state if possible, else initial figure
+         current_fig = initial_figure
+         try:
+              current_fig = callback_context.outputs_list[0].get('value', initial_figure) # Safer access
+         except Exception as e:
+              print(f"Error accessing previous figure state: {e}")
+              pass # Use initial_figure
+         # Ensure we return values for all outputs, even if they are 'no_update' or defaults
+         return (
+              current_fig, "Waiting...",
+              hist1, hist2, hist3, # Keep current messages
+              frame_idx if frame_idx is not None else 0, # Keep current frame
+              frame_idx if frame_idx is not None else 0,
+              frame_idx if frame_idx is not None else 0,
+              hmm_data, # Keep current HMM
+              all_messages_history or [], all_messages_history or [], # Keep current messages
+              UPDATE_INTERVAL_MS, interactions or [], open_message_ids or [], new_message_timestamps or {}
+         )
+
 
     condition_idx = study_state['current_condition_idx']
     scenario_num = participant_data['scenarios'][study_state['current_scenario_idx']]
     framework_mode = 'with_framework' if condition_idx % 2 == 0 else 'without_framework'
 
-    current_hmms = hmm_data.copy()
+    current_hmms = hmm_data.copy() if hmm_data else {} # Ensure it's a dict
     current_frame_data = scenario_data[frame_idx]
     fig = create_figure_for_frame(static_map_data, current_frame_data)
-    
-    mission_time_threshold = THRESHOLD_VALUES[framework_mode].get(scenario_num, 1) 
-    
+
+    mission_time_threshold = THRESHOLD_VALUES[framework_mode].get(scenario_num, 1)
+
     robots_dict = current_frame_data.get('robots', {})
     packages = current_frame_data.get('packages', [])
-    
+
     log_text = f"🎬 Frame: {frame_idx} / {len(scenario_data)-1}\n"
     log_text += f"⏰ Timestamp: {current_frame_data.get('simulator time', 'N/A'):.2f}s\n" + "="*30 + "\n\n"
     log_text += "🤖 ROBOTS:\n" + "-"*20 + "\n"
@@ -930,90 +974,123 @@ def update_simulation_views(frame_idx, message_opens, scenario_data, hmm_data, s
         for r_id, r_data in robots_dict.items():
             state, x, y = r_data.get('state', '?'), r_data.get('x', 0), r_data.get('y', 0)
             log_text += f"- {r_id}: {state.upper()} @ ({x:.1f}, {y:.1f})\n"
-    
+
     histories = [hist1, hist2, hist3]
-    new_messages = [hist1, hist2, hist3] 
+    # Initialize with current histories or empty lists
+    new_robot_message_outputs = [histories[0] or [], histories[1] or [], histories[2] or []]
     sim_time = current_frame_data.get('simulator time', 0)
     any_sync_occurred = False
-    newly_generated_messages = []
-    
+    newly_generated_messages_for_feed = []
+
     for i in range(1, 4):
         robot_id = f'robot{i}'
-        
+
         if robot_id in robots_dict:
             raw_robot_data = robots_dict[robot_id]
-            
+
             rmm_keys_to_select = [
                 "state", "plan_index", "x", "y", "mission_time",
                 "Current_weather", "Battery_status", "Momentarily_offline",
                 "Replan_flag", "target_package_id", "plan", "immediate_goal_x", "immediate_goal_y"
             ]
-            
+
             selected_robot_rmm_array = {'id': robot_id}
             for key in rmm_keys_to_select:
                 selected_robot_rmm_array[key] = raw_robot_data.get(key)
             selected_robot_rmm_array['robot_time'] = sim_time
-            
+
             selected_robot_hmm_array = current_hmms.get(robot_id)
             robot_info = {**robots_dict[robot_id], 'id': robot_id}
-            
+
             if selected_robot_hmm_array:
-                updated_hmm_array, sync_occurred = dynamic_deviation_threshold_multi_logic(
-                    hmm_array=selected_robot_hmm_array,
-                    rmm_array=selected_robot_rmm_array,
-                    update_logic_functions={},
-                    uncertainty_factor_pos=0.1,
-                    uncertainty_factor_time=0.1,
-                    dynamic_threshold_mission_time=mission_time_threshold,
-                    robot_id=robot_id
-                )
-                
+                try: # Add error handling around backend call
+                    updated_hmm_array, sync_occurred = dynamic_deviation_threshold_multi_logic(
+                        hmm_array=selected_robot_hmm_array,
+                        rmm_array=selected_robot_rmm_array,
+                        update_logic_functions={},
+                        uncertainty_factor_pos=0.1,
+                        uncertainty_factor_time=0.1,
+                        dynamic_threshold_mission_time=mission_time_threshold,
+                        robot_id=robot_id
+                    )
+                except Exception as e:
+                    print(f"Error in backend logic for {robot_id}: {e}")
+                    sync_occurred = False # Prevent message generation on error
+                    updated_hmm_array = selected_robot_hmm_array # Keep old HMM
+
+
                 current_hmms[robot_id] = updated_hmm_array
-                
-                if sync_occurred and framework_mode == 'with_framework':
+
+                # --- MODIFICATION START ---
+                # Generate message if sync occurred, regardless of framework
+                if sync_occurred:
                     any_sync_occurred = True
                     new_message_div = create_rich_status_message(
-                        robot_info, 
-                        sim_time, 
-                        packages, 
+                        robot_info,
+                        sim_time,
+                        packages,
                         open_message_ids,
-                        selected_robot_hmm_array, # Pass the HMM *before* the update
+                        selected_robot_hmm_array, # Pass HMM *before* update
                         selected_robot_rmm_array,
                         scenario_num
                     )
-                    newly_generated_messages.append(new_message_div)
-                    
-                    updated_history = [new_message_div]
-                    hist_list = histories[i-1] if isinstance(histories[i-1], list) else [histories[i-1]]
-                    if histories[i-1]:
-                        updated_history.append(html.P("--- previous updates ---", className="divider"))
-                        updated_history.extend(hist_list)
-                    new_messages[i-1] = updated_history
-    
-    updated_all_messages = newly_generated_messages + all_messages_history
-    updated_all_messages = updated_all_messages[:100]
-    
-    new_interval = SLOW_INTERVAL_MS if any_sync_occurred else UPDATE_INTERVAL_MS
-    
-    return (
-        fig, log_text, 
-        *new_messages,
-        frame_idx, frame_idx, frame_idx,
-        current_hmms, 
-        updated_all_messages, updated_all_messages,
-        new_interval, 
-        interactions,
-        open_message_ids
-    )
 
+                    # Log appearance time
+                    msg_id = new_message_div.id['id']
+                    if msg_id not in new_message_timestamps:
+                         new_message_timestamps[msg_id] = time.time()
+
+                    # Add to lists - these will be used or cleared based on framework later
+                    newly_generated_messages_for_feed.append(new_message_div)
+
+                    updated_history = [new_message_div]
+                    # Ensure histories[i-1] is treated as a list
+                    current_hist = histories[i-1] if isinstance(histories[i-1], list) else ([histories[i-1]] if histories[i-1] else [])
+
+                    if current_hist:
+                        updated_history.append(html.P("--- previous updates ---", className="divider"))
+                        updated_history.extend(current_hist)
+                    new_robot_message_outputs[i-1] = updated_history
+                # --- MODIFICATION END ---
+
+
+    # --- MODIFICATION START ---
+    # Combine messages based on generated messages, DON'T explicitly clear based on framework here.
+    # The reset happens in load_data_and_start_simulation
+    updated_all_messages = newly_generated_messages_for_feed + (all_messages_history or [])
+    updated_all_messages = updated_all_messages[:100] # Limit length
+
+    # Determine interval based on whether sync occurred and framework is on
+    new_interval = SLOW_INTERVAL_MS if any_sync_occurred and framework_mode == 'with_framework' else UPDATE_INTERVAL_MS
+    # --- MODIFICATION END ---
+
+
+    return (
+        fig, log_text,
+        *new_robot_message_outputs, # Unpack the list
+        frame_idx, frame_idx, frame_idx,
+        current_hmms,
+        updated_all_messages, updated_all_messages, # Send the potentially populated list
+        new_interval,
+        interactions,
+        open_message_ids,
+        new_message_timestamps # Return updated timestamps
+    )
+    
+    
 @app.callback(
     Output('simulation-map-snapshot', 'figure'),
-    Input('simulation-graph', 'figure')
+    Input('simulation-graph', 'figure'),
+    Input('study-state-store', 'data') # Add dependency
 )
-def update_snapshot(main_fig):
+def update_snapshot(main_fig, study_state): # Add argument
+    # Guard clause
+    if not study_state or study_state.get('phase') != 'simulation':
+        return no_update # Don't update if not in simulation
+
     if main_fig is None:
-        return initial_figure
-        
+        return initial_figure # Or no_update? Initial is safer.
+
     snapshot_fig = go.Figure(main_fig)
     for trace in snapshot_fig.data:
         if hasattr(trace, 'marker') and trace.marker is not None:
@@ -1050,12 +1127,12 @@ def update_snapshot(main_fig):
 def submit_questions(n_clicks, study_state, participant_data, responses, q_values, q_ids):
     if n_clicks == 0 or not study_state or not participant_data:
         raise PreventUpdate
-    
+
     scenario_num = participant_data['scenarios'][study_state['current_scenario_idx']]
     condition_idx = study_state['current_condition_idx']
     view_type = 'map' if condition_idx < 2 else 'text'
     framework = 'with_framework' if condition_idx % 2 == 0 else 'without_framework'
-    
+
     answer_dict = {q_id['id']: val for q_id, val in zip(q_ids, q_values)}
     ordered_answers = [
         answer_dict.get('mental-demand'), answer_dict.get('physical-demand'),
@@ -1064,7 +1141,7 @@ def submit_questions(n_clicks, study_state, participant_data, responses, q_value
         answer_dict.get('situation-awareness'), answer_dict.get('replan-count'),
         answer_dict.get('cognitive-load'), answer_dict.get('open-response')
     ]
-    
+
     response_entry = {
         'timestamp': datetime.now().isoformat(),
         'segment_start_time': study_state.get('segment_start_time'),
@@ -1076,12 +1153,12 @@ def submit_questions(n_clicks, study_state, participant_data, responses, q_value
         'answers': ordered_answers
     }
     responses.append(response_entry)
-    
+
     new_study_state = study_state.copy()
     new_study_state['current_question_idx'] += 1
-    
-    pause_points = PAUSE_POINTS.get(scenario_num, [100, 200, 300]) 
-    
+
+    pause_points = PAUSE_POINTS.get(scenario_num, [100, 200, 300])
+
     if new_study_state['current_question_idx'] < len(pause_points):
         # Go back to simulation
         new_study_state['phase'] = 'simulation'
@@ -1089,13 +1166,13 @@ def submit_questions(n_clicks, study_state, participant_data, responses, q_value
     else:
         # Finished all segments for this condition
         new_study_state['current_condition_idx'] += 1
-        new_study_state['current_question_idx'] = 0
-        
+        new_study_state['current_question_idx'] = 0 # Reset for next condition/scenario
+
         if new_study_state['current_condition_idx'] >= 4:
             # Finished all 4 conditions for this scenario
             new_study_state['current_scenario_idx'] += 1
-            new_study_state['current_condition_idx'] = 0
-            
+            new_study_state['current_condition_idx'] = 0 # Reset for next scenario
+
             if new_study_state['current_scenario_idx'] >= len(participant_data['scenarios']):
                 # Finished all scenarios
                 new_study_state['phase'] = 'post_study'
@@ -1103,16 +1180,21 @@ def submit_questions(n_clicks, study_state, participant_data, responses, q_value
             else:
                 # Go to briefing for next scenario
                 new_study_state['phase'] = 'briefing'
-                scenario_num = participant_data['scenarios'][new_study_state['current_scenario_idx']]
-                return briefing_screen(scenario_num, 'map', 'with_framework'), responses, new_study_state
+                next_scenario_num = participant_data['scenarios'][new_study_state['current_scenario_idx']]
+                # Determine view/framework for the *first* condition of the next scenario
+                next_condition_idx = 0
+                next_view_type = 'map' if next_condition_idx < 2 else 'text'
+                next_framework = 'with_framework' if next_condition_idx % 2 == 0 else 'without_framework'
+                return briefing_screen(next_scenario_num, next_view_type, next_framework), responses, new_study_state
         else:
             # Go to briefing for next condition
             new_study_state['phase'] = 'briefing'
-            scenario_num = participant_data['scenarios'][new_study_state['current_scenario_idx']]
-            condition_idx = new_study_state['current_condition_idx']
-            view_type = 'map' if condition_idx < 2 else 'text'
-            framework = 'with_framework' if condition_idx % 2 == 0 else 'without_framework'
-            return briefing_screen(scenario_num, view_type, framework), responses, new_study_state
+            current_scenario_num = participant_data['scenarios'][new_study_state['current_scenario_idx']]
+            next_condition_idx = new_study_state['current_condition_idx']
+            next_view_type = 'map' if next_condition_idx < 2 else 'text'
+            next_framework = 'with_framework' if next_condition_idx % 2 == 0 else 'without_framework'
+            return briefing_screen(current_scenario_num, next_view_type, next_framework), responses, new_study_state
+
 
 @app.callback(
     Output('page-content', 'children', allow_duplicate=True),
@@ -1127,7 +1209,7 @@ def submit_questions(n_clicks, study_state, participant_data, responses, q_value
 def submit_final_questionnaire(n_clicks, participant_data, responses, interactions, post_values, post_ids):
     if not participant_data:
         raise PreventUpdate
-    
+
     answer_dict = {q_id['id']: val for q_id, val in zip(post_ids, post_values)}
     post_response = {
         'timestamp': datetime.now().isoformat(),
@@ -1135,15 +1217,16 @@ def submit_final_questionnaire(n_clicks, participant_data, responses, interactio
         'answers': answer_dict
     }
     responses.append(post_response)
-    
+
     save_study_data(participant_data, responses, interactions)
-    
+
     return thank_you_screen()
 
 # --- Main Execution ---
 if __name__ == '__main__':
     if not os.path.exists("assets"):
         os.makedirs("assets")
+    # MODIFIED: Updated CSS for generic message container styling
     with open("assets/style.css", "w") as f:
         f.write("""
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
@@ -1158,13 +1241,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
     margin-right: auto;
     flex-shrink: 0;
 }
-.robot-card-bottom { 
-    background-color: #ffffff; 
-    border: 1px solid #dee2e6; 
-    border-radius: 0.5rem; 
-    padding: 15px; 
-    display: flex; 
-    flex-direction: column; 
+.robot-card-bottom {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
     flex-grow: 1;
     min-height: 0;
 }
@@ -1181,37 +1264,37 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 .robot-card-top .rc-slider-mark-text { color: #555; font-weight: bold; }
 .robot-card-top .rc-slider-disabled .rc-slider-handle { display: none; }
 
-/* --- MODIFICATION START --- */
+/* --- MODIFIED CSS START --- */
 /* Base style for all message containers */
-.replan-message-container, .status-message-container {
+.message-container-details {
     padding: 15px;
     border-radius: 5px;
     margin-bottom: 13px;
     border: 1px solid #ddd;
     color: #212529;
+    /* Background color set by specific class below */
 }
-.replan-message-container summary, .status-message-container summary {
+.message-container-details summary {
     cursor: pointer;
     outline: none;
     display: block;
 }
-.replan-message-container summary::-webkit-details-marker, 
-.status-message-container summary::-webkit-details-marker {
+.message-container-details summary::-webkit-details-marker {
     display: none;
 }
 
-/* Specific background colors */
-.replan-message-container {
+/* Specific background colors via classes */
+.message-container-details.replan {
     background-color: #ffdede; /* Red for replan */
 }
-.status-message-container.on-track {
+.message-container-details.on-track {
     background-color: #e0f5e1; /* Green for on-track */
 }
-.status-message-container.stationary {
+.message-container-details.stationary {
     background-color: #fff9c4; /* Yellow for stationary */
 }
-/* --- MODIFICATION END --- */
+/* --- MODIFIED CSS END --- */
         """)
-    # app.run(debug=True, host='0.0.0.0', port=4095)
-    
-    app.run(debug=False, host='0.0.0.0', port=1095)
+    # Use debug=False for actual study deployment
+    # app.run(debug=True, host='0.0.0.0', port=1091) # Keep debug=True for testing
+    app.run(debug=False, host='0.0.0.0', port=1091)
