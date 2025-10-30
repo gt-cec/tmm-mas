@@ -242,21 +242,98 @@ def create_figure_for_frame(static_data, frame_data):
                                      text=traces['texts'], textposition='middle center',
                                      textfont=dict(color='white', size=12, family="Arial Black"),
                                      hovertext=traces['hovers'], hoverinfo='text'))
+            
+            
+            
+
+        
         if packages:
-            traces = {'x': [], 'y': [], 'texts': [], 'hovers': []}
+            
+            
+            
+            
+            
+            # traces = {'x': [], 'y': [], 'texts': [], 'hovers': []}
+            # robot_pos = {r['id']: (r['x'], r['y']) for r in robots}
+            # for p in packages:
+            #     px, py = robot_pos.get(p.get('carried_by'), (p.get('x', 0), p.get('y', 0)))
+            #     traces['x'].append(px); traces['y'].append(py); traces['texts'].append(p['id'][-1])
+            #     traces['hovers'].append(f"Package {p['id']}, {'Carried' if p.get('carried_by') else 'On Ground'}")
+            # fig.add_trace(go.Scatter(x=traces['x'], y=traces['y'], mode='markers+text', marker=dict(size=20, color='gold', symbol='square', line=dict(width=1, color='black')),
+            #                          text=traces['texts'], textposition='middle center', textfont=dict(color='black', size=10, family="Arial Black"),
+            #                          hovertext=traces['hovers'], hoverinfo='text'))
+            
+            
+            # --- NEW DYNAMIC PACKAGE DRAWING ---
+            pkg_x = []
+            pkg_y = []
+            pkg_texts = []
+            pkg_hovers = []
+            pkg_colors = []
+            pkg_symbols = []
+            
+            # Get a dictionary of all current robot positions from the 'robots' list
             robot_pos = {r['id']: (r['x'], r['y']) for r in robots}
+
             for p in packages:
-                px, py = robot_pos.get(p.get('carried_by'), (p.get('x', 0), p.get('y', 0)))
-                traces['x'].append(px)
-                traces['y'].append(py)
-                traces['texts'].append(p['id'][-1])
-                traces['hovers'].append(f"Package {p['id']}, {'Carried' if p.get('carried_by') else 'On Ground'}")
-            fig.add_trace(go.Scatter(x=traces['x'], y=traces['y'], mode='markers+text',
-                                     marker=dict(size=20, color='gold', symbol='square', line=dict(width=1, color='black')),
-                                     text=traces['texts'], textposition='middle center',
-                                     textfont=dict(color='black', size=10, family="Arial Black"),
-                                     hovertext=traces['hovers'], hoverinfo='text'))
+                carried_by_robot = p.get('carried_by')
+                # Default to 1 (discovered) if 'Discovered' key is missing
+                is_discovered = p.get('Discovered', 1) == 1 
+                # A package is carried if 'carried_by' is not None AND not the string "Null"
+                is_carried = carried_by_robot is not None and carried_by_robot != "Null"
+
+                # 1. Get position: 
+                # If carried, use the robot's position.
+                # If not carried, use the package's own (x, y) coordinates.
+                px, py = robot_pos.get(carried_by_robot, (p.get('x', 0), p.get('y', 0)))
+                
+                # 2. Add to basic lists
+                pkg_x.append(px)
+                pkg_y.append(py)
+                pkg_texts.append(p['id'][-1])
+                
+                # 3. Determine marker properties and hover text based on state
+                if is_carried:
+                    # State 1: Carried by a robot
+                    pkg_colors.append('gold')
+                    pkg_symbols.append('square')
+                    pkg_hovers.append(f"Package {p['id']}, Carried by {carried_by_robot}")
+                elif is_discovered:
+                    # State 2: On the ground and Discovered (Discovered == 1)
+                    pkg_colors.append('gold')
+                    pkg_symbols.append('square')
+                    pkg_hovers.append(f"Package {p['id']}, On Ground (Discovered)")
+                else: 
+                    # State 3: On the ground and Undiscovered (Discovered == 0)
+                    pkg_colors.append('lightgreen')
+                    pkg_symbols.append('triangle-up') # This is the Plotly name for a triangle
+                    pkg_hovers.append(f"Package {p['id']}, On Ground (Undiscovered)")
+
+            # 4. Create the new trace using these dynamic lists
+            fig.add_trace(go.Scatter(
+                x=pkg_x, 
+                y=pkg_y, 
+                mode='markers+text', 
+                marker=dict(
+                    size=20, 
+                    color=pkg_colors,     # Use the list of colors
+                    symbol=pkg_symbols,   # Use the list of symbols
+                    line=dict(width=1, color='black')
+                ),
+                text=pkg_texts, 
+                textposition='middle center', 
+                textfont=dict(color='black', size=10, family="Arial Black"),
+                hovertext=pkg_hovers, 
+                hoverinfo='text'
+            ))
+            # --- END OF NEW CODE ---            
+            
+            
     return fig
+
+
+
+
 
 # MODIFIED: Refactored to always return html.Details and use generic ID/class
 def create_rich_status_message(robot_data, sim_time, all_packages, open_message_ids, selected_robot_hmm_array, selected_robot_rmm_array, scenario_id):

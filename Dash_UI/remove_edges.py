@@ -26,10 +26,10 @@ for i in range(1, 7):
                 with open(file_path, 'r') as f:
                     data = json.load(f)
 
-                # Check if the 'edges' key exists and remove it if it does
-                if 'edges' in data:
-                    del data['edges']
-                    print(f"  Removed 'edges' from {filename}")
+                # Check if the 'nodes' key exists and remove it if it does
+                if 'nodes' in data:
+                    del data['nodes']
+                    print(f"  Removed 'nodes' from {filename}")
 
                     # Open the file again in write mode to overwrite it
                     with open(file_path, 'w') as f:
@@ -37,8 +37,8 @@ for i in range(1, 7):
                         # Use indent=4 for pretty printing (optional, but makes files readable)
                         json.dump(data, f, indent=4)
                 else:
-                    # Optional: Print a message if 'edges' key was not found
-                    # print(f"  'edges' key not found in {filename}")
+                    # Optional: Print a message if 'nodes' key was not found
+                    # print(f"  'nodes' key not found in {filename}")
                     pass
 
 
