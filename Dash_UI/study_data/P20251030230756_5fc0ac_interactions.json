@@ -1,0 +1,122 @@
+[
+  {
+    "timestamp_iso": "2025-10-30T23:08:00.292455",
+    "timestamp_unix": 1761880080.2924638,
+    "participant": "P20251030230756_5fc0ac",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 1,
+    "type": "graph_click",
+    "click_details": "robot3 State: moving Pos: (10.0, 10.0)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T23:08:00.772297",
+    "timestamp_unix": 1761880080.7723148,
+    "participant": "P20251030230756_5fc0ac",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 1,
+    "type": "graph_click",
+    "click_details": "robot1 State: moving Pos: (9.0, 10.0)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T23:08:01.371059",
+    "timestamp_unix": 1761880081.3710668,
+    "participant": "P20251030230756_5fc0ac",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 2,
+    "type": "graph_click",
+    "click_details": "robot2 State: moving Pos: (11.0, 10.0)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T23:08:02.680640",
+    "timestamp_unix": 1761880082.680649,
+    "participant": "P20251030230756_5fc0ac",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 3,
+    "type": "graph_click",
+    "click_details": "Package p1, On Ground (Discovered)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T23:08:03.190052",
+    "timestamp_unix": 1761880083.1900606,
+    "participant": "P20251030230756_5fc0ac",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 4,
+    "type": "graph_click",
+    "click_details": "Package d5, On Ground (Undiscovered)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T23:08:03.791755",
+    "timestamp_unix": 1761880083.7917638,
+    "participant": "P20251030230756_5fc0ac",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 4,
+    "type": "graph_click",
+    "click_details": "Package d6, On Ground (Undiscovered)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T23:08:05.701402",
+    "timestamp_unix": 1761880085.7014143,
+    "participant": "P20251030230756_5fc0ac",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 5,
+    "type": "graph_click",
+    "click_details": "Package d3, On Ground (Undiscovered)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T23:08:06.285839",
+    "timestamp_unix": 1761880086.2858477,
+    "participant": "P20251030230756_5fc0ac",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 5,
+    "type": "graph_click",
+    "click_details": "Package p17, On Ground (Discovered)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T23:08:08.999287",
+    "timestamp_unix": 1761880088.999296,
+    "participant": "P20251030230756_5fc0ac",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 7,
+    "type": "graph_click",
+    "click_details": "robot3 State: moving Pos: (14.7, 15.3)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T23:08:09.496326",
+    "timestamp_unix": 1761880089.496334,
+    "participant": "P20251030230756_5fc0ac",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 7,
+    "type": "graph_click",
+    "click_details": "Package d7, On Ground (Discovered)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T23:08:10.109862",
+    "timestamp_unix": 1761880090.1098714,
+    "participant": "P20251030230756_5fc0ac",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 8,
+    "type": "graph_click",
+    "click_details": "Package p17, On Ground (Discovered)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T23:08:10.680102",
+    "timestamp_unix": 1761880090.6801107,
+    "participant": "P20251030230756_5fc0ac",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 8,
+    "type": "graph_click",
+    "click_details": "Package d2, On Ground (Undiscovered)"
+  }
+]

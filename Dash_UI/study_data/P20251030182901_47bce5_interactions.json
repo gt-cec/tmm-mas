@@ -1,0 +1,42 @@
+[
+  {
+    "timestamp_iso": "2025-10-30T18:30:25.462530",
+    "timestamp_unix": 1761863425.4625392,
+    "participant": "P20251030182901_47bce5",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 47,
+    "type": "graph_click",
+    "click_details": "robot3 State: moving Pos: (12.8, 15.8)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T18:30:27.276660",
+    "timestamp_unix": 1761863427.2766683,
+    "participant": "P20251030182901_47bce5",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 48,
+    "type": "graph_click",
+    "click_details": "Package d2, On Ground (Undiscovered)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T18:30:29.178269",
+    "timestamp_unix": 1761863429.1782873,
+    "participant": "P20251030182901_47bce5",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 49,
+    "type": "graph_click",
+    "click_details": "robot1 State: carrying Pos: (2.2, 5.7)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T18:30:29.848758",
+    "timestamp_unix": 1761863429.8487659,
+    "participant": "P20251030182901_47bce5",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 49,
+    "type": "graph_click",
+    "click_details": "Package d8, On Ground (Undiscovered)"
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "timestamp_iso": "2025-10-30T23:05:52.357214",
+    "timestamp_unix": 1761879952.3572237,
+    "participant": "P20251030230544_e34a88",
+    "scenario": 1,
+    "condition": 1,
+    "frame": 6,
+    "type": "graph_click",
+    "click_details": "Package p17, On Ground (Discovered)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T23:05:52.786574",
+    "timestamp_unix": 1761879952.7865837,
+    "participant": "P20251030230544_e34a88",
+    "scenario": 1,
+    "condition": 1,
+    "frame": 7,
+    "type": "graph_click",
+    "click_details": "Package d3, On Ground (Undiscovered)"
+  }
+]

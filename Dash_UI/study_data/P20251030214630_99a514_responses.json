@@ -1,0 +1,23 @@
+[
+  {
+    "timestamp": "2025-10-30T21:46:52.320396",
+    "segment_start_time": "2025-10-30T21:46:31.677769",
+    "scenario": 1,
+    "condition": 0,
+    "view_type": "map",
+    "framework": "with_framework",
+    "question_set": 1,
+    "answers": [
+      0,
+      0,
+      0,
+      0,
+      13,
+      0,
+      null,
+      null,
+      null,
+      "sadgfaDG"
+    ]
+  }
+]

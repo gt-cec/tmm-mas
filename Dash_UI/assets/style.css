@@ -34,7 +34,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 .robot-card-top .rc-slider-mark-text { color: #555; font-weight: bold; }
 .robot-card-top .rc-slider-disabled .rc-slider-handle { display: none; }
 
-/* --- MODIFIED CSS START --- */
 /* Base style for all message containers */
 .message-container-details {
     padding: 15px;
@@ -42,7 +41,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
     margin-bottom: 13px;
     border: 1px solid #ddd;
     color: #212529;
-    /* Background color set by specific class below */
 }
 .message-container-details summary {
     cursor: pointer;
@@ -63,5 +61,37 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 .message-container-details.stationary {
     background-color: #fff9c4; /* Yellow for stationary */
 }
-/* --- MODIFIED CSS END --- */
+
+/* This is for the dark-theme log on the map view */
+.message-box-dark-theme .message-container-details.replan {
+    background-color: #5a2d2d;
+    border-color: #a94442;
+    color: #f2f2f2;
+}
+.message-box-dark-theme .message-container-details.on-track {
+    background-color: #2a4a2b;
+    border-color: #3c763d;
+    color: #f2f2f2;
+}
+.message-box-dark-theme .message-container-details.stationary {
+    background-color: #5a5a2d;
+    border-color: #8a6d3b;
+    color: #f2f2f2;
+}
+.message-box-dark-theme .message-container-details summary {
+    color: #eee;
+}
+.message-box-dark-theme .message-container-details p {
+    color: #ccc;
+}
+
+
+/* Animation for new messages */
+@keyframes flash-border {
+    0% { box-shadow: 0 0 10px 3px #00ff88; }
+    100% { box-shadow: none; }
+}
+.message-container-details.new-message {
+    animation: flash-border 1.2s ease-out;
+}
         

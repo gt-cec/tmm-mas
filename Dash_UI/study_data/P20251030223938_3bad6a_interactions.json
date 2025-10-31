@@ -1,0 +1,152 @@
+[
+  {
+    "timestamp_iso": "2025-10-30T22:41:46.274971",
+    "timestamp_unix": 1761878506.274979,
+    "participant": "P20251030223938_3bad6a",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 28,
+    "type": "graph_click",
+    "click_details": "robot3 State: moving Pos: (13.9, 15.4)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T22:41:47.151897",
+    "timestamp_unix": 1761878507.1519055,
+    "participant": "P20251030223938_3bad6a",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 29,
+    "type": "graph_click",
+    "click_details": "Package p5, On Ground (Discovered)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T22:41:51.446176",
+    "timestamp_unix": 1761878511.4461834,
+    "participant": "P20251030223938_3bad6a",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 32,
+    "type": "graph_click",
+    "click_details": "Package d7, On Ground (Discovered)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T22:41:52.356487",
+    "timestamp_unix": 1761878512.3564954,
+    "participant": "P20251030223938_3bad6a",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 33,
+    "type": "graph_click",
+    "click_details": "Package p17, On Ground (Discovered)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T22:41:52.835835",
+    "timestamp_unix": 1761878512.8358433,
+    "participant": "P20251030223938_3bad6a",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 33,
+    "type": "graph_click",
+    "click_details": "Package d2, On Ground (Undiscovered)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T22:43:32.875753",
+    "timestamp_unix": 1761878612.875762,
+    "participant": "P20251030223938_3bad6a",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 93,
+    "type": "graph_click",
+    "click_details": "Package d7, On Ground (Discovered)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T22:43:33.971217",
+    "timestamp_unix": 1761878613.971225,
+    "participant": "P20251030223938_3bad6a",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 94,
+    "type": "graph_click",
+    "click_details": "robot2 State: moving Pos: (6.4, 16.8)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T22:43:34.666531",
+    "timestamp_unix": 1761878614.6665392,
+    "participant": "P20251030223938_3bad6a",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 95,
+    "type": "graph_click",
+    "click_details": "Package d4, On Ground (Undiscovered)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T22:43:35.819147",
+    "timestamp_unix": 1761878615.8191562,
+    "participant": "P20251030223938_3bad6a",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 96,
+    "type": "graph_click",
+    "click_details": "Package d9, On Ground (Discovered)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T22:43:36.583960",
+    "timestamp_unix": 1761878616.5839677,
+    "participant": "P20251030223938_3bad6a",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 96,
+    "type": "graph_click",
+    "click_details": "robot1 State: waiting Pos: (1.0, 9.0)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T22:44:57.023195",
+    "timestamp_unix": 1761878697.0232038,
+    "participant": "P20251030223938_3bad6a",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 148,
+    "type": "graph_click",
+    "click_details": "robot1 State: moving Pos: (8.6, 3.9)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T22:44:57.717408",
+    "timestamp_unix": 1761878697.7174156,
+    "participant": "P20251030223938_3bad6a",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 148,
+    "type": "graph_click",
+    "click_details": "Package p16, On Ground (Discovered)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T22:44:58.659920",
+    "timestamp_unix": 1761878698.6599288,
+    "participant": "P20251030223938_3bad6a",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 148,
+    "type": "graph_click",
+    "click_details": "Package p17, On Ground (Discovered)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T22:44:59.286331",
+    "timestamp_unix": 1761878699.286339,
+    "participant": "P20251030223938_3bad6a",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 149,
+    "type": "graph_click",
+    "click_details": "Package d3, On Ground (Discovered)"
+  },
+  {
+    "timestamp_iso": "2025-10-30T22:45:00.480713",
+    "timestamp_unix": 1761878700.4807217,
+    "participant": "P20251030223938_3bad6a",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 150,
+    "type": "graph_click",
+    "click_details": "robot2 State: moving Pos: (4.8, 13.1)"
+  }
+]

@@ -1388,4 +1388,4 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
         """)
     # Use debug=False for actual study deployment
     # app.run(debug=True, host='0.0.0.0', port=1091) # Keep debug=True for testing
-    app.run(debug=False, host='0.0.0.0', port=1039)
+    app.run(debug=False, host='0.0.0.0', port=1031)

@@ -1,0 +1,46 @@
+[
+  {
+    "timestamp": "2025-10-30T22:41:17.710000",
+    "segment_start_time": "2025-10-30T22:39:39.885223",
+    "run_number": 1,
+    "scenario": 1,
+    "condition": 0,
+    "view_type": "map",
+    "framework": "with_framework",
+    "question_set": 1,
+    "answers": [
+      18,
+      18,
+      18,
+      18,
+      0,
+      18,
+      null,
+      null,
+      null,
+      "savasdzvc"
+    ]
+  },
+  {
+    "timestamp": "2025-10-30T22:45:19.674113",
+    "segment_start_time": "2025-10-30T22:41:17.718628",
+    "run_number": 1,
+    "scenario": 1,
+    "condition": 0,
+    "view_type": "map",
+    "framework": "with_framework",
+    "question_set": 2,
+    "answers": [
+      19,
+      19,
+      0,
+      0,
+      0,
+      0,
+      null,
+      null,
+      null,
+      "asfgsrg"
+    ]
+  }
+]
