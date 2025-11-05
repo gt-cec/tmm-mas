@@ -1,0 +1,24 @@
+[
+  {
+    "timestamp": "2025-11-04T21:56:07.870829",
+    "segment_start_time": "2025-11-04T21:55:54.373627",
+    "run_number": 1,
+    "scenario": 3,
+    "condition": 1,
+    "view_type": "map",
+    "framework": "without_framework",
+    "question_set": 1,
+    "answers": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      null,
+      null,
+      null,
+      "sFsda"
+    ]
+  }
+]

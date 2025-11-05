@@ -1,272 +1,3 @@
-# """
-# Message Analytics Analysis Script for HRI Study
-
-# This script analyzes the comprehensive message logs to generate insights
-# about user attention, engagement, and interaction patterns.
-# """
-
-# import pandas as pd
-# import json
-# import os
-# import glob
-# from pathlib import Path
-# import matplotlib.pyplot as plt
-# import seaborn as sns
-# from datetime import datetime
-
-# def load_all_participant_data(study_data_dir='study_data'):
-#     """Load all participant message logs"""
-#     message_log_files = glob.glob(os.path.join(study_data_dir, '*_message_logs.csv'))
-    
-#     all_data = []
-#     for file in message_log_files:
-#         df = pd.read_csv(file)
-#         all_data.append(df)
-    
-#     if all_data:
-#         return pd.concat(all_data, ignore_index=True)
-#     return pd.DataFrame()
-
-# def generate_attention_metrics(df):
-#     """Generate comprehensive attention and engagement metrics"""
-#     metrics = {
-#         'overall': {},
-#         'by_participant': {},
-#         'by_condition': {},
-#         'by_scenario': {},
-#         'by_robot': {},
-#         'by_message_type': {}
-#     }
-    
-#     # Overall metrics
-#     metrics['overall'] = {
-#         'total_messages': len(df),
-#         'total_clicked': df['clicked'].sum(),
-#         'total_ignored': (df['clicked'] == 0).sum(),
-#         'overall_click_rate': df['clicked'].mean(),
-#         'mean_time_to_click': df[df['clicked'] == 1]['time_to_click_seconds'].mean(),
-#         'median_time_to_click': df[df['clicked'] == 1]['time_to_click_seconds'].median(),
-#         'std_time_to_click': df[df['clicked'] == 1]['time_to_click_seconds'].std(),
-#     }
-    
-#     # By participant
-#     for participant in df['participant_id'].unique():
-#         p_df = df[df['participant_id'] == participant]
-#         metrics['by_participant'][participant] = {
-#             'total_messages': len(p_df),
-#             'clicked': p_df['clicked'].sum(),
-#             'click_rate': p_df['clicked'].mean(),
-#             'mean_time_to_click': p_df[p_df['clicked'] == 1]['time_to_click_seconds'].mean(),
-#             'critical_messages_clicked': p_df[(p_df['message_type'] == 'replan') & (p_df['clicked'] == 1)].shape[0],
-#             'critical_messages_total': p_df[p_df['message_type'] == 'replan'].shape[0]
-#         }
-    
-#     # By condition (0-3)
-#     for condition in df['condition'].unique():
-#         c_df = df[df['condition'] == condition]
-#         metrics['by_condition'][f'condition_{condition}'] = {
-#             'total_messages': len(c_df),
-#             'clicked': c_df['clicked'].sum(),
-#             'click_rate': c_df['clicked'].mean(),
-#             'mean_time_to_click': c_df[c_df['clicked'] == 1]['time_to_click_seconds'].mean()
-#         }
-    
-#     # By scenario
-#     for scenario in df['scenario'].unique():
-#         s_df = df[df['scenario'] == scenario]
-#         metrics['by_scenario'][f'scenario_{scenario}'] = {
-#             'total_messages': len(s_df),
-#             'clicked': s_df['clicked'].sum(),
-#             'click_rate': s_df['clicked'].mean()
-#         }
-    
-#     # By robot
-#     for robot in df['robot_id'].unique():
-#         r_df = df[df['robot_id'] == robot]
-#         metrics['by_robot'][robot] = {
-#             'total_messages': len(r_df),
-#             'clicked': r_df['clicked'].sum(),
-#             'click_rate': r_df['clicked'].mean()
-#         }
-    
-#     # By message type
-#     for msg_type in df['message_type'].unique():
-#         t_df = df[df['message_type'] == msg_type]
-#         metrics['by_message_type'][msg_type] = {
-#             'total_messages': len(t_df),
-#             'clicked': t_df['clicked'].sum(),
-#             'click_rate': t_df['clicked'].mean(),
-#             'mean_time_to_click': t_df[t_df['clicked'] == 1]['time_to_click_seconds'].mean()
-#         }
-    
-#     return metrics
-
-# def generate_visualizations(df, output_dir='analysis_output'):
-#     """Generate visualization plots"""
-#     os.makedirs(output_dir, exist_ok=True)
-    
-#     # Set style
-#     sns.set_style("whitegrid")
-#     plt.rcParams['figure.figsize'] = (12, 8)
-    
-#     # 1. Click rate by condition
-#     fig, ax = plt.subplots()
-#     condition_data = df.groupby('condition')['clicked'].agg(['mean', 'count'])
-#     condition_data['mean'].plot(kind='bar', ax=ax)
-#     ax.set_title('Click Rate by Condition')
-#     ax.set_xlabel('Condition (0=Map+Frame, 1=Map+No, 2=Text+Frame, 3=Text+No)')
-#     ax.set_ylabel('Click Rate')
-#     plt.tight_layout()
-#     plt.savefig(os.path.join(output_dir, 'click_rate_by_condition.png'))
-#     plt.close()
-    
-#     # 2. Time to click distribution
-#     fig, ax = plt.subplots()
-#     clicked_df = df[df['clicked'] == 1]
-#     ax.hist(clicked_df['time_to_click_seconds'], bins=30, edgecolor='black')
-#     ax.set_title('Distribution of Time to Click Messages')
-#     ax.set_xlabel('Time to Click (seconds)')
-#     ax.set_ylabel('Frequency')
-#     plt.tight_layout()
-#     plt.savefig(os.path.join(output_dir, 'time_to_click_distribution.png'))
-#     plt.close()
-    
-#     # 3. Click rate by message type
-#     fig, ax = plt.subplots()
-#     msg_type_data = df.groupby('message_type')['clicked'].mean()
-#     msg_type_data.plot(kind='bar', ax=ax, color=['red', 'green', 'yellow'])
-#     ax.set_title('Click Rate by Message Type')
-#     ax.set_xlabel('Message Type')
-#     ax.set_ylabel('Click Rate')
-#     plt.tight_layout()
-#     plt.savefig(os.path.join(output_dir, 'click_rate_by_message_type.png'))
-#     plt.close()
-    
-#     # 4. Messages per robot
-#     fig, ax = plt.subplots()
-#     robot_data = df.groupby('robot_id')['clicked'].agg(['sum', 'count'])
-#     robot_data.plot(kind='bar', ax=ax)
-#     ax.set_title('Messages per Robot (Clicked vs Total)')
-#     ax.set_xlabel('Robot')
-#     ax.set_ylabel('Count')
-#     ax.legend(['Clicked', 'Total'])
-#     plt.tight_layout()
-#     plt.savefig(os.path.join(output_dir, 'messages_per_robot.png'))
-#     plt.close()
-    
-#     # 5. Heatmap: Click rate by scenario and condition
-#     pivot_data = df.groupby(['scenario', 'condition'])['clicked'].mean().unstack()
-#     fig, ax = plt.subplots(figsize=(10, 6))
-#     sns.heatmap(pivot_data, annot=True, fmt='.2f', cmap='YlGnBu', ax=ax)
-#     ax.set_title('Click Rate Heatmap: Scenario vs Condition')
-#     ax.set_xlabel('Condition')
-#     ax.set_ylabel('Scenario')
-#     plt.tight_layout()
-#     plt.savefig(os.path.join(output_dir, 'heatmap_scenario_condition.png'))
-#     plt.close()
-    
-#     print(f"Visualizations saved to {output_dir}/")
-
-# def generate_statistical_tests(df):
-#     """Perform statistical tests on the data"""
-#     from scipy import stats
-    
-#     results = {}
-    
-#     # Test 1: Do click rates differ by condition?
-#     condition_groups = [df[df['condition'] == c]['clicked'].values for c in df['condition'].unique()]
-#     f_stat, p_value = stats.f_oneway(*condition_groups)
-#     results['condition_anova'] = {
-#         'test': 'One-way ANOVA on click rates by condition',
-#         'f_statistic': f_stat,
-#         'p_value': p_value,
-#         'significant': p_value < 0.05
-#     }
-    
-#     # Test 2: Are critical messages (replan) clicked more often?
-#     replan_clicks = df[df['message_type'] == 'replan']['clicked'].mean()
-#     other_clicks = df[df['message_type'] != 'replan']['clicked'].mean()
-#     replan_group = df[df['message_type'] == 'replan']['clicked'].values
-#     other_group = df[df['message_type'] != 'replan']['clicked'].values
-#     t_stat, p_value = stats.ttest_ind(replan_group, other_group)
-#     results['critical_message_attention'] = {
-#         'test': 't-test: Replan vs Other message click rates',
-#         'replan_click_rate': replan_clicks,
-#         'other_click_rate': other_clicks,
-#         't_statistic': t_stat,
-#         'p_value': p_value,
-#         'significant': p_value < 0.05
-#     }
-    
-#     # Test 3: Does time to click differ by condition?
-#     clicked_df = df[df['clicked'] == 1]
-#     time_groups = [clicked_df[clicked_df['condition'] == c]['time_to_click_seconds'].dropna().values 
-#                    for c in clicked_df['condition'].unique()]
-#     time_groups = [g for g in time_groups if len(g) > 0]
-#     if len(time_groups) > 1:
-#         f_stat, p_value = stats.f_oneway(*time_groups)
-#         results['time_to_click_anova'] = {
-#             'test': 'One-way ANOVA on time to click by condition',
-#             'f_statistic': f_stat,
-#             'p_value': p_value,
-#             'significant': p_value < 0.05
-#         }
-    
-#     return results
-
-# def main():
-#     """Main analysis pipeline"""
-#     print("Loading message log data...")
-#     df = load_all_participant_data()
-    
-#     if df.empty:
-#         print("No data found! Make sure message log CSV files exist in study_data/")
-#         return
-    
-#     print(f"Loaded {len(df)} message records from {df['participant_id'].nunique()} participants")
-    
-#     # Generate metrics
-#     print("\nCalculating attention metrics...")
-#     metrics = generate_attention_metrics(df)
-    
-#     # Save metrics to JSON
-#     with open('analysis_output/attention_metrics.json', 'w') as f:
-#         json.dump(metrics, f, indent=2, default=str)
-#     print("Metrics saved to analysis_output/attention_metrics.json")
-    
-#     # Generate visualizations
-#     print("\nGenerating visualizations...")
-#     generate_visualizations(df)
-    
-#     # Statistical tests
-#     print("\nPerforming statistical tests...")
-#     stat_results = generate_statistical_tests(df)
-#     with open('analysis_output/statistical_tests.json', 'w') as f:
-#         json.dump(stat_results, f, indent=2, default=str)
-#     print("Statistical test results saved to analysis_output/statistical_tests.json")
-    
-#     # Print summary
-#     print("\n" + "="*60)
-#     print("SUMMARY STATISTICS")
-#     print("="*60)
-#     print(f"Total Messages: {metrics['overall']['total_messages']}")
-#     print(f"Total Clicked: {metrics['overall']['total_clicked']}")
-#     print(f"Overall Click Rate: {metrics['overall']['overall_click_rate']:.2%}")
-#     print(f"Mean Time to Click: {metrics['overall']['mean_time_to_click']:.2f} seconds")
-#     print(f"Median Time to Click: {metrics['overall']['median_time_to_click']:.2f} seconds")
-    
-#     print("\n" + "="*60)
-#     print("CRITICAL MESSAGE ATTENTION (Replan Messages)")
-#     print("="*60)
-#     replan_metrics = metrics['by_message_type'].get('replan', {})
-#     print(f"Total Replan Messages: {replan_metrics.get('total_messages', 0)}")
-#     print(f"Replan Messages Clicked: {replan_metrics.get('clicked', 0)}")
-#     print(f"Replan Click Rate: {replan_metrics.get('click_rate', 0):.2%}")
-    
-#     print("\nAnalysis complete! Check the analysis_output/ directory for detailed results.")
-
-# if __name__ == "__main__":
-#     main()
 
 
 import dash
@@ -303,6 +34,8 @@ GRID_WIDTH = 20
 GRID_HEIGHT = 20
 UPDATE_INTERVAL_MS = 1000
 SLOW_INTERVAL_MS = 2000
+# --- NEW: Fast interval for click polling ---
+CLICK_POLL_INTERVAL_MS = 100 
 
 # --- ADDED CONSTANTS for participant counting ---
 PARTICIPANT_COUNT_FILE = 'study_data/participant_count.txt'
@@ -374,7 +107,7 @@ def get_condition_names(condition_idx):
     return view_type, framework_mode
 # -----------------------------
 
-# --- NEW: Message Log Creation Function ---
+# --- MODIFIED: Message Log Creation Function (Removed close data) ---
 def create_message_log_entry(message_id, robot_id, scenario_num, condition_idx, 
                              frame_idx, sim_time, message_type, message_text,
                              participant_id, appear_time, robot_state, robot_x, robot_y):
@@ -394,18 +127,18 @@ def create_message_log_entry(message_id, robot_id, scenario_num, condition_idx,
         'message_type': message_type,
         'message_text': message_text,
         'appear_timestamp_iso': datetime.fromtimestamp(appear_time).isoformat(),
-        'appear_timestamp_unix': appear_time,
-        'clicked': 0,
+        'appear_timestamp_unix': appear_time, # Internal-only
+        'clicked': 0, # This will be a counter
         'click_timestamp_iso': None,
-        'click_timestamp_unix': None,
+        'click_timestamp_unix': None, # Internal-only
         'time_to_click_seconds': None,
-        'was_closed': 0,
-        'close_timestamp_unix': None,
-        'time_open_seconds': None,
-        '_time_open_start': None # Internal tracker
+        # 'was_closed': 0, # REMOVED
+        # 'close_timestamp_unix': None, # REMOVED
+        # 'time_open_seconds': None, # REMOVED
+        # '_time_open_start': None # REMOVED
     }
 
-# --- NEW: Message Log Saving Function ---
+# --- MODIFIED: Message Log Saving Function (Removed close data) ---
 def save_message_logs(participant_data, all_message_logs, study_state):
     """Save ALL message logs to CSV - one row per message"""
     os.makedirs('study_data', exist_ok=True)
@@ -414,7 +147,6 @@ def save_message_logs(participant_data, all_message_logs, study_state):
     csv_file = f'study_data/{participant_id}_message_logs.csv'
     
     # Fill in the current run number for logs that don't have it
-    # This is useful for incremental saves
     current_run_idx = study_state.get('current_run_idx', 0)
     for log in all_message_logs:
         if log.get('run_number') is None:
@@ -422,16 +154,24 @@ def save_message_logs(participant_data, all_message_logs, study_state):
     
     if all_message_logs:
         with open(csv_file, 'w', newline='', encoding='utf-8') as f:
+            # --- MODIFIED fieldnames to remove _unix and close columns ---
             fieldnames = [
                 'message_id', 'participant_id', 'scenario', 'condition', 'run_number',
                 'frame', 'sim_time', 'robot_id', 'robot_state', 'robot_x', 'robot_y',
                 'message_type', 'message_text', 
-                'appear_timestamp_iso', 'appear_timestamp_unix',
-                'clicked', 'click_timestamp_iso', 'click_timestamp_unix', 
-                'time_to_click_seconds', 'was_closed', 'close_timestamp_unix', 
-                'time_open_seconds'
+                'appear_timestamp_iso',
+                # 'appear_timestamp_unix', # REMOVED
+                'clicked', # This is now a counter
+                'click_timestamp_iso', 
+                # 'click_timestamp_unix', # REMOVED
+                'time_to_click_seconds', 
+                # 'was_closed', # REMOVED
+                # 'close_timestamp_unix', # REMOVED
+                # 'time_open_seconds' # REMOVED
             ]
-            # Only include fields that actually exist in the log (and remove internal one)
+            # --- END MODIFICATION ---
+
+            # Only include fields that actually exist in the log
             existing_fieldnames = [fn for fn in fieldnames if fn in all_message_logs[0]]
             
             writer = csv.DictWriter(f, fieldnames=existing_fieldnames, extrasaction='ignore')
@@ -495,25 +235,22 @@ def save_study_data(participant_data, responses, interactions):
     with open(csv_file, 'a', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         if not file_exists:
-            # --- MODIFIED CSV HEADER ---
             writer.writerow([
                 'ParticipantID', 'Name', 'ParticipantStartTime',
-                'RunNumber', 'Scenario', 'ConditionIndex',  # <-- MODIFIED
+                'RunNumber', 'Scenario', 'ConditionIndex', 
                 'ViewType', 'Framework', 'QuestionSet', 'SegmentStartTime', 'ResponseTimestamp',
                 'Q1_MentalDemand', 'Q2_PhysicalDemand', 'Q3_TemporalDemand', 'Q4_Performance',
                 'Q5_Effort', 'Q6_Frustration', 'Q7_SitAwareness', 'Q8_ReplanCount',
                 'Q9_CognitiveLoad', 'Q10_OpenResponse'
             ])
-            # --- END MODIFICATION ---
         for resp in responses:
             if resp.get('type') == 'post_study': continue
             q_answers = resp.get('answers', [None]*10)
-            # --- MODIFIED CSV ROW ---
             writer.writerow([
                 participant_id,
                 participant_data['name'],
                 participant_data['start_time'],
-                resp.get('run_number'),  # <-- ADDED
+                resp.get('run_number'),
                 resp.get('scenario'),
                 resp.get('condition'),
                 resp.get('view_type'),
@@ -523,7 +260,6 @@ def save_study_data(participant_data, responses, interactions):
                 resp.get('timestamp'),
                 *q_answers
             ])
-            # --- END MODIFICATION ---
 
 # --- Figure and Component Creation ---
 # create_figure_for_frame is UNCHANGED
@@ -951,7 +687,7 @@ def thank_you_screen():
         ])
     ])
 
-# --- App Layout (MODIFIED to add all-message-logs-store) ---
+# --- App Layout (MODIFIED to add message stores & click interval) ---
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content', children=welcome_screen()),
@@ -962,22 +698,37 @@ app.layout = html.Div([
     dcc.Store(id='current-frame-store', data=0),
     dcc.Store(id='hmm-data-store'),
     dcc.Store(id='open-messages-store', data=[]),
-    dcc.Store(id='all-messages-store', data=[]),
+    dcc.Store(id='all-messages-store', data=[]), # For Map UI log
     dcc.Store(id='responses-store', data=[]),
     dcc.Store(id='interaction-log-store', data=[]),
     dcc.Store(id='message-timestamps-store', data={}),
+    
+    # --- STORES FOR TEXT UI (to fix animation bug) ---
+    dcc.Store(id='robot-1-messages-store', data=[]),
+    dcc.Store(id='robot-2-messages-store', data=[]),
+    dcc.Store(id='robot-3-messages-store', data=[]),
+    
     # --- NEW STORE FOR COMPREHENSIVE MESSAGE LOGGING ---
     dcc.Store(id='all-message-logs-store', data=[]),
     
     # Hidden div to capture message clicks
     html.Div(id='message-click-relay', style={'display': 'none'}),
-    dcc.Interval(id='animation-interval', interval=UPDATE_INTERVAL_MS, n_intervals=0, disabled=True)
+    
+    # Intervals
+    dcc.Interval(id='animation-interval', interval=UPDATE_INTERVAL_MS, n_intervals=0, disabled=True),
+    # --- NEW: Fast interval for reliable click logging ---
+    dcc.Interval(id='click-logger-interval', interval=CLICK_POLL_INTERVAL_MS, n_intervals=0, disabled=True) 
 ])
 
-# --- Clientside callback to capture message clicks (UNCHANGED) ---
+# --- MODIFIED Clientside callback (to use queue and fast interval) ---
 app.clientside_callback(
     """
     function(n_intervals) {
+        // --- NEW: Ensure queue exists on window ---
+        if (!window.messageClickQueue) {
+            window.messageClickQueue = [];
+        }
+        
         // This function is tricky because Dash recreates the DOM.
         // We need to ensure we only attach one listener per element.
         const detailsElements = document.querySelectorAll('details[id*="status-message"]');
@@ -1009,101 +760,105 @@ app.clientside_callback(
                     timestamp: Date.now()
                 };
                 
-                // Set on window for the server callback to pick up
-                // Use a unique key to avoid collisions
-                window.lastMessageClickData = JSON.stringify(clickData);
+                // --- MODIFIED: Push to queue instead of overwriting a single var ---
+                window.messageClickQueue.push(JSON.stringify(clickData));
             });
         });
         
-        // Return the data and clear it to prevent re-firing
-        const dataToReturn = window.lastMessageClickData;
-        if (dataToReturn) {
-            window.lastMessageClickData = null; // Clear after reading
+        // --- MODIFIED: Return the entire queue and clear it ---
+        if (window.messageClickQueue.length > 0) {
+            const dataToReturn = JSON.stringify(window.messageClickQueue); // Send the whole queue
+            window.messageClickQueue = []; // Clear the queue
+            return dataToReturn;
         }
-        return dataToReturn;
+        return null; // Dash will interpret this as no_update
     }
     """,
     Output('message-click-relay', 'children'),
-    Input('animation-interval', 'n_intervals')
+    Input('click-logger-interval', 'n_intervals') # --- MODIFIED: Use fast interval ---
 )
+# --- END MODIFICATION ---
 
 
-# --- MODIFIED Server callback to log message clicks ---
+# --- MODIFIED Server callback (logs only "open" events as a counter) ---
 @app.callback(
     Output('interaction-log-store', 'data', allow_duplicate=True),
     Output('all-message-logs-store', 'data', allow_duplicate=True),
     Input('message-click-relay', 'children'),
     State('interaction-log-store', 'data'),
-    State('all-message-logs-store', 'data'), # <-- ADDED
+    State('all-message-logs-store', 'data'), 
     State('participant-store', 'data'),
     State('study-state-store', 'data'),
     State('current-frame-store', 'data'),
     prevent_initial_call=True
 )
-def log_message_clicks(click_data, interactions, all_message_logs, 
+def log_message_clicks(click_data_json_array, interactions, all_message_logs, 
                              participant_data, study_state, frame_idx):
-    if not click_data or not all([participant_data, study_state, all_message_logs]):
+    
+    if not click_data_json_array or not all([participant_data, study_state, all_message_logs]):
         raise PreventUpdate
     
     new_interactions = interactions.copy() if interactions is not None else []
     new_all_message_logs = all_message_logs.copy()
     
     try:
-        click_info = json.loads(click_data)
-        message_id = click_info.get('messageId', '')
-        is_open = click_info.get('isOpen', False)
-        click_time_unix = click_info.get('timestamp', time.time() * 1000) / 1000.0  # Convert ms to seconds
-        click_time_iso = datetime.fromtimestamp(click_time_unix).isoformat()
+        click_data_list = json.loads(click_data_json_array)
         
-        action = "opened" if is_open else "closed"
-        
-        # --- 1. Update the comprehensive message log ---
-        message_found = False
-        for entry in new_all_message_logs:
-            if entry['message_id'] == message_id:
-                message_found = True
-                if action == "opened" and entry['clicked'] == 0: # Only log first open
-                    entry['clicked'] = 1
-                    entry['click_timestamp_unix'] = click_time_unix
-                    entry['click_timestamp_iso'] = click_time_iso
-                    entry['time_to_click_seconds'] = click_time_unix - entry['appear_timestamp_unix']
-                    entry['_time_open_start'] = click_time_unix # Start timer
+        for click_data in click_data_list:
+            click_info = json.loads(click_data)
+            is_open = click_info.get('isOpen', False)
+            
+            # --- THIS IS THE FIX: Only log "open" events ---
+            if is_open:
+                message_id = click_info.get('messageId', '')
+                click_time_unix = click_info.get('timestamp', time.time() * 1000) / 1000.0
+                click_time_iso = datetime.fromtimestamp(click_time_unix).isoformat()
+                action = "opened"
+            
+                # --- 1. Update the comprehensive message log ---
+                message_found = False
+                for entry in new_all_message_logs:
+                    if entry['message_id'] == message_id:
+                        message_found = True
+                        
+                        # Check if this is the very first click
+                        if entry['clicked'] == 0:
+                            entry['click_timestamp_unix'] = click_time_unix
+                            entry['click_timestamp_iso'] = click_time_iso
+                            entry['time_to_click_seconds'] = click_time_unix - entry['appear_timestamp_unix']
+                        
+                        # Increment the click counter for EVERY "open" action
+                        entry['clicked'] += 1
+                        
+                        break
                 
-                elif action == "closed":
-                    entry['was_closed'] = 1
-                    entry['close_timestamp_unix'] = click_time_unix
-                    if entry.get('_time_open_start'):
-                        duration = click_time_unix - entry['_time_open_start']
-                        current_duration = entry.get('time_open_seconds') or 0
-                        entry['time_open_seconds'] = current_duration + duration
-                        entry['_time_open_start'] = None # Stop timer
-                break
-        
-        if not message_found:
-            print(f"Warning: Click logged for message_id '{message_id}' but not found in all_message_logs_store.")
+                if not message_found:
+                    print(f"Warning: 'Open' click logged for message_id '{message_id}' but not found in all_message_logs_store.")
 
-        # --- 2. Keep logging to the simple interaction log as well ---
-        current_run_idx = study_state.get('current_run_idx', 0)
-        current_run_info = participant_data['track'][current_run_idx]
-        scenario_num = current_run_info[0]
-        condition_idx = current_run_info[1]
-        
-        interaction_entry = {
-            'timestamp_iso': click_time_iso,
-            'timestamp_unix': click_time_unix,
-            'participant': participant_data.get('id'),
-            'scenario': scenario_num,
-            'condition': condition_idx,
-            'frame': frame_idx,
-            'type': 'message_click',
-            'message_id': message_id,
-            'action': action,
-        }
-        
-        new_interactions.append(interaction_entry)
+                # --- 2. Log to the simple interaction log ---
+                current_run_idx = study_state.get('current_run_idx', 0)
+                current_run_info = participant_data['track'][current_run_idx]
+                scenario_num = current_run_info[0]
+                condition_idx = current_run_info[1]
+                
+                interaction_entry = {
+                    'timestamp_iso': click_time_iso,
+                    'timestamp_unix': click_time_unix,
+                    'participant': participant_data.get('id'),
+                    'scenario': scenario_num,
+                    'condition': condition_idx,
+                    'frame': frame_idx,
+                    'type': 'message_click',
+                    'message_id': message_id,
+                    'action': action, # Will always be "opened"
+                }
+                
+                new_interactions.append(interaction_entry)
+            
+            # --- "close" events (is_open=False) are now completely ignored ---
         
     except Exception as e:
-        print(f"Error logging message click: {e} | Click Data: {click_data}")
+        print(f"Error logging message click: {e} | Click Data: {click_data_json_array}")
     
     return new_interactions, new_all_message_logs
 # --- END MODIFICATION ---
@@ -1189,7 +944,7 @@ def begin_scenario(n_clicks, study_state, participant_data):
     new_study_state['segment_start_time'] = datetime.now().isoformat()
     return create_simulation_layout(), new_study_state
 
-# load_data_and_start_simulation is UNCHANGED
+# --- MODIFIED: load_data_and_start_simulation (clears text stores) ---
 @app.callback(
     Output('scenario-data-store', 'data'),
     Output('hmm-data-store', 'data'),
@@ -1203,6 +958,10 @@ def begin_scenario(n_clicks, study_state, participant_data):
     Output('all-messages-store', 'data', allow_duplicate=True),
     Output('open-messages-store', 'data', allow_duplicate=True),
     Output('message-timestamps-store', 'data', allow_duplicate=True),
+    # --- NEW: Clear Text UI stores on load ---
+    Output('robot-1-messages-store', 'data', allow_duplicate=True),
+    Output('robot-2-messages-store', 'data', allow_duplicate=True),
+    Output('robot-3-messages-store', 'data', allow_duplicate=True),
     Input('simulation-layout-loaded-signal', 'children'),
     State('study-state-store', 'data'),
     State('participant-store', 'data'),
@@ -1234,20 +993,22 @@ def load_data_and_start_simulation(layout_signal, study_state, participant_data)
     mid_point = max_frames // 2
     marks = {0: 'Start', mid_point: 'Midpoint', max_frames: 'End'}
     
-    # Clear message stores for the new run
-    return frames, hmms, start_frame, max_frames, max_frames, max_frames, marks, marks, marks, [], [], {}
+    # Clear all message stores for the new run
+    return frames, hmms, start_frame, max_frames, max_frames, max_frames, marks, marks, marks, [], [], {}, [], [], []
 
-# control_animation is UNCHANGED
+# --- MODIFIED: control_animation (controls both intervals) ---
 @app.callback(
     Output('animation-interval', 'disabled'),
+    Output('click-logger-interval', 'disabled'), # --- ADDED ---
     Input('study-state-store', 'data'),
 )
 def control_animation(study_state):
     if study_state and study_state.get('phase') == 'simulation':
-        # print("Enabling animation interval") # Too noisy
-        return False
-    # print("Disabling animation interval") # Too noisy
-    return True
+        # print("Enabling intervals") # Too noisy
+        return False, False # --- MODIFIED: Enable both ---
+    # print("Disabling intervals") # Too noisy
+    return True, True # --- MODIFIED: Disable both ---
+# --- END MODIFICATION ---
 
 # update_frame_and_check_pause is UNCHANGED
 @app.callback(
@@ -1328,12 +1089,13 @@ def programmatically_switch_view(study_state, participant_data):
     header_text = f"Run: {current_run_idx + 1} / {len(participant_data['track'])} | Scenario: {scenario_num} | View: {view_name} | Framework: {framework_name}"
     return map_style, text_style, header_text
 
-# --- MODIFIED update_simulation_views (to log message appearance) ---
+# --- MODIFIED update_simulation_views (to use stores for Text UI) ---
 @app.callback(
     Output('simulation-graph', 'figure'),
-    Output('robot-1-messages', 'children'),
-    Output('robot-2-messages', 'children'),
-    Output('robot-3-messages', 'children'),
+    # --- MODIFIED: Outputs are to stores, not UI ---
+    Output('robot-1-messages-store', 'data'),
+    Output('robot-2-messages-store', 'data'),
+    Output('robot-3-messages-store', 'data'),
     Output('robot-1-timeline', 'value'),
     Output('robot-2-timeline', 'value'),
     Output('robot-3-timeline', 'value'),
@@ -1343,17 +1105,18 @@ def programmatically_switch_view(study_state, participant_data):
     Output('animation-interval', 'interval'),
     Output('open-messages-store', 'data'),
     Output('message-timestamps-store', 'data'),
-    Output('all-message-logs-store', 'data', allow_duplicate=True), # <-- ADDED
+    Output('all-message-logs-store', 'data', allow_duplicate=True),
     Input('current-frame-store', 'data'),
     Input('study-state-store', 'data'),
     State('scenario-data-store', 'data'),
     State('hmm-data-store', 'data'),
     State('participant-store', 'data'),
-    [State(f'robot-{i}-messages', 'children') for i in range(1, 4)],
+    # --- MODIFIED STATE: Use stores for Text UI history ---
+    [State(f'robot-{i}-messages-store', 'data') for i in range(1, 4)],
     State('open-messages-store', 'data'),
     State('all-messages-store', 'data'),
     State('message-timestamps-store', 'data'),
-    State('all-message-logs-store', 'data'), # <-- ADDED
+    State('all-message-logs-store', 'data'),
     prevent_initial_call=True
 )
 def update_simulation_views(frame_idx, study_state,
@@ -1362,11 +1125,12 @@ def update_simulation_views(frame_idx, study_state,
                             open_message_ids, all_messages_history,
                             message_timestamps, all_message_logs):
     if not study_state or study_state.get('phase') != 'simulation':
-        return (no_update,) * 14 # <-- Incremented count
+        # --- MODIFIED: Return 14 no_updates ---
+        return (no_update,) * 14
     
     new_open_message_ids = set(open_message_ids) if open_message_ids else set()
     new_message_timestamps = message_timestamps.copy() if message_timestamps else {}
-    new_all_message_logs = all_message_logs.copy() if all_message_logs else [] # <-- ADDED
+    new_all_message_logs = all_message_logs.copy() if all_message_logs else []
     
     # Get current run info
     current_run_idx = study_state['current_run_idx']
@@ -1377,10 +1141,9 @@ def update_simulation_views(frame_idx, study_state,
     
     if not all([scenario_data, hmm_data, study_state, participant_data]):
         print("Warning: Missing data in update_simulation_views")
-        return (no_update,) * 14 # <-- Incremented count
+        return (no_update,) * 14
     
     if frame_idx is None or frame_idx >= len(scenario_data):
-        # ... (error handling) ...
         current_fig = initial_figure
         try:
             current_fig = callback_context.outputs_list[0].get('value', initial_figure)
@@ -1388,7 +1151,7 @@ def update_simulation_views(frame_idx, study_state,
             pass
         return (
             current_fig,
-            hist1, hist2, hist3,
+            hist1 or [], hist2 or [], hist3 or [], # Return current store state
             frame_idx if frame_idx is not None else 0,
             frame_idx if frame_idx is not None else 0,
             frame_idx if frame_idx is not None else 0,
@@ -1397,7 +1160,7 @@ def update_simulation_views(frame_idx, study_state,
             UPDATE_INTERVAL_MS,
             list(new_open_message_ids),
             new_message_timestamps,
-            new_all_message_logs # <-- ADDED
+            new_all_message_logs
         )
     
     current_hmms = hmm_data.copy() if hmm_data else {}
@@ -1407,6 +1170,10 @@ def update_simulation_views(frame_idx, study_state,
     mission_time_threshold = THRESHOLD_VALUES[framework_mode].get(scenario_num, 1)
     robots_dict = current_frame_data.get('robots', {})
     packages = current_frame_data.get('packages', [])
+    
+    
+    
+    # --- MODIFIED: hist1, hist2, hist3 now come from stores ---
     histories = [hist1, hist2, hist3]
     new_robot_message_outputs = [histories[0] or [], histories[1] or [], histories[2] or []]
     sim_time = current_frame_data.get('simulator time', 0)
@@ -1451,7 +1218,6 @@ def update_simulation_views(frame_idx, study_state,
                 if sync_occurred:
                     any_sync_occurred = True
                     
-                    # --- MODIFIED to get loggable data ---
                     new_message_div, message_type, message_text = create_rich_status_message(
                         robot_info,
                         sim_time,
@@ -1461,17 +1227,15 @@ def update_simulation_views(frame_idx, study_state,
                         selected_robot_rmm_array,
                         scenario_num
                     )
-                    # --- END MODIFICATION ---
                     
                     is_new_message = False
                     msg_id = new_message_div.id['id']
                     
                     if msg_id not in new_message_timestamps:
-                        appear_time = time.time() # <-- Log appearance time
+                        appear_time = time.time()
                         new_message_timestamps[msg_id] = appear_time
                         is_new_message = True
                         
-                        # --- NEW: Create and store the log entry ---
                         log_entry = create_message_log_entry(
                             message_id=msg_id,
                             robot_id=robot_id,
@@ -1488,7 +1252,6 @@ def update_simulation_views(frame_idx, study_state,
                             robot_y=robot_info.get('y')
                         )
                         new_all_message_logs.append(log_entry)
-                        # --- END NEW ---
                     
                     if is_new_message:
                         current_class = new_message_div.className or ""
@@ -1497,6 +1260,7 @@ def update_simulation_views(frame_idx, study_state,
                     newly_generated_messages_for_feed.append(new_message_div)
                     
                     updated_history = [new_message_div]
+                    # --- MODIFIED: Get history from store-fed var ---
                     current_hist = histories[i-1] if isinstance(histories[i-1], list) else ([histories[i-1]] if histories[i-1] else [])
                     if current_hist:
                         updated_history.append(html.P("--- previous updates ---", className="divider"))
@@ -1510,16 +1274,42 @@ def update_simulation_views(frame_idx, study_state,
     
     return (
         fig,
-        *new_robot_message_outputs,
+        # --- MODIFIED: Return new history to stores ---
+        new_robot_message_outputs[0],
+        new_robot_message_outputs[1],
+        new_robot_message_outputs[2],
         frame_idx, frame_idx, frame_idx,
         current_hmms,
         updated_all_messages, updated_all_messages,
         new_interval,
         list(new_open_message_ids),
         new_message_timestamps,
-        new_all_message_logs # <-- RETURNED
+        new_all_message_logs
     )
 # --- END MODIFICATION ---
+
+# --- NEW: Callbacks to link stores to Text UI (fixes animation bug) ---
+@app.callback(
+    Output('robot-1-messages', 'children'),
+    Input('robot-1-messages-store', 'data')
+)
+def update_robot_1_ui(data):
+    return data
+
+@app.callback(
+    Output('robot-2-messages', 'children'),
+    Input('robot-2-messages-store', 'data')
+)
+def update_robot_2_ui(data):
+    return data
+
+@app.callback(
+    Output('robot-3-messages', 'children'),
+    Input('robot-3-messages-store', 'data')
+)
+def update_robot_3_ui(data):
+    return data
+# --- END NEW CALLBACKS ---
 
 # update_snapshot is UNCHANGED
 @app.callback(
@@ -1723,6 +1513,7 @@ if __name__ == '__main__':
     if not os.path.exists("assets"):
         os.makedirs("assets")
     
+    # --- MODIFIED: Removed all .message-box-dark-theme rules ---
     with open("assets/style.css", "w") as f:
         f.write("""
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
@@ -1756,6 +1547,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
     flex-grow: 1;
 }
 
+/* This class is for the Map View's log */
 .message-box-dark-theme {
     height: 100%;
     overflow-y: auto;
@@ -1781,12 +1573,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
     background-color: #f8f9fa; /* Default light background */
 }
 
-/* Styles for dark theme message feed */
-.message-box-dark-theme .message-container-details {
-    border: 1px solid #555;
-    color: #f0f0f0;
-}
-
 .message-container-details summary {
     cursor: pointer;
     outline: none;
@@ -1802,29 +1588,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
     background-color: #ffdede; /* Red for replan */
     border-color: #ffb0b0;
 }
-.message-box-dark-theme .message-container-details.replan {
-    background-color: #5a2828;
-    border-color: #a44;
-}
 
 .message-container-details.on-track {
     background-color: #e0f5e1; /* Green for on-track */
     border-color: #b0dcb0;
-}
-.message-box-dark-theme .message-container-details.on-track {
-    background-color: #2a4a2a;
-    border-color: #4a4;
 }
 
 .message-container-details.stationary {
     background-color: #fff9c4; /* Yellow for stationary */
     border-color: #e0dcb0;
 }
-.message-box-dark-theme .message-container-details.stationary {
-    background-color: #5a5a28;
-    border-color: #a4a440;
-}
-
 
 /* Animation for new messages */
 @keyframes flash-border {
@@ -1836,6 +1609,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
     animation: flash-border 1.2s ease-out;
 }
 """)
+    # --- END MODIFICATION ---
     
     # Use debug=False for actual study deployment
-    app.run(debug=False, host='0.0.0.0', port=9924)
+    app.run(debug=False, host='0.0.0.0', port=9964)

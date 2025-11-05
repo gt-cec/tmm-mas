@@ -1,0 +1,24 @@
+[
+  {
+    "timestamp": "2025-11-04T21:35:42.116001",
+    "segment_start_time": "2025-11-04T21:35:21.741953",
+    "run_number": 1,
+    "scenario": 1,
+    "condition": 2,
+    "view_type": "text",
+    "framework": "with_framework",
+    "question_set": 1,
+    "answers": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      null,
+      null,
+      null,
+      "rhgsertdh"
+    ]
+  }
+]

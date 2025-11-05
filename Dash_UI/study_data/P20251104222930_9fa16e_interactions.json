@@ -1,0 +1,79 @@
+[
+  {
+    "timestamp_iso": "2025-11-04T22:29:33.273000",
+    "timestamp_unix": 1762313373.273,
+    "participant": "P20251104222930_9fa16e",
+    "scenario": 1,
+    "condition": 3,
+    "frame": 1,
+    "type": "message_click",
+    "message_id": "robot1-7.47",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-04T22:29:34.441000",
+    "timestamp_unix": 1762313374.441,
+    "participant": "P20251104222930_9fa16e",
+    "scenario": 1,
+    "condition": 3,
+    "frame": 2,
+    "type": "message_click",
+    "message_id": "robot3-7.47",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-04T22:29:34.802000",
+    "timestamp_unix": 1762313374.802,
+    "participant": "P20251104222930_9fa16e",
+    "scenario": 1,
+    "condition": 3,
+    "frame": 3,
+    "type": "message_click",
+    "message_id": "robot2-7.47",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-04T22:29:37.681000",
+    "timestamp_unix": 1762313377.681,
+    "participant": "P20251104222930_9fa16e",
+    "scenario": 1,
+    "condition": 3,
+    "frame": 6,
+    "type": "message_click",
+    "message_id": "robot2-27.47",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-04T22:29:38.377000",
+    "timestamp_unix": 1762313378.377,
+    "participant": "P20251104222930_9fa16e",
+    "scenario": 1,
+    "condition": 3,
+    "frame": 6,
+    "type": "message_click",
+    "message_id": "robot3-32.47",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-04T22:29:39.775000",
+    "timestamp_unix": 1762313379.775,
+    "participant": "P20251104222930_9fa16e",
+    "scenario": 1,
+    "condition": 3,
+    "frame": 8,
+    "type": "message_click",
+    "message_id": "robot1-27.47",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-04T22:29:42.364000",
+    "timestamp_unix": 1762313382.364,
+    "participant": "P20251104222930_9fa16e",
+    "scenario": 1,
+    "condition": 3,
+    "frame": 10,
+    "type": "message_click",
+    "message_id": "robot2-34.10",
+    "action": "opened"
+  }
+]

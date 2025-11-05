@@ -1,0 +1,68 @@
+[
+  {
+    "timestamp_iso": "2025-11-04T21:55:56.140000",
+    "timestamp_unix": 1762311356.14,
+    "participant": "P20251104215552_858269",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 1,
+    "type": "message_click",
+    "message_id": "robot2-7.68",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-04T21:55:56.451000",
+    "timestamp_unix": 1762311356.451,
+    "participant": "P20251104215552_858269",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 1,
+    "type": "message_click",
+    "message_id": "robot1-7.68",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-04T21:55:57.024000",
+    "timestamp_unix": 1762311357.024,
+    "participant": "P20251104215552_858269",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 2,
+    "type": "message_click",
+    "message_id": "robot3-7.68",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-04T21:55:59.145000",
+    "timestamp_unix": 1762311359.145,
+    "participant": "P20251104215552_858269",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 4,
+    "type": "message_click",
+    "message_id": "robot1-27.68",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-04T21:56:00.163000",
+    "timestamp_unix": 1762311360.163,
+    "participant": "P20251104215552_858269",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 5,
+    "type": "message_click",
+    "message_id": "robot3-32.68",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-04T21:56:02.289000",
+    "timestamp_unix": 1762311362.289,
+    "participant": "P20251104215552_858269",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 7,
+    "type": "message_click",
+    "message_id": "robot3-37.08",
+    "action": "opened"
+  }
+]
