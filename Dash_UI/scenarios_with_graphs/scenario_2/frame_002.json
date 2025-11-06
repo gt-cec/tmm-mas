@@ -1,20 +1,6 @@
 {
-    "simulator time": 12.212360858917236,
+    "simulator time": 10.11552381515503,
     "robots": {
-        "robot2": {
-            "state": "moving",
-            "plan": [],
-            "plan_index": 0,
-            "immediate_goal": null,
-            "x": 11.0,
-            "y": 10.0,
-            "mission_time": 0,
-            "replan_flag": false,
-            "replan_count": 0,
-            "Current_weather": "1",
-            "Battery_status": "1",
-            "Momentarily_offline": "0"
-        },
         "robot3": {
             "state": "moving",
             "plan": [],
@@ -22,10 +8,28 @@
             "immediate_goal": null,
             "x": 10.0,
             "y": 10.0,
+            "Quadrant": "SW",
             "mission_time": 0,
             "replan_flag": false,
             "replan_count": 0,
             "Current_weather": "1",
+            "Bad_Terrain": "1",
+            "Battery_status": "1",
+            "Momentarily_offline": "0"
+        },
+        "robot2": {
+            "state": "moving",
+            "plan": [],
+            "plan_index": 0,
+            "immediate_goal": null,
+            "x": 11.0,
+            "y": 10.0,
+            "Quadrant": "SE",
+            "mission_time": 0,
+            "replan_flag": false,
+            "replan_count": 0,
+            "Current_weather": "1",
+            "Bad_Terrain": "1",
             "Battery_status": "1",
             "Momentarily_offline": "0"
         },
@@ -36,10 +40,12 @@
             "immediate_goal": null,
             "x": 9.0,
             "y": 10.0,
+            "Quadrant": "SW",
             "mission_time": 0,
             "replan_flag": false,
             "replan_count": 0,
             "Current_weather": "1",
+            "Bad_Terrain": "1",
             "Battery_status": "1",
             "Momentarily_offline": "0"
         }
@@ -52,7 +58,10 @@
             "carried_by": "Null",
             "state": "On Ground",
             "Quadrant": "SW",
-            "Discovered": 0
+            "Discovered": 0,
+            "Assigned_to": "Null",
+            "Discovered_by": "Null",
+            "undiscovered_pkg_discovered": 0
         },
         {
             "id": "p3",
@@ -61,7 +70,10 @@
             "carried_by": "Null",
             "state": "On Ground",
             "Quadrant": "SW",
-            "Discovered": 1
+            "Discovered": 1,
+            "Assigned_to": "robot1",
+            "Discovered_by": "Null",
+            "undiscovered_pkg_discovered": 0
         },
         {
             "id": "p1",
@@ -70,7 +82,10 @@
             "carried_by": "Null",
             "state": "On Ground",
             "Quadrant": "SW",
-            "Discovered": 1
+            "Discovered": 1,
+            "Assigned_to": "robot1",
+            "Discovered_by": "Null",
+            "undiscovered_pkg_discovered": 0
         },
         {
             "id": "d1",
@@ -79,16 +94,22 @@
             "carried_by": "Null",
             "state": "On Ground",
             "Quadrant": "SW",
-            "Discovered": 0
+            "Discovered": 0,
+            "Assigned_to": "Null",
+            "Discovered_by": "Null",
+            "undiscovered_pkg_discovered": 0
         },
         {
-            "id": "p17",
+            "id": "p8",
             "x": 9.0,
             "y": 4.5,
             "carried_by": "Null",
             "state": "On Ground",
             "Quadrant": "SW",
-            "Discovered": 1
+            "Discovered": 1,
+            "Assigned_to": "robot1",
+            "Discovered_by": "Null",
+            "undiscovered_pkg_discovered": 0
         },
         {
             "id": "d6",
@@ -97,7 +118,10 @@
             "carried_by": "Null",
             "state": "On Ground",
             "Quadrant": "SE",
-            "Discovered": 0
+            "Discovered": 0,
+            "Assigned_to": "Null",
+            "Discovered_by": "Null",
+            "undiscovered_pkg_discovered": 0
         },
         {
             "id": "d7",
@@ -106,7 +130,10 @@
             "carried_by": "Null",
             "state": "On Ground",
             "Quadrant": "SE",
-            "Discovered": 0
+            "Discovered": 0,
+            "Assigned_to": "Null",
+            "Discovered_by": "Null",
+            "undiscovered_pkg_discovered": 0
         },
         {
             "id": "d5",
@@ -115,7 +142,10 @@
             "carried_by": "Null",
             "state": "On Ground",
             "Quadrant": "NW",
-            "Discovered": 0
+            "Discovered": 0,
+            "Assigned_to": "Null",
+            "Discovered_by": "Null",
+            "undiscovered_pkg_discovered": 0
         },
         {
             "id": "p4",
@@ -124,7 +154,10 @@
             "carried_by": "Null",
             "state": "On Ground",
             "Quadrant": "NW",
-            "Discovered": 1
+            "Discovered": 1,
+            "Assigned_to": "robot2",
+            "Discovered_by": "Null",
+            "undiscovered_pkg_discovered": 0
         },
         {
             "id": "d4",
@@ -133,7 +166,10 @@
             "carried_by": "Null",
             "state": "On Ground",
             "Quadrant": "SW",
-            "Discovered": 0
+            "Discovered": 0,
+            "Assigned_to": "Null",
+            "Discovered_by": "Null",
+            "undiscovered_pkg_discovered": 0
         },
         {
             "id": "p2",
@@ -142,16 +178,22 @@
             "carried_by": "Null",
             "state": "On Ground",
             "Quadrant": "SW",
-            "Discovered": 1
+            "Discovered": 1,
+            "Assigned_to": "robot1",
+            "Discovered_by": "Null",
+            "undiscovered_pkg_discovered": 0
         },
         {
-            "id": "p16",
+            "id": "p7",
             "x": 1.0,
             "y": 11.0,
             "carried_by": "Null",
             "state": "On Ground",
             "Quadrant": "NW",
-            "Discovered": 1
+            "Discovered": 1,
+            "Assigned_to": "robot2",
+            "Discovered_by": "Null",
+            "undiscovered_pkg_discovered": 0
         },
         {
             "id": "d2",
@@ -160,7 +202,10 @@
             "carried_by": "Null",
             "state": "On Ground",
             "Quadrant": "NW",
-            "Discovered": 0
+            "Discovered": 0,
+            "Assigned_to": "Null",
+            "Discovered_by": "Null",
+            "undiscovered_pkg_discovered": 0
         },
         {
             "id": "p5",
@@ -169,7 +214,10 @@
             "carried_by": "Null",
             "state": "On Ground",
             "Quadrant": "NW",
-            "Discovered": 1
+            "Discovered": 1,
+            "Assigned_to": "robot2",
+            "Discovered_by": "Null",
+            "undiscovered_pkg_discovered": 0
         },
         {
             "id": "d3",
@@ -178,7 +226,10 @@
             "carried_by": "Null",
             "state": "On Ground",
             "Quadrant": "NW",
-            "Discovered": 0
+            "Discovered": 0,
+            "Assigned_to": "Null",
+            "Discovered_by": "Null",
+            "undiscovered_pkg_discovered": 0
         },
         {
             "id": "d9",
@@ -187,7 +238,10 @@
             "carried_by": "Null",
             "state": "On Ground",
             "Quadrant": "NW",
-            "Discovered": 0
+            "Discovered": 0,
+            "Assigned_to": "Null",
+            "Discovered_by": "Null",
+            "undiscovered_pkg_discovered": 0
         },
         {
             "id": "p6",
@@ -196,7 +250,10 @@
             "carried_by": "Null",
             "state": "On Ground",
             "Quadrant": "NW",
-            "Discovered": 1
+            "Discovered": 1,
+            "Assigned_to": "robot2",
+            "Discovered_by": "Null",
+            "undiscovered_pkg_discovered": 0
         }
     ],
     "walls": [
@@ -321,15 +378,15 @@
     ],
     "zones": [
         {
-            "x0": 4.0,
+            "x0": 3.5,
             "y0": 13.5,
             "x1": 6.0,
             "y1": 13.5,
             "x2": 6.0,
-            "y2": 17.0,
-            "x3": 4.0,
-            "y3": 17.0,
-            "color": "(173, 216, 230)"
+            "y2": 17.5,
+            "x3": 3.5,
+            "y3": 17.5,
+            "color": "(128, 128, 128)"
         },
         {
             "x0": 10.0,
@@ -340,7 +397,7 @@
             "y2": 16.2,
             "x3": 10.0,
             "y3": 16.2,
-            "color": "(173, 216, 230)"
+            "color": "(128, 128, 128)"
         },
         {
             "x0": 15.2,
@@ -351,18 +408,78 @@
             "y2": 7.0,
             "x3": 15.2,
             "y3": 7.0,
-            "color": "(173, 216, 230)"
+            "color": "(128, 128, 128)"
         },
         {
             "x0": 5.0,
-            "y0": 4.2,
+            "y0": 3.8,
             "x1": 9.5,
-            "y1": 4.2,
+            "y1": 3.8,
             "x2": 9.5,
             "y2": 4.8,
             "x3": 5.0,
             "y3": 4.8,
-            "color": "(173, 216, 230)"
+            "color": "(128, 128, 128)"
+        },
+        {
+            "x0": 1.9,
+            "y0": 7.5,
+            "x1": 2.1,
+            "y1": 7.5,
+            "x2": 2.1,
+            "y2": 8.5,
+            "x3": 1.9,
+            "y3": 8.5,
+            "color": "(255, 0, 0)"
+        },
+        {
+            "x0": 7.0,
+            "y0": 13.9,
+            "x1": 6.0,
+            "y1": 13.9,
+            "x2": 6.0,
+            "y2": 14.1,
+            "x3": 7.0,
+            "y3": 14.1,
+            "color": "(255, 0, 0)"
+        },
+        {
+            "x0": 1.2,
+            "y0": 9.0,
+            "x1": 1.1414213562373094,
+            "y1": 9.14142135623731,
+            "x2": 1.0,
+            "y2": 9.2,
+            "x3": 0.8585786437626906,
+            "y3": 9.14142135623731,
+            "x4": 0.8,
+            "y4": 9.0,
+            "x5": 0.8585786437626904,
+            "y5": 8.85857864376269,
+            "x6": 1.0,
+            "y6": 8.8,
+            "x7": 1.1414213562373094,
+            "y7": 8.85857864376269,
+            "color": "(255, 255, 0)"
+        },
+        {
+            "x0": 6.7,
+            "y0": 13.5,
+            "x1": 6.641421356237309,
+            "y1": 13.64142135623731,
+            "x2": 6.5,
+            "y2": 13.7,
+            "x3": 6.358578643762691,
+            "y3": 13.64142135623731,
+            "x4": 6.3,
+            "y4": 13.5,
+            "x5": 6.358578643762691,
+            "y5": 13.35857864376269,
+            "x6": 6.5,
+            "y6": 13.3,
+            "x7": 6.641421356237309,
+            "y7": 13.35857864376269,
+            "color": "(255, 255, 0)"
         }
     ]
 }

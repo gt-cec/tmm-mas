@@ -1,0 +1,134 @@
+[
+  {
+    "timestamp": "2025-11-06T02:29:37.573034",
+    "segment_start_time": "2025-11-06T02:29:23.404646",
+    "run_number": 1,
+    "scenario": 1,
+    "condition": 1,
+    "view_type": "map",
+    "framework": "without_framework",
+    "question_set": 1,
+    "answers": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "timestamp": "2025-11-06T02:32:09.310208",
+    "segment_start_time": "2025-11-06T02:29:37.574286",
+    "run_number": 1,
+    "scenario": 1,
+    "condition": 1,
+    "view_type": "map",
+    "framework": "without_framework",
+    "question_set": 2,
+    "answers": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "timestamp": "2025-11-06T02:33:12.539745",
+    "segment_start_time": "2025-11-06T02:32:09.311613",
+    "run_number": 1,
+    "scenario": 1,
+    "condition": 1,
+    "view_type": "map",
+    "framework": "without_framework",
+    "question_set": 3,
+    "answers": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "timestamp": "2025-11-06T02:33:42.360308",
+    "segment_start_time": "2025-11-06T02:33:20.683453",
+    "run_number": 2,
+    "scenario": 2,
+    "condition": 0,
+    "view_type": "map",
+    "framework": "with_framework",
+    "question_set": 1,
+    "answers": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "timestamp": "2025-11-06T02:35:47.117558",
+    "segment_start_time": "2025-11-06T02:33:42.361941",
+    "run_number": 2,
+    "scenario": 2,
+    "condition": 0,
+    "view_type": "map",
+    "framework": "with_framework",
+    "question_set": 2,
+    "answers": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  {
+    "timestamp": "2025-11-06T02:36:37.758620",
+    "segment_start_time": "2025-11-06T02:35:47.119934",
+    "run_number": 2,
+    "scenario": 2,
+    "condition": 0,
+    "view_type": "map",
+    "framework": "with_framework",
+    "question_set": 3,
+    "answers": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      null,
+      null,
+      null,
+      null
+    ]
+  }
+]

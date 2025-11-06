@@ -1,5 +1,6 @@
 
 
+
 import dash
 from dash import dcc, html, Input, Output, State, callback_context, no_update
 from dash.dependencies import ALL
@@ -132,10 +133,6 @@ def create_message_log_entry(message_id, robot_id, scenario_num, condition_idx,
         'click_timestamp_iso': None,
         'click_timestamp_unix': None, # Internal-only
         'time_to_click_seconds': None,
-        # 'was_closed': 0, # REMOVED
-        # 'close_timestamp_unix': None, # REMOVED
-        # 'time_open_seconds': None, # REMOVED
-        # '_time_open_start': None # REMOVED
     }
 
 # --- MODIFIED: Message Log Saving Function (Removed close data) ---
@@ -160,14 +157,9 @@ def save_message_logs(participant_data, all_message_logs, study_state):
                 'frame', 'sim_time', 'robot_id', 'robot_state', 'robot_x', 'robot_y',
                 'message_type', 'message_text', 
                 'appear_timestamp_iso',
-                # 'appear_timestamp_unix', # REMOVED
                 'clicked', # This is now a counter
                 'click_timestamp_iso', 
-                # 'click_timestamp_unix', # REMOVED
                 'time_to_click_seconds', 
-                # 'was_closed', # REMOVED
-                # 'close_timestamp_unix', # REMOVED
-                # 'time_open_seconds' # REMOVED
             ]
             # --- END MODIFICATION ---
 
@@ -262,15 +254,40 @@ def save_study_data(participant_data, responses, interactions):
             ])
 
 # --- Figure and Component Creation ---
-# create_figure_for_frame is UNCHANGED
+# --- vvv MODIFICATIONS BELOW vvv ---
 def create_figure_for_frame(static_data, frame_data):
     fig = go.Figure()
+    
+    # --- MODIFICATION: Added Quadrant Annotations ---
     fig.update_layout(
         xaxis=dict(range=[0, GRID_WIDTH], autorange=True, showgrid=True, gridcolor='rgba(100,100,100,0.3)', zeroline=False, dtick=10),
         yaxis=dict(range=[0, GRID_HEIGHT], autorange=True, showgrid=True, gridcolor='rgba(100,100,100,0.3)', zeroline=False),
         plot_bgcolor='#ffffff', paper_bgcolor='#ffffff', font=dict(color='black'),
-        showlegend=False, margin=dict(l=0, r=0, t=0, b=0), uirevision='constant'
+        showlegend=False, margin=dict(l=0, r=0, t=0, b=0), uirevision='constant',
+        
+        # --- NEW ANNOTATIONS ---
+        annotations=[
+            go.layout.Annotation(
+                x=2.5, y=17.5, text="<b>NW</b>", showarrow=False,
+                font=dict(size=24, color="rgba(0, 0, 0, 0.20)"), # Large, semi-transparent text
+            ),
+            go.layout.Annotation(
+                x=17.5, y=17.5, text="<b>NE</b>", showarrow=False,
+                font=dict(size=24, color="rgba(0, 0, 0, 0.20)"),
+            ),
+            go.layout.Annotation(
+                x=2.5, y=2.5, text="<b>SW</b>", showarrow=False,
+                font=dict(size=24, color="rgba(0, 0, 0, 0.20)"),
+            ),
+            go.layout.Annotation(
+                x=17.5, y=2.5, text="<b>SE</b>", showarrow=False,
+                font=dict(size=24, color="rgba(0, 0, 0, 0.20)"),
+            )
+        ]
+        # --- END NEW ANNOTATIONS ---
     )
+    # --- END MODIFICATION ---
+
     walls_data = frame_data.get('walls', []) if frame_data else static_data.get('walls', [])
     zones_data = frame_data.get('zones', []) if frame_data else static_data.get('zones', [])
     nodes_data = frame_data.get('nodes', []) if frame_data else static_data.get('nodes', [])
@@ -306,6 +323,7 @@ def create_figure_for_frame(static_data, frame_data):
     if frame_data:
         robots = [{'id': rid, **rdata} for rid, rdata in frame_data.get('robots', {}).items()]
         packages = frame_data.get('packages', [])
+        
         if robots:
             traces = {'x': [], 'y': [], 'colors': [], 'texts': [], 'hovers': []}
             for r in robots:
@@ -313,12 +331,25 @@ def create_figure_for_frame(static_data, frame_data):
                 traces['y'].append(r['y'])
                 traces['texts'].append(r['id'][-1])
                 traces['hovers'].append(f"{r['id']} State: {r['state']} Pos: ({r['x']:.1f}, {r['y']:.1f})")
-                traces['colors'].append({'moving': 'red', 'carrying': 'orange', 'waiting': 'blue'}.get(r['state'], 'grey'))
+                
+                # --- MODIFICATION: Robot color for 'all_tasks_complete' ---
+                r_state = r['state']
+                color_map = {
+                    'moving': 'red', 
+                    'carrying': 'orange', 
+                    'waiting': 'blue', 
+                    'all_tasks_complete': 'green' # <-- ADDED
+                }
+                traces['colors'].append(color_map.get(r_state, 'grey'))
+                # --- END MODIFICATION ---
+
+            # --- MODIFICATION: Increased robot marker size ---
             fig.add_trace(go.Scatter(x=traces['x'], y=traces['y'], mode='markers+text',
-                                    marker=dict(size=30, color=traces['colors'], line=dict(width=2, color='white')),
+                                    marker=dict(size=40, color=traces['colors'], line=dict(width=2, color='white')), # <-- size=35
                                     text=traces['texts'], textposition='middle center',
                                     textfont=dict(color='white', size=12, family="Arial Black"),
                                     hovertext=traces['hovers'], hoverinfo='text'))
+            # --- END MODIFICATION ---
 
         if packages:
             pkg_x = []
@@ -328,26 +359,48 @@ def create_figure_for_frame(static_data, frame_data):
             pkg_colors = []
             pkg_symbols = []
             robot_pos = {r['id']: (r['x'], r['y']) for r in robots}
+            
+            # --- MODIFICATION: New package logic for 'd' packages ---
             for p in packages:
                 carried_by_robot = p.get('carried_by')
-                is_discovered = p.get('Discovered', 1) == 1
+                # Default to discovered=1 (for 'p' packages) if key is missing
+                is_discovered = p.get('Discovered', 1) == 1 
                 is_carried = carried_by_robot is not None and carried_by_robot != "Null"
+                is_d_package = p['id'].startswith('d')
+
                 px, py = robot_pos.get(carried_by_robot, (p.get('x', 0), p.get('y', 0)))
                 pkg_x.append(px)
                 pkg_y.append(py)
                 pkg_texts.append(p['id'][-1])
+
                 if is_carried:
                     pkg_colors.append('gold')
                     pkg_symbols.append('square')
                     pkg_hovers.append(f"Package {p['id']}, Carried by {carried_by_robot}")
-                elif is_discovered:
+                
+                elif is_d_package:
+                    if is_discovered:
+                        # 'd' package that is now discovered
+                        pkg_colors.append('gold') # User requested yellow
+                        pkg_symbols.append('triangle-up') # User requested triangle
+                        pkg_hovers.append(f"Package {p['id']}, On Ground (Discovered 'd' package)")
+                    else:
+                        # 'd' package that is still undiscovered
+                        pkg_colors.append('lightgreen') # User requested green
+                        pkg_symbols.append('triangle-up') # User requested triangle
+                        pkg_hovers.append(f"Package {p['id']}, On Ground (Undiscovered)")
+                
+                elif is_discovered: # This now implies it's a 'p' package (or other) and discovered
                     pkg_colors.append('gold')
                     pkg_symbols.append('square')
-                    pkg_hovers.append(f"Package {p['id']}, On Ground (Discovered)")
-                else:
+                    pkg_hovers.append(f"Package {p['id']}, On Ground (Discovered 'p' package)")
+                
+                else: # Fallback for any other case
                     pkg_colors.append('lightgreen')
                     pkg_symbols.append('triangle-up')
-                    pkg_hovers.append(f"Package {p['id']}, On Ground (Undiscovered)")
+                    pkg_hovers.append(f"Package {p['id']}, On Ground (Unknown State)")
+            # --- END MODIFICATION ---
+
             fig.add_trace(go.Scatter(
                 x=pkg_x,
                 y=pkg_y,
@@ -366,11 +419,12 @@ def create_figure_for_frame(static_data, frame_data):
             ))
 
     return fig
+# --- ^^^ MODIFICATIONS ABOVE ^^^ ---
 
-# --- MODIFIED create_rich_status_message (to return loggable data) ---
-def create_rich_status_message(robot_data, sim_time, all_packages, open_message_ids, selected_robot_hmm_array, selected_robot_rmm_array, scenario_id):
-    if open_message_ids is None:
-        open_message_ids = []
+
+# --- MODIFIED: Renamed to create_rich_status_message_data ---
+# --- This function now returns a DATA DICT, not a component ---
+def create_rich_status_message_data(robot_data, sim_time, all_packages, selected_robot_hmm_array, selected_robot_rmm_array, scenario_id):
     time_str = datetime.now().strftime('%I:%M:%S %p')
     robot_id = robot_data.get('id', 'N/A')
     x, y = float(robot_data.get('x', 0)), float(robot_data.get('y', 0))
@@ -443,31 +497,68 @@ def create_rich_status_message(robot_data, sim_time, all_packages, open_message_
     elif state == 'waiting':
         status_key = 'stationary'
         details_msg = f"Robot is awaiting task at Position (X{x:.0f}, Y{y:.0f}). {combined_info}".strip()
+    # --- MODIFICATION: Handle 'all_tasks_complete' state text ---
+    elif state == 'all_tasks_complete':
+        status_key = 'on_track' # Use 'on_track' style (green)
+        details_msg = f"All tasks complete. Robot is at Position (X{x:.0f}, Y{y:.0f}). {feature_text}".strip()
+    # --- END MODIFICATION ---
     else:
         status_key = 'stationary'
         details_msg = f"Robot in unknown state '{state}' at Position (X{x:.0f}, Y{y:.0f}). {combined_info}".strip()
 
     status_info = status_map[status_key]
-    component_class = f"message-container-details {status_info['class_suffix']}"
+    
+    # --- MODIFICATION: Handle 'all_tasks_complete' icon/text ---
+    final_status_text = status_info['text']
+    final_status_icon = status_info['icon']
+    if state == 'all_tasks_complete':
+        final_status_text = 'TASKS COMPLETE'
+        final_status_icon = '🎉' # Or '🏁' or '✅'
+    # --- END MODIFICATION ---
 
+    # --- RETURN DATA, NOT COMPONENT ---
+    return {
+        'message_id': message_id,
+        'robot_id_title': robot_id.title(),
+        'status_icon': final_status_icon, # <-- Use final icon
+        'status_text': final_status_text, # <-- Use final text
+        'status_class_suffix': status_info['class_suffix'],
+        'time_str': time_str,
+        'details_msg': details_msg
+    }, status_key, details_msg # <-- RETURN LOGGABLE DATA + RENDER DATA
+# --- END MODIFICATION ---
+
+# --- NEW: Function to render a message component from data ---
+def render_message_component(message_data, open_message_ids, is_new=False):
+    """
+    Takes a message_data dict and renders the html.Details component.
+    Applies 'new-message' class only if is_new is True.
+    Sets 'open' state based on open_message_ids.
+    """
+    message_id = message_data['message_id']
+    component_class = f"message-container-details {message_data['status_class_suffix']}"
+    if is_new:
+        component_class += " new-message"
+        
     summary = html.Summary(
         html.Div([
-            html.Span(status_info['icon'], style={'marginRight': '10px', 'fontSize': '1.5em'}),
-            html.Strong(f"{robot_id.title()}: {status_info['text']}")
+            html.Span(message_data['status_icon'], style={'marginRight': '10px', 'fontSize': '1.5em'}),
+            html.Strong(f"{message_data['robot_id_title']}: {message_data['status_text']}")
         ], style={'display': 'flex', 'alignItems': 'center', 'fontSize': '1.2em'})
     )
 
     details_content = html.Div([
-        html.P(time_str, style={'fontSize': '0.9em', 'color': '#555', 'margin': '10px 0 5px 0'}),
-        html.P(details_msg, style={'fontSize': '1.1em', 'margin': '5px 0 0 0'})
+        html.P(message_data['time_str'], style={'fontSize': '0.9em', 'color': '#555', 'margin': '10px 0 5px 0'}),
+        html.P(message_data['details_msg'], style={'fontSize': '1.1em', 'margin': '5px 0 0 0'})
     ], style={'paddingLeft': '45px', 'paddingTop': '10px'})
 
     return html.Details([summary, details_content],
                        className=component_class,
                        id={'type': 'status-message', 'id': message_id},
                        open=(message_id in open_message_ids),
-                       ), status_key, details_msg # <-- RETURN LOGGABLE DATA
-# --- END MODIFICATION ---
+                       )
+# --- END NEW FUNCTION ---
+
 
 # --- App Initialization ---
 app = dash.Dash(__name__, update_title=None, suppress_callback_exceptions=True)
@@ -704,6 +795,7 @@ app.layout = html.Div([
     dcc.Store(id='message-timestamps-store', data={}),
     
     # --- STORES FOR TEXT UI (to fix animation bug) ---
+    # --- These will now store DATA (dicts), not COMPONENTS ---
     dcc.Store(id='robot-1-messages-store', data=[]),
     dcc.Store(id='robot-2-messages-store', data=[]),
     dcc.Store(id='robot-3-messages-store', data=[]),
@@ -779,20 +871,22 @@ app.clientside_callback(
 )
 # --- END MODIFICATION ---
 
-
-# --- MODIFIED Server callback (logs only "open" events as a counter) ---
+# --- MODIFIED Server callback (logs ONLY FIRST click AND updates open-messages-store) ---
 @app.callback(
     Output('interaction-log-store', 'data', allow_duplicate=True),
     Output('all-message-logs-store', 'data', allow_duplicate=True),
+    Output('open-messages-store', 'data', allow_duplicate=True), # <-- ADDED OUTPUT
     Input('message-click-relay', 'children'),
     State('interaction-log-store', 'data'),
-    State('all-message-logs-store', 'data'), 
+    State('all-message-logs-store', 'data'),
+    State('open-messages-store', 'data'), # <-- ADDED STATE
     State('participant-store', 'data'),
     State('study-state-store', 'data'),
     State('current-frame-store', 'data'),
     prevent_initial_call=True
 )
 def log_message_clicks(click_data_json_array, interactions, all_message_logs, 
+                             open_message_ids, # <-- ADDED STATE
                              participant_data, study_state, frame_idx):
     
     if not click_data_json_array or not all([participant_data, study_state, all_message_logs]):
@@ -800,6 +894,7 @@ def log_message_clicks(click_data_json_array, interactions, all_message_logs,
     
     new_interactions = interactions.copy() if interactions is not None else []
     new_all_message_logs = all_message_logs.copy()
+    new_open_message_ids = set(open_message_ids.copy() if open_message_ids is not None else []) # <-- Use a set
     
     try:
         click_data_list = json.loads(click_data_json_array)
@@ -807,62 +902,69 @@ def log_message_clicks(click_data_json_array, interactions, all_message_logs,
         for click_data in click_data_list:
             click_info = json.loads(click_data)
             is_open = click_info.get('isOpen', False)
+            message_id = click_info.get('messageId', '')
             
-            # --- THIS IS THE FIX: Only log "open" events ---
+            # --- 1. Manage UI open/closed state ---
             if is_open:
-                message_id = click_info.get('messageId', '')
-                click_time_unix = click_info.get('timestamp', time.time() * 1000) / 1000.0
-                click_time_iso = datetime.fromtimestamp(click_time_unix).isoformat()
-                action = "opened"
-            
-                # --- 1. Update the comprehensive message log ---
+                new_open_message_ids.add(message_id) # Add to set if opened
+            else:
+                new_open_message_ids.discard(message_id) # Remove from set if closed
+            # --- END UI LOGIC ---
+
+            # --- 2. Log data ONLY on the first "open" event ---
+            if is_open:
                 message_found = False
                 for entry in new_all_message_logs:
                     if entry['message_id'] == message_id:
                         message_found = True
                         
-                        # Check if this is the very first click
+                        # --- MODIFIED LOGIC ---
+                        # Only log if this is the VERY first click (clicked == 0)
                         if entry['clicked'] == 0:
+                            
+                            click_time_unix = click_info.get('timestamp', time.time() * 1000) / 1000.0
+                            click_time_iso = datetime.fromtimestamp(click_time_unix).isoformat()
+                            action = "opened"
+                            
+                            # --- 2a. Update the message log entry (all at once) ---
                             entry['click_timestamp_unix'] = click_time_unix
                             entry['click_timestamp_iso'] = click_time_iso
                             entry['time_to_click_seconds'] = click_time_unix - entry['appear_timestamp_unix']
+                            entry['clicked'] = 1 # Set to 1, don't increment
                         
-                        # Increment the click counter for EVERY "open" action
-                        entry['clicked'] += 1
+                            # --- 2b. Log to the simple interaction log (ONLY ONCE) ---
+                            current_run_idx = study_state.get('current_run_idx', 0)
+                            current_run_info = participant_data['track'][current_run_idx]
+                            scenario_num = current_run_info[0]
+                            condition_idx = current_run_info[1]
+                            
+                            interaction_entry = {
+                                'timestamp_iso': click_time_iso,
+                                'timestamp_unix': click_time_unix,
+                                'participant': participant_data.get('id'),
+                                'scenario': scenario_num,
+                                'condition': condition_idx,
+                                'frame': frame_idx,
+                                'type': 'message_click',
+                                'message_id': message_id,
+                                'action': action,
+                            }
+                            new_interactions.append(interaction_entry)
                         
+                        # If entry['clicked'] was already 1, we do nothing.
+                        # --- END MODIFIED LOGIC ---
                         break
                 
                 if not message_found:
                     print(f"Warning: 'Open' click logged for message_id '{message_id}' but not found in all_message_logs_store.")
-
-                # --- 2. Log to the simple interaction log ---
-                current_run_idx = study_state.get('current_run_idx', 0)
-                current_run_info = participant_data['track'][current_run_idx]
-                scenario_num = current_run_info[0]
-                condition_idx = current_run_info[1]
-                
-                interaction_entry = {
-                    'timestamp_iso': click_time_iso,
-                    'timestamp_unix': click_time_unix,
-                    'participant': participant_data.get('id'),
-                    'scenario': scenario_num,
-                    'condition': condition_idx,
-                    'frame': frame_idx,
-                    'type': 'message_click',
-                    'message_id': message_id,
-                    'action': action, # Will always be "opened"
-                }
-                
-                new_interactions.append(interaction_entry)
             
-            # --- "close" events (is_open=False) are now completely ignored ---
+            # --- "close" events (is_open=False) are now handled by the UI set, but not logged ---
         
     except Exception as e:
         print(f"Error logging message click: {e} | Click Data: {click_data_json_array}")
     
-    return new_interactions, new_all_message_logs
+    return new_interactions, new_all_message_logs, list(new_open_message_ids) # <-- RETURN LIST
 # --- END MODIFICATION ---
-
 # --- Callbacks ---
 
 # start_study is UNCHANGED
@@ -1089,13 +1191,14 @@ def programmatically_switch_view(study_state, participant_data):
     header_text = f"Run: {current_run_idx + 1} / {len(participant_data['track'])} | Scenario: {scenario_num} | View: {view_name} | Framework: {framework_name}"
     return map_style, text_style, header_text
 
-# --- MODIFIED update_simulation_views (to use stores for Text UI) ---
+# --- *** MAJOR MODIFICATION: update_simulation_views *** ---
+# --- This callback now saves DATA to stores, not components ---
 @app.callback(
     Output('simulation-graph', 'figure'),
     # --- MODIFIED: Outputs are to stores, not UI ---
-    Output('robot-1-messages-store', 'data'),
-    Output('robot-2-messages-store', 'data'),
-    Output('robot-3-messages-store', 'data'),
+    Output('robot-1-messages-store', 'data', allow_duplicate=True),
+    Output('robot-2-messages-store', 'data', allow_duplicate=True),
+    Output('robot-3-messages-store', 'data', allow_duplicate=True),
     Output('robot-1-timeline', 'value'),
     Output('robot-2-timeline', 'value'),
     Output('robot-3-timeline', 'value'),
@@ -1103,15 +1206,15 @@ def programmatically_switch_view(study_state, participant_data):
     Output('all-messages-feed', 'children'),
     Output('all-messages-store', 'data', allow_duplicate=True),
     Output('animation-interval', 'interval'),
-    Output('open-messages-store', 'data'),
-    Output('message-timestamps-store', 'data'),
+    Output('open-messages-store', 'data', allow_duplicate=True),
+    Output('message-timestamps-store', 'data', allow_duplicate=True),
     Output('all-message-logs-store', 'data', allow_duplicate=True),
     Input('current-frame-store', 'data'),
     Input('study-state-store', 'data'),
     State('scenario-data-store', 'data'),
     State('hmm-data-store', 'data'),
     State('participant-store', 'data'),
-    # --- MODIFIED STATE: Use stores for Text UI history ---
+    # --- MODIFIED STATE: Use stores for Text UI history DATA ---
     [State(f'robot-{i}-messages-store', 'data') for i in range(1, 4)],
     State('open-messages-store', 'data'),
     State('all-messages-store', 'data'),
@@ -1128,7 +1231,8 @@ def update_simulation_views(frame_idx, study_state,
         # --- MODIFIED: Return 14 no_updates ---
         return (no_update,) * 14
     
-    new_open_message_ids = set(open_message_ids) if open_message_ids else set()
+    # --- Use list(set()) to ensure open_message_ids is a list of uniques ---
+    current_open_message_ids = list(set(open_message_ids)) if open_message_ids else []
     new_message_timestamps = message_timestamps.copy() if message_timestamps else {}
     new_all_message_logs = all_message_logs.copy() if all_message_logs else []
     
@@ -1158,7 +1262,7 @@ def update_simulation_views(frame_idx, study_state,
             hmm_data,
             all_messages_history or [], all_messages_history or [],
             UPDATE_INTERVAL_MS,
-            list(new_open_message_ids),
+            current_open_message_ids,
             new_message_timestamps,
             new_all_message_logs
         )
@@ -1173,8 +1277,9 @@ def update_simulation_views(frame_idx, study_state,
     
     
     
-    # --- MODIFIED: hist1, hist2, hist3 now come from stores ---
+    # --- MODIFIED: hist1, hist2, hist3 now come from stores (and contain DATA, not components) ---
     histories = [hist1, hist2, hist3]
+    # This will hold the new DATA lists for the stores
     new_robot_message_outputs = [histories[0] or [], histories[1] or [], histories[2] or []]
     sim_time = current_frame_data.get('simulator time', 0)
     any_sync_occurred = False
@@ -1218,18 +1323,18 @@ def update_simulation_views(frame_idx, study_state,
                 if sync_occurred:
                     any_sync_occurred = True
                     
-                    new_message_div, message_type, message_text = create_rich_status_message(
+                    # --- MODIFIED: Call new data function ---
+                    new_message_data, message_type, message_text = create_rich_status_message_data(
                         robot_info,
                         sim_time,
                         packages,
-                        list(new_open_message_ids),
                         selected_robot_hmm_array,
                         selected_robot_rmm_array,
                         scenario_num
                     )
                     
                     is_new_message = False
-                    msg_id = new_message_div.id['id']
+                    msg_id = new_message_data['message_id'] # <-- Get ID from data
                     
                     if msg_id not in new_message_timestamps:
                         appear_time = time.time()
@@ -1253,19 +1358,29 @@ def update_simulation_views(frame_idx, study_state,
                         )
                         new_all_message_logs.append(log_entry)
                     
-                    if is_new_message:
-                        current_class = new_message_div.className or ""
-                        new_message_div.className = current_class + " new-message"
+                    # --- Create the component for the Map UI (which needs 'new-message') ---
+                    new_message_div = render_message_component(
+                        new_message_data,
+                        current_open_message_ids,
+                        is_new=is_new_message # <-- Pass blink status
+                    )
                     
                     newly_generated_messages_for_feed.append(new_message_div)
                     
-                    updated_history = [new_message_div]
-                    # --- MODIFIED: Get history from store-fed var ---
-                    current_hist = histories[i-1] if isinstance(histories[i-1], list) else ([histories[i-1]] if histories[i-1] else [])
-                    if current_hist:
-                        updated_history.append(html.P("--- previous updates ---", className="divider"))
-                        updated_history.extend(current_hist)
-                    new_robot_message_outputs[i-1] = updated_history
+                    # --- MODIFIED: Update the Text UI *store* with *data*, not components ---
+                    
+                    # 1. Start new history with new *data*
+                    updated_history_data = [new_message_data]
+                    
+                    # 2. Get old history *data* from store
+                    current_hist_data = histories[i-1] if isinstance(histories[i-1], list) else ([histories[i-1]] if histories[i-1] else [])
+                    
+                    # 3. Extend
+                    updated_history_data.extend(current_hist_data)
+                    
+                    # 4. Set output to store
+                    new_robot_message_outputs[i-1] = updated_history_data
+                    # --- END TEXT UI STORE MODIFICATION ---
     
     updated_all_messages = newly_generated_messages_for_feed + (all_messages_history or [])
     updated_all_messages = updated_all_messages[:100]
@@ -1274,7 +1389,7 @@ def update_simulation_views(frame_idx, study_state,
     
     return (
         fig,
-        # --- MODIFIED: Return new history to stores ---
+        # --- MODIFIED: Return new *data* history to stores ---
         new_robot_message_outputs[0],
         new_robot_message_outputs[1],
         new_robot_message_outputs[2],
@@ -1282,34 +1397,83 @@ def update_simulation_views(frame_idx, study_state,
         current_hmms,
         updated_all_messages, updated_all_messages,
         new_interval,
-        list(new_open_message_ids),
+        current_open_message_ids, # Pass back the same list
         new_message_timestamps,
         new_all_message_logs
     )
 # --- END MODIFICATION ---
 
-# --- NEW: Callbacks to link stores to Text UI (fixes animation bug) ---
+# --- *** NEW/MODIFIED: Callbacks to link stores to Text UI *** ---
+# --- These callbacks now RENDER components from DATA ---
 @app.callback(
     Output('robot-1-messages', 'children'),
-    Input('robot-1-messages-store', 'data')
+    Input('robot-1-messages-store', 'data'),
+    State('open-messages-store', 'data') # <-- ADD STATE
 )
-def update_robot_1_ui(data):
-    return data
+def update_robot_1_ui(message_data_list, open_message_ids):
+    if not message_data_list:
+        return []
+    if open_message_ids is None:
+        open_message_ids = []
+        
+    children = []
+    # Render the first (newest) message with is_new=True
+    children.append(render_message_component(message_data_list[0], open_message_ids, is_new=True))
+    
+    # Render the rest of the messages
+    if len(message_data_list) > 1:
+        children.append(html.P("--- previous updates ---", className="divider"))
+        for msg_data in message_data_list[1:]:
+            children.append(render_message_component(msg_data, open_message_ids, is_new=False))
+            
+    return children
 
 @app.callback(
     Output('robot-2-messages', 'children'),
-    Input('robot-2-messages-store', 'data')
+    Input('robot-2-messages-store', 'data'),
+    State('open-messages-store', 'data')
 )
-def update_robot_2_ui(data):
-    return data
+def update_robot_2_ui(message_data_list, open_message_ids):
+    if not message_data_list:
+        return []
+    if open_message_ids is None:
+        open_message_ids = []
+        
+    children = []
+    # Render the first (newest) message with is_new=True
+    children.append(render_message_component(message_data_list[0], open_message_ids, is_new=True))
+    
+    # Render the rest of the messages
+    if len(message_data_list) > 1:
+        children.append(html.P("--- previous updates ---", className="divider"))
+        for msg_data in message_data_list[1:]:
+            children.append(render_message_component(msg_data, open_message_ids, is_new=False))
+            
+    return children
 
 @app.callback(
     Output('robot-3-messages', 'children'),
-    Input('robot-3-messages-store', 'data')
+    Input('robot-3-messages-store', 'data'),
+    State('open-messages-store', 'data')
 )
-def update_robot_3_ui(data):
-    return data
-# --- END NEW CALLBACKS ---
+def update_robot_3_ui(message_data_list, open_message_ids):
+    if not message_data_list:
+        return []
+    if open_message_ids is None:
+        open_message_ids = []
+        
+    children = []
+    # Render the first (newest) message with is_new=True
+    children.append(render_message_component(message_data_list[0], open_message_ids, is_new=True))
+    
+    # Render the rest of the messages
+    if len(message_data_list) > 1:
+        children.append(html.P("--- previous updates ---", className="divider"))
+        for msg_data in message_data_list[1:]:
+            children.append(render_message_component(msg_data, open_message_ids, is_new=False))
+            
+    return children
+# --- END NEW/MODIFIED CALLBACKS ---
 
 # update_snapshot is UNCHANGED
 @app.callback(
@@ -1612,4 +1776,4 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
     # --- END MODIFICATION ---
     
     # Use debug=False for actual study deployment
-    app.run(debug=False, host='0.0.0.0', port=9964)
+    app.run(debug=False, host='0.0.0.0', port=9244)

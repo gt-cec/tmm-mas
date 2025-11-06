@@ -1,0 +1,9 @@
+message_id,participant_id,scenario,condition,run_number,frame,sim_time,robot_id,robot_state,robot_x,robot_y,message_type,message_text,appear_timestamp_iso,clicked,click_timestamp_iso,time_to_click_seconds
+robot1-5.13,P20251106000706_0e7815,1,0,1,0,5.127362251281738,robot1,moving,9,10,on_track,"Moving to acquire package at Position (X9, Y10).",2025-11-06T00:07:07.991492,0,,
+robot2-5.13,P20251106000706_0e7815,1,0,1,0,5.127362251281738,robot2,moving,11,10,on_track,"Moving to acquire package at Position (X11, Y10).",2025-11-06T00:07:07.991712,1,2025-11-06T00:07:10.295000,2.303287982940674
+robot3-5.13,P20251106000706_0e7815,1,0,1,0,5.127362251281738,robot3,moving,10,10,on_track,"Moving to acquire package at Position (X10, Y10).",2025-11-06T00:07:07.991946,1,2025-11-06T00:07:13.203000,5.211054086685181
+robot3-25.13,P20251106000706_0e7815,1,0,1,4,25.12954092025757,robot3,moving,12.548828125,12.409693644261546,on_track,"Moving to acquire package at Position (X13, Y12).",2025-11-06T00:07:15.576705,0,,
+robot1-30.13,P20251106000706_0e7815,1,0,1,5,30.12946343421936,robot1,moving,7.265625,6.090534979423868,on_track,"Moving to acquire package at Position (X7, Y6).",2025-11-06T00:07:18.220844,0,,
+robot2-30.13,P20251106000706_0e7815,1,0,1,5,30.12946343421936,robot2,moving,9.921875,14.10150891632373,on_track,"Moving to acquire package at Position (X10, Y14).",2025-11-06T00:07:18.221159,0,,
+robot3-32.68,P20251106000706_0e7815,1,0,1,6,32.675299644470215,robot3,moving,14.7265625,15.336076817558297,replan,"Route recalculated. Current Position (X15, Y15). Robot is 18 seconds behind of schedule.",2025-11-06T00:07:20.035891,1,2025-11-06T00:07:19.961000,-0.0748906135559082
+robot2-37.17,P20251106000706_0e7815,1,0,1,10,37.17093300819397,robot2,moving,9,19,on_track,"Moving to acquire package at Position (X9, Y19).",2025-11-06T00:07:24.975452,0,,

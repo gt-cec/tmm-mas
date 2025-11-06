@@ -1,3 +1,5 @@
+
+
 import dash
 from dash import dcc, html, Input, Output, State, callback_context, no_update
 from dash.dependencies import ALL
@@ -11,6 +13,24 @@ import csv
 from dash.exceptions import PreventUpdate
 import time # Import time for interaction timing
 from filelock import FileLock # <-- ADDED FOR SEQUENTIAL ASSIGNMENT
+
+# Assuming backend_operations.py exists in the same directory
+try:
+    from backend_operations import dynamic_deviation_threshold_multi_logic
+except ImportError:
+    print("FATAL ERROR: backend_operations.py not found.")
+    print("Please make sure this file is in the same directory as the app.")
+    def dynamic_deviation_threshold_multi_logic(**kwargs):
+        print("Warning: Using dummy backend function.")
+        hmm_array = kwargs.get('hmm_array', {})
+        rmm_array = kwargs.get('rmm_array', {}) # Get RMM too
+        # Simple dummy logic: Sync if replan flag is true
+        sync_occurred = rmm_array.get('Replan_flag', False)
+        # Return the RMM on sync, HMM otherwise, consistent with real logic
+        return rmm_array if sync_occurred else hmm_array, sync_occurred
+    
+    
+    
 
 # Assuming backend_operations.py exists in the same directory
 try:
@@ -96,6 +116,187 @@ STUDY_DESIGN_TABLE = [
     [(5, 3), (6, 2), (3, 1), (4, 0)],  # C23: Seq3 - Textual+N, Textual+F, Map+N, Map+F
     [(5, 2), (6, 1), (3, 0), (4, 3)]   # C24: Seq4 - Textual+F, Map+N, Map+F, Textual+N
 ]
+
+
+# --- NEW: SCENARIO CONTENT (BRIEFINGS AND QUESTIONS) ---
+SCENARIO_CONTENT = {
+    1: {
+        "briefing": """In this mission, three robots are working together to collect packages distributed throughout the environment and deliver them to two designated drop-off points. 
+
+Robot 1 is responsible for the southwest (SW) region. 
+Robot 2 is responsible for the northwest (NW) region. 
+Robot 3 acts as a support and exploration unit, assisting with package drop-offs and searching for the unassigned quadrants to locate any remaining packages. 
+
+Robots 1 and 2 begin the mission with knowledge of four package locations within their respective regions. These are represented on the map as a yellow square. Robots will also discover packages along their journey. These are represented by green triangles. Robots will add these packages to their workload or the workload of one another as they are discovered. Robot 3 will adapt to assist where needed.""",
+        "questions": [
+            {
+                "text": "Has more than one package been discovered?",
+                "options": ["Yes", "No"]
+            },
+            {
+                "text": "Which quadrant has most packages been discovered?",
+                "options": ["SE", "SW", "NE", "NW"]
+            },
+            {
+                "text": "Which containment zone will robot 3 deliver its package to?",
+                "options": [
+                    "a. Robot 3 will leave the SW quadrant and deliver its package in the NW",
+                    "b. Robot 3 will remain in the SW quadrant and deliver its package in the SW",
+                    "c. Robot 3 will go to the NE quadrant and deliver its package in the NW",
+                    "d. Robot 3 will leave the SW quadrant and deliver its package in the SE"
+                ]
+            }
+        ]
+    },
+    2: {
+        "briefing": """In this mission, three robots are working together to collect packages distributed throughout the environment and deliver them to two designated drop-off points. 
+
+Robot 1 is responsible for the southwest (SW) region. 
+Robot 2 is responsible for the northwest (NW) region. 
+Robot 3 acts as a support and exploration unit, assisting with package drop-offs and searching for the unassigned quadrants to locate any remaining packages. 
+
+Robots 1 and 2 begin the mission with knowledge of four package locations within their respective regions. These are represented on the map as a yellow square. Robots will also discover packages along their journey. These are represented by green triangles. Robots will add these packages to their workload or the workload of one another as they are discovered. Robot 3 will adapt to assist where needed.""",
+        "questions": [
+            {
+                "text": "Which robot(s) are currently navigating around an obstacle?",
+                "options": ["Robot 1", "Robot 2", "Robot 3", "None"]
+            },
+            {
+                "text": "What obstacle is Robot 3 facing?",
+                "options": [
+                    "Robot 3 is communicating to a different robot",
+                    "Robot 3 is stuck in rough terrain",
+                    "Robot 3 is recharging",
+                    "Robot 3 is encountering bad weather"
+                ]
+            },
+            {
+                "text": "Which robot do you expect will finish its task last?",
+                "options": ["Robot 1", "Robot 2", "Robot 3"]
+            }
+        ]
+    },
+    3: {
+        "briefing": """In this mission, three robots are working together to collect packages distributed throughout the environment and deliver them to two designated drop-off points. 
+
+Robot 1 is responsible for the northwest (NW) region. 
+Robot 2 is responsible for the southeast (SE) region. 
+Robot 3 acts as a support and exploration unit, assisting with package drop-offs and searching for the unassigned quadrants to locate any remaining packages. 
+
+Robots 1 and 2 begin the mission with knowledge of four package locations within their respective regions. These are represented on the map as a yellow square. Robots will also discover packages along their journey. These are represented by green triangles. Robots will add these packages to their workload or the workload of one another as they are discovered. Robot 3 will adapt to assist where needed.""",
+        "questions": [
+            {
+                "text": "What is the status of Robot 2?",
+                "options": ["Replanning due to bad weather", "Replanning due to rough terrain", "Recharging", "On track"]
+            },
+            {
+                "text": "What are the implications of robot 2 being caught in a bad weather system?",
+                "options": [
+                    "Robot 2 will have to send its assignment to a different robot",
+                    "Robot 2’s delivery will not be impacted",
+                    "Robot 2 will desert its mission entirely",
+                    "Robot 2 will have to replan its route"
+                ]
+            },
+            {
+                "text": "Which robot is likely to deliver a package next?",
+                "options": ["Robot 1", "Robot 2", "Robot 3", "Robot 2 and 3 simultaneously"]
+            }
+        ]
+    },
+    4: {
+        "briefing": """In this mission, three robots are working together to collect packages distributed throughout the environment and deliver them to two designated drop-off points. 
+
+Robot 1 is responsible for the northwest (NW) region. 
+Robot 2 is responsible for the southeast (SE) region. 
+Robot 3 acts as a support and exploration unit, assisting with package drop-offs and searching for the unassigned quadrants to locate any remaining packages. 
+
+Robots 1 and 2 begin the mission with knowledge of four package locations within their respective regions. These are represented on the map as a yellow square. Robots will also discover packages along their journey. These are represented by green triangles. Robots will add these packages to their workload or the workload of one another as they are discovered. Robot 3 will adapt to assist where needed.""",
+        "questions": [
+            {
+                "text": "Which quadrant is Robot 3 in?",
+                "options": ["SE", "NE", "NW", "SW"]
+            },
+            {
+                "text": "Why is Robot 3 in the NW quadrant?",
+                "options": [
+                    "Robot 3 discovered a package in the NE and is delivering it to the NW",
+                    "Robot 3 was assigned a package in the NW and is delivering it",
+                    "Robot 1 requested Robot 3 to pick-up a package in the NW region",
+                    "Robot 2 requested Robot 3 to pick-up a package in the NW region"
+                ]
+            },
+            {
+                "text": "Which containment zone will robot 3 end its mission?",
+                "options": ["SE", "SW", "NE", "NW"]
+            }
+        ]
+    },
+    5: {
+        "briefing": """In this mission, three robots are working together to collect packages distributed throughout the environment and deliver them to two designated drop-off points. 
+
+Robot 1 is responsible for the northeast (NE) region. 
+Robot 2 is responsible for the southwest (SW) region. 
+Robot 3 acts as a support and exploration unit, assisting with package drop-offs and searching for the unassigned quadrants to locate any remaining packages. 
+
+Robots 1 and 2 begin the mission with knowledge of four package locations within their respective regions. These are represented on the map as a yellow square. Robots will also discover packages along their journey. These are represented by green triangles. Robots will add these packages to their workload or the workload of one another as they are discovered. Robot 3 will adapt to assist where needed.""",
+        "questions": [
+            {
+                "text": "What is the status of robot 2?",
+                "options": ["Just picked up a package", "Just delivered a package", "Robot 2 is recharging", "Robot 2 is replanning"]
+            },
+            {
+                "text": "Given that robot 2 just delivered a package, what comes next?",
+                "options": [
+                    "Robot 2 will head towards a different package in the NW quadrant",
+                    "Robot 2 will assist Robot 2 in the NW quadrant",
+                    "Robot 2 will head towards a different package in the SW quadrant",
+                    "Robot 2 will assist Robot 3 in the NE quadrant",
+                    "Robot 2 will search the NE and SE quadrants for remaining packages"
+                ]
+            },
+            {
+                "text": "Which robot is likely to finish its mission next?",
+                "options": ["Robot 1", "Robot 2", "Robot 3", "Robot 1 and 2 simultaneously", "Robot 3 and 2 simultaneously"]
+            }
+        ]
+    },
+    6: {
+        "briefing": """In this mission, three robots are working together to collect packages distributed throughout the environment and deliver them to two designated drop-off points. 
+
+Robot 1 is responsible for the northeast (NE) region. 
+Robot 2 is responsible for the southwest (SW) region. 
+Robot 3 acts as a support and exploration unit, assisting with package drop-offs and searching for the unassigned quadrants to locate any remaining packages. 
+
+Robots 1 and 2 begin the mission with knowledge of four package locations within their respective regions. These are represented on the map as a yellow square. Robots will also discover packages along their journey. These are represented by green triangles. Robots will add these packages to their workload or the workload of one another as they are discovered. Robot 3 will adapt to assist where needed.""",
+        "questions": [
+            {
+                "text": "Which robot(s) are currently navigating around an obstacle?",
+                "options": ["Robot 1", "Robot 2", "Robot 3", "No robots are encountering an obstacle"]
+            },
+            {
+                "text": "What type of obstacle(s) are robot 2 and robot 3 experiencing?",
+                "options": [
+                    "Both robots are experiencing poor weather",
+                    "Both robots are experiencing rough terrain",
+                    "Robot 2 is experiencing poor weather, Robot 3 is experiencing rough terrain",
+                    "Robot 2 is experiencing rough terrain, Robot 3 is experiencing poor weather" # Assuming this was the intended non-duplicate
+                ]
+            },
+            {
+                "text": "What is robot 3 going to do now that it has cleared both the NE and SE quadrants and dropped off any discovered packages?",
+                "options": [
+                    "Robot 3 will end its mission",
+                    "Robot 3 will assist Robot 2 in the SE",
+                    "Robot 3 will assist Robot 1 in the NW",
+                    "Robot 3 will recharge"
+                ]
+            }
+        ]
+    }
+}
+# --- END NEW CONTENT ---
+
 
 # --- ADDED HELPER FUNCTION ---
 def get_condition_names(condition_idx):
@@ -212,54 +413,104 @@ def generate_participant_id(name):
     name_hash = hashlib.md5(name.encode()).hexdigest()[:6]
     return f"P{timestamp}_{name_hash}"
 
+# --- MODIFIED: save_study_data ---
 def save_study_data(participant_data, responses, interactions):
+    """
+    Saves responses to JSON and master CSVs.
+    - Pause questions are saved to the JSON.
+    - Post-scenario 6 questions are saved to master_post_scenario_responses.csv.
+    - Final post-study questions are saved to the JSON.
+    - Interactions are saved to a separate JSON.
+    """
     os.makedirs('study_data', exist_ok=True)
     participant_id = participant_data['id']
+    
+    # Save all responses (pause, post-scenario, post-study) to one JSON file
     with open(f'study_data/{participant_id}_responses.json', 'w') as f:
         json.dump(responses, f, indent=2)
+        
+    # Save interactions log
     with open(f'study_data/{participant_id}_interactions.json', 'w') as f:
         json.dump(interactions if interactions is not None else [], f, indent=2)
-    csv_file = 'study_data/master_data.csv'
+    
+    # --- NEW CSV logic for POST-SCENARIO questions ---
+    csv_file = 'study_data/master_post_scenario_responses.csv'
     file_exists = os.path.isfile(csv_file)
+    
+    post_scenario_responses = [r for r in responses if r.get('type') == 'post_scenario']
+    
+    if not post_scenario_responses:
+        print("No post-scenario responses to save to CSV yet.")
+        return # Don't try to write an empty CSV
+
     with open(csv_file, 'a', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         if not file_exists:
             writer.writerow([
                 'ParticipantID', 'Name', 'ParticipantStartTime',
                 'RunNumber', 'Scenario', 'ConditionIndex', 
-                'ViewType', 'Framework', 'QuestionSet', 'SegmentStartTime', 'ResponseTimestamp',
-                'Q1_MentalDemand', 'Q2_PhysicalDemand', 'Q3_TemporalDemand', 'Q4_Performance',
-                'Q5_Effort', 'Q6_Frustration', 'Q7_SitAwareness', 'Q8_ReplanCount',
-                'Q9_CognitiveLoad', 'Q10_OpenResponse'
+                'ViewType', 'Framework', 'ResponseTimestamp',
+                'MentalDemand', 'PhysicalDemand', 'TemporalDemand', 'Performance',
+                'Effort', 'Frustration'
             ])
-        for resp in responses:
-            if resp.get('type') == 'post_study': continue
-            q_answers = resp.get('answers', [None]*10)
-            writer.writerow([
-                participant_id,
-                participant_data['name'],
-                participant_data['start_time'],
-                resp.get('run_number'),
-                resp.get('scenario'),
-                resp.get('condition'),
-                resp.get('view_type'),
-                resp.get('framework'),
-                resp.get('question_set'),
-                resp.get('segment_start_time'),
-                resp.get('timestamp'),
-                *q_answers
-            ])
+            
+        # Get the *last* post-scenario response to write
+        # (This function is called incrementally, so we just write the newest one)
+        resp = post_scenario_responses[-1]
+        q_answers = resp.get('answers', {})
+        
+        writer.writerow([
+            participant_id,
+            participant_data['name'],
+            participant_data['start_time'],
+            resp.get('run_number'),
+            resp.get('scenario'),
+            resp.get('condition'),
+            resp.get('view_type'),
+            resp.get('framework'),
+            resp.get('timestamp'),
+            q_answers.get('mental_demand'),
+            q_answers.get('physical_demand'),
+            q_answers.get('temporal_demand'),
+            q_answers.get('performance'),
+            q_answers.get('effort'),
+            q_answers.get('frustration'),
+        ])
+    print(f"Saved post-scenario response for run {resp.get('run_number')} to CSV.")
+# --- END MODIFICATION ---
+
 
 # --- Figure and Component Creation ---
-# create_figure_for_frame is UNCHANGED
+# --- vvv MODIFICATIONS BELOW vvv ---
 def create_figure_for_frame(static_data, frame_data):
     fig = go.Figure()
+
+    # Annotations for quadrants
     fig.update_layout(
         xaxis=dict(range=[0, GRID_WIDTH], autorange=True, showgrid=True, gridcolor='rgba(100,100,100,0.3)', zeroline=False, dtick=10),
         yaxis=dict(range=[0, GRID_HEIGHT], autorange=True, showgrid=True, gridcolor='rgba(100,100,100,0.3)', zeroline=False),
         plot_bgcolor='#ffffff', paper_bgcolor='#ffffff', font=dict(color='black'),
-        showlegend=False, margin=dict(l=0, r=0, t=0, b=0), uirevision='constant'
+        showlegend=False, margin=dict(l=0, r=0, t=0, b=0), uirevision='constant',
+        annotations=[
+            go.layout.Annotation(
+                x=2.5, y=17.5, text="NW", showarrow=False,
+                font=dict(size=24, color="rgba(0, 0, 0, 0.20)"),
+            ),
+            go.layout.Annotation(
+                x=17.5, y=17.5, text="NE", showarrow=False,
+                font=dict(size=24, color="rgba(0, 0, 0, 0.20)"),
+            ),
+            go.layout.Annotation(
+                x=2.5, y=2.5, text="SW", showarrow=False,
+                font=dict(size=24, color="rgba(0, 0, 0, 0.20)"),
+            ),
+            go.layout.Annotation(
+                x=17.5, y=2.5, text="SE", showarrow=False,
+                font=dict(size=24, color="rgba(0, 0, 0, 0.20)"),
+            )
+        ]
     )
+
     walls_data = frame_data.get('walls', []) if frame_data else static_data.get('walls', [])
     zones_data = frame_data.get('zones', []) if frame_data else static_data.get('zones', [])
     nodes_data = frame_data.get('nodes', []) if frame_data else static_data.get('nodes', [])
@@ -270,7 +521,7 @@ def create_figure_for_frame(static_data, frame_data):
         wall_x = [v for k, v in wall_coords if k.startswith('x')]
         wall_y = [v for k, v in wall_coords if k.startswith('y')]
         fig.add_trace(go.Scatter(x=wall_x, y=wall_y, mode='lines',
-                                line=dict(color='black', width=2), hoverinfo='none'))
+                                 line=dict(color='black', width=2), hoverinfo='none'))
 
     for zone in zones_data:
         color_str = zone.get('color', 'rgba(0,0,0,0)')
@@ -280,21 +531,23 @@ def create_figure_for_frame(static_data, frame_data):
         zone_x = [v for k, v in zone_coords if k.startswith('x')]
         zone_y = [v for k, v in zone_coords if k.startswith('y')]
         fig.add_trace(go.Scatter(x=zone_x, y=zone_y, fill="toself", fillcolor=color_str,
-                                line=dict(width=0), mode='lines', hoverinfo='none'))
+                                 line=dict(width=0), mode='lines', hoverinfo='none'))
 
     edge_x, edge_y = [], []
     for edge in edges_data:
-        edge_x.extend([edge['x0'], edge['x1'], None]); edge_y.extend([edge['y0'], edge['y1'], None])
+        edge_x.extend([edge['x0'], edge['x1'], None])
+        edge_y.extend([edge['y0'], edge['y1'], None])
 
     if nodes_data:
         node_x = [node[0] for node in nodes_data]
         node_y = [node[1] for node in nodes_data]
         fig.add_trace(go.Scatter(x=node_x, y=node_y, mode='markers',
-                                marker=dict(size=4, color='rgba(50, 50, 150, 0.8)'), hoverinfo='none'))
+                                 marker=dict(size=4, color='rgba(50, 50, 150, 0.8)'), hoverinfo='none'))
 
     if frame_data:
         robots = [{'id': rid, **rdata} for rid, rdata in frame_data.get('robots', {}).items()]
         packages = frame_data.get('packages', [])
+
         if robots:
             traces = {'x': [], 'y': [], 'colors': [], 'texts': [], 'hovers': []}
             for r in robots:
@@ -302,13 +555,23 @@ def create_figure_for_frame(static_data, frame_data):
                 traces['y'].append(r['y'])
                 traces['texts'].append(r['id'][-1])
                 traces['hovers'].append(f"{r['id']} State: {r['state']} Pos: ({r['x']:.1f}, {r['y']:.1f})")
-                traces['colors'].append({'moving': 'red', 'carrying': 'orange', 'waiting': 'blue'}.get(r['state'], 'grey'))
-            fig.add_trace(go.Scatter(x=traces['x'], y=traces['y'], mode='markers+text',
-                                    marker=dict(size=30, color=traces['colors'], line=dict(width=2, color='white')),
-                                    text=traces['texts'], textposition='middle center',
-                                    textfont=dict(color='white', size=12, family="Arial Black"),
-                                    hovertext=traces['hovers'], hoverinfo='text'))
 
+                r_state = r['state']
+                color_map = {
+                    'moving': 'red',
+                    'carrying': 'orange',
+                    'waiting': 'blue',
+                    'all_tasks_complete': 'green'
+                }
+                traces['colors'].append(color_map.get(r_state, 'grey'))
+
+            fig.add_trace(go.Scatter(x=traces['x'], y=traces['y'], mode='markers+text',
+                                     marker=dict(size=40, color=traces['colors'], line=dict(width=2, color='white')),
+                                     text=traces['texts'], textposition='middle center',
+                                     textfont=dict(color='white', size=12, family="Arial Black"),
+                                     hovertext=traces['hovers'], hoverinfo='text'))
+
+        # ===== FIXED PACKAGE RENDERING SECTION =====
         if packages:
             pkg_x = []
             pkg_y = []
@@ -316,27 +579,64 @@ def create_figure_for_frame(static_data, frame_data):
             pkg_hovers = []
             pkg_colors = []
             pkg_symbols = []
+
             robot_pos = {r['id']: (r['x'], r['y']) for r in robots}
+
+            # Track plotted coordinates to avoid duplicates
+            plotted_coords = set()
+
             for p in packages:
                 carried_by_robot = p.get('carried_by')
-                is_discovered = p.get('Discovered', 1) == 1
                 is_carried = carried_by_robot is not None and carried_by_robot != "Null"
-                px, py = robot_pos.get(carried_by_robot, (p.get('x', 0), p.get('y', 0)))
+                is_d_package = p['id'].startswith('d')
+
+                if is_d_package:
+                    # 'd' packages default to 0 (undiscovered) if 'Discovered' key is missing
+                    is_discovered = p.get('Discovered', 0) == 1
+                else:
+                    # 'p' packages are ALWAYS treated as discovered
+                    is_discovered = True
+
+                # Get position
+                if is_carried:
+                    px, py = robot_pos.get(carried_by_robot, (p.get('x', 0), p.get('y', 0)))
+                else:
+                    px, py = p.get('x', 0), p.get('y', 0)
+
+                # Create coordinate key for duplicate checking
+                coord_key = (round(px, 2), round(py, 2), is_carried)
+
+                # Skip if this coordinate already has a package plotted
+                if coord_key in plotted_coords:
+                    continue
+
+                plotted_coords.add(coord_key)
+
                 pkg_x.append(px)
                 pkg_y.append(py)
                 pkg_texts.append(p['id'][-1])
+
+                # Determine color and shape based on state
                 if is_carried:
                     pkg_colors.append('gold')
                     pkg_symbols.append('square')
                     pkg_hovers.append(f"Package {p['id']}, Carried by {carried_by_robot}")
-                elif is_discovered:
+                elif is_d_package:
+                    if is_discovered:
+                        # 'd' package that is now discovered
+                        pkg_colors.append('gold')  # yellow
+                        pkg_symbols.append('triangle-up')  # triangle
+                        pkg_hovers.append(f"Package {p['id']}, On Ground (Discovered 'd' package)")
+                    else:
+                        # 'd' package that is still undiscovered
+                        pkg_colors.append('lightgreen')  # green
+                        pkg_symbols.append('triangle-up')  # triangle
+                        pkg_hovers.append(f"Package {p['id']}, On Ground (Undiscovered 'd' package)")
+                else:  # 'p' package (always discovered)
                     pkg_colors.append('gold')
                     pkg_symbols.append('square')
-                    pkg_hovers.append(f"Package {p['id']}, On Ground (Discovered)")
-                else:
-                    pkg_colors.append('lightgreen')
-                    pkg_symbols.append('triangle-up')
-                    pkg_hovers.append(f"Package {p['id']}, On Ground (Undiscovered)")
+                    pkg_hovers.append(f"Package {p['id']}, On Ground (Pre-known 'p' package)")
+
             fig.add_trace(go.Scatter(
                 x=pkg_x,
                 y=pkg_y,
@@ -356,13 +656,13 @@ def create_figure_for_frame(static_data, frame_data):
 
     return fig
 
-# --- MODIFIED: Renamed to create_rich_status_message_data ---
-# --- This function now returns a DATA DICT, not a component ---
+# --- vvv MODIFICATIONS vvv ---
 def create_rich_status_message_data(robot_data, sim_time, all_packages, selected_robot_hmm_array, selected_robot_rmm_array, scenario_id):
     time_str = datetime.now().strftime('%I:%M:%S %p')
     robot_id = robot_data.get('id', 'N/A')
     x, y = float(robot_data.get('x', 0)), float(robot_data.get('y', 0))
     state = robot_data.get('state')
+    quadrant = robot_data.get('Quadrant', 'N/A') # <-- 1. GET QUADRANT
     message_id = f"{robot_id}-{sim_time:.2f}"
 
     status_map = {
@@ -379,22 +679,39 @@ def create_rich_status_message_data(robot_data, sim_time, all_packages, selected
     time_difference = (plan_index * time_per_step) - sim_time if plan_index > 0 else 0
 
     time_status_text = ""
-    if abs(time_difference) > 0.1:
+    # --- MODIFICATION: Changed threshold from 0.1 to 1.0 ---
+    if abs(time_difference) >= 1.0:
         time_status_text = f"Robot is {int(abs(time_difference))} seconds {'ahead' if time_difference > 0 else 'behind'} of schedule."
 
     feature_alerts = []
+    
+    # Weather Check
     hmm_weather = int(selected_robot_hmm_array.get('Current_weather', 1)) if selected_robot_hmm_array else 1
     rmm_weather = int(selected_robot_rmm_array.get('Current_weather', 1))
     if hmm_weather != rmm_weather:
         feature_alerts.append("Weather has turned bad." if rmm_weather == 0 else "Weather has improved.")
 
+    # --- 2. ADD BAD TERRAIN CHECK ---
+    hmm_terrain = int(selected_robot_hmm_array.get('Bad_Terrain', 1)) if selected_robot_hmm_array else 1
+    rmm_terrain = int(selected_robot_rmm_array.get('Bad_Terrain', 1))
+    if hmm_terrain != rmm_terrain:
+        if rmm_terrain == 0 and hmm_terrain == 1:
+            feature_alerts.append("Encountering rough terrain.")
+        elif rmm_terrain == 1 and hmm_terrain == 0:
+            feature_alerts.append("Terrain has cleared.")
+    # --- END TERRAIN CHECK ---
+
+    # --- 3. UPDATE BATTERY STATUS LOGIC ---
     hmm_battery = int(selected_robot_hmm_array.get('Battery_status', 1)) if selected_robot_hmm_array else 1
     rmm_battery = int(selected_robot_rmm_array.get('Battery_status', 1))
     if hmm_battery != rmm_battery:
-        if rmm_battery == 0: feature_alerts.append("Battery is low (<40%).")
-        elif rmm_battery == 2: feature_alerts.append("Battery is dead.")
-        elif rmm_battery == 1: feature_alerts.append("Battery is good (>40%).")
+        if rmm_battery == 0: 
+            feature_alerts.append("Battery is low/depleting.")
+        elif rmm_battery == 1: 
+            feature_alerts.append("Battery is good.")
+    # --- END BATTERY LOGIC ---
 
+    # Offline Check
     hmm_offline = int(selected_robot_hmm_array.get('Momentarily_offline', 0)) if selected_robot_hmm_array else 0
     rmm_offline = int(selected_robot_rmm_array.get('Momentarily_offline', 0))
     if hmm_offline != rmm_offline:
@@ -410,44 +727,114 @@ def create_rich_status_message_data(robot_data, sim_time, all_packages, selected
     if feature_text: time_and_features.append(feature_text)
     combined_info = " ".join(time_and_features).strip()
 
+    # --- MODIFICATION: details_msg is now a list of components ---
+    details_msg = []
+    
+    # --- 4. ADD QUADRANT TO ALL DETAIL MESSAGES ---
     if robot_data.get('replan_flag') == True:
         status_key = 'replan'
-        pkg_id_text = ""
+        pkg_id_text = []
         if state == 'carrying':
-            pkg_id = next((p['id'] for p in all_packages if p.get('carried_by') == robot_id), "N/A")
-            pkg_id_text = f" Carrying {pkg_id}."
-        details_msg = f"Route recalculated.{pkg_id_text} Current Position (X{x:.0f}, Y{y:.0f}). {combined_info}".strip()
+            pkg_id = next((p['id'] for p in all_packages if p.get('carried_by') == robot_id), None) 
+            if pkg_id: 
+                pkg_id_text = [" Carrying ", html.Strong(pkg_id), "."]
+        
+        details_msg = [
+            f"Route recalculated.",
+            *pkg_id_text,
+            f" Current Position is (X{x:.0f}, Y{y:.0f}) in the ",
+            html.Strong(quadrant),
+            " quadrant", # <-- ADDED
+            f". {combined_info}"
+        ]
     elif state == 'carrying':
         status_key = 'on_track'
         pkg_id = next((p['id'] for p in all_packages if p.get('carried_by') == robot_id), "N/A")
+        
+        # --- NEW: SKIP MESSAGE IF CARRYING N/A ---
+        if pkg_id == "N/A":
+            return None, None, None
+        # --- END NEW ---
+        
         plan = robot_data.get('plan', [])
         dest_x, dest_y = (plan[-1][0], plan[-1][1]) if plan else (x, y)
-        details_msg = f"Transporting {pkg_id} to Position (X{dest_x:.0f}, Y{dest_y:.0f}). Currently at Position (X{x:.0f}, Y{y:.0f}). {feature_text}".strip()
+        
+        details_msg = [
+            "Transporting ",
+            html.Strong(pkg_id),
+            f" to Position (X{dest_x:.0f}, Y{dest_y:.0f}). Currently at Position (X{x:.0f}, Y{y:.0f}) in the ",
+            html.Strong(quadrant),
+            " quadrant", # <-- ADDED
+            f". {feature_text}"
+        ]
     elif state == 'moving':
         status_key = 'on_track'
         pkg_id = robot_data.get('target_package_id', "package")
         goal_x, goal_y = robot_data.get('immediate_goal_x', x), robot_data.get('immediate_goal_y', y)
-        details_msg = f"Moving to acquire {pkg_id} at Position (X{goal_x:.0f}, Y{goal_y:.0f}). {feature_text}".strip()
+
+        # --- MODIFICATION: Condense message if at destination & fix "package package" ---
+        if round(x) == round(goal_x) and round(y) == round(goal_y):
+             details_msg = [
+                "Moving to acquire ", # <-- FIXED
+                pkg_id, # <-- FIXED (no strong)
+                f" at Position (X{goal_x:.0f}, Y{goal_y:.0f}) in the ",
+                html.Strong(quadrant),
+                " quadrant", # <-- ADDED
+                f". {feature_text}"
+            ]
+        else:
+            details_msg = [
+                "Moving to acquire ", # <-- FIXED
+                pkg_id, # <-- FIXED (no strong)
+                f" at Position (X{goal_x:.0f}, Y{goal_y:.0f}). Currently at Position (X{x:.0f}, Y{y:.0f}) in the ",
+                html.Strong(quadrant),
+                " quadrant", # <-- ADDED
+                f". {feature_text}"
+            ]
     elif state == 'waiting':
         status_key = 'stationary'
-        details_msg = f"Robot is awaiting task at Position (X{x:.0f}, Y{y:.0f}). {combined_info}".strip()
+        details_msg = [
+            f"Robot is awaiting task at Position (X{x:.0f}, Y{y:.0f}) in the ",
+            html.Strong(quadrant),
+            " quadrant", # <-- ADDED
+            f". {combined_info}"
+        ]
+    elif state == 'all_tasks_complete':
+        status_key = 'on_track' # Use 'on_track' style (green)
+        details_msg = [
+            f"All tasks complete. Robot is at Position (X{x:.0f}, Y{y:.0f}) in the ",
+            html.Strong(quadrant),
+            " quadrant", # <-- ADDED
+            f". {feature_text}"
+        ]
     else:
         status_key = 'stationary'
-        details_msg = f"Robot in unknown state '{state}' at Position (X{x:.0f}, Y{y:.0f}). {combined_info}".strip()
+        details_msg = [
+            f"Robot in unknown state '{state}' at Position (X{x:.0f}, Y{y:.0f}) in the ",
+            html.Strong(quadrant),
+            " quadrant", # <-- ADDED
+            f". {combined_info}"
+        ]
+    # --- END QUADRANT ADDITION ---
 
     status_info = status_map[status_key]
-
+    
+    final_status_text = status_info['text']
+    final_status_icon = status_info['icon']
+    if state == 'all_tasks_complete':
+        final_status_text = 'TASKS COMPLETE'
+        final_status_icon = '🎉' 
     # --- RETURN DATA, NOT COMPONENT ---
     return {
         'message_id': message_id,
         'robot_id_title': robot_id.title(),
-        'status_icon': status_info['icon'],
-        'status_text': status_info['text'],
+        'status_icon': final_status_icon,
+        'status_text': final_status_text,
         'status_class_suffix': status_info['class_suffix'],
         'time_str': time_str,
-        'details_msg': details_msg
-    }, status_key, details_msg # <-- RETURN LOGGABLE DATA + RENDER DATA
-# --- END MODIFICATION ---
+        'details_msg': details_msg  #<-- This is now a list
+    }, status_key, " ".join([str(item) for item in details_msg]) # <-- Log a flattened string
+# --- ^^^ END MODIFICATIONS ^^^ ---
 
 # --- NEW: Function to render a message component from data ---
 def render_message_component(message_data, open_message_ids, is_new=False):
@@ -465,14 +852,17 @@ def render_message_component(message_data, open_message_ids, is_new=False):
         html.Div([
             html.Span(message_data['status_icon'], style={'marginRight': '10px', 'fontSize': '1.5em'}),
             html.Strong(f"{message_data['robot_id_title']}: {message_data['status_text']}")
-        ], style={'display': 'flex', 'alignItems': 'center', 'fontSize': '1.2em'})
+        ], style={'display': 'flex', 'alignItems': 'center', 'fontSize': '1.2em', 'fontWeight': 'bold'}) #<-- Made 1.2em
     )
 
     details_content = html.Div([
         html.P(message_data['time_str'], style={'fontSize': '0.9em', 'color': '#555', 'margin': '10px 0 5px 0'}),
-        html.P(message_data['details_msg'], style={'fontSize': '1.1em', 'margin': '5px 0 0 0'})
+        html.P(message_data['details_msg'], style={'fontSize': '1.1em', 'margin': '5px 0 0 0'}) #<-- This now correctly handles the list
     ], style={'paddingLeft': '45px', 'paddingTop': '10px'})
 
+    # --- MODIFICATION: Use message_id_title for component ID ---
+    # This is safer in case of special characters, though message_id should be fine.
+    # Using the original message_id as the pattern-matching ID is correct.
     return html.Details([summary, details_content],
                        className=component_class,
                        id={'type': 'status-message', 'id': message_id},
@@ -511,18 +901,23 @@ def welcome_screen():
         ])
     ])
 
-# briefing_screen is UNCHANGED
+# --- MODIFIED: briefing_screen ---
 def briefing_screen(run_number, total_runs, scenario_num, view_type, framework_mode):
     view_name = "Simulator View (Map + Log)" if view_type == 'map' else "Textual Overview"
     framework_name = "WITH Communication Framework" if framework_mode == 'with_framework' else "WITHOUT Communication Framework"
     
+    # Load scenario-specific briefing
+    scenario_briefing = SCENARIO_CONTENT.get(scenario_num, {}).get('briefing', "No briefing text found for this scenario.")
+    
+    # Combine specific briefing with dynamic run info
     briefing_text = f"""
-You are about to begin Run {run_number} of {total_runs}.
+{scenario_briefing}
 
-This run will use:
-- Scenario {scenario_num}
+---
+**This run will use:**
 - {view_name}
 - {framework_name}
+---
 
 In this scenario, you will monitor three robots delivering packages.
 The simulation will pause automatically at several points to ask you questions.
@@ -538,7 +933,7 @@ Click "Begin Scenario" when you're ready to start.
                        'maxWidth': '800px', 'width': '90%'}, children=[
             html.H2(f"Run {run_number} / {total_runs} - Briefing",
                    style={'color': '#00ff88', 'marginBottom': '30px'}),
-            html.Pre(briefing_text, style={'whiteSpace': 'pre-wrap', 'lineHeight': '1.8',
+            dcc.Markdown(briefing_text, style={'whiteSpace': 'pre-wrap', 'lineHeight': '1.8',
                                           'fontSize': '16px'}),
             html.Button('Begin Scenario', id='begin-scenario-btn', n_clicks=0,
                        style={'padding': '15px 40px', 'fontSize': '18px',
@@ -546,68 +941,93 @@ Click "Begin Scenario" when you're ready to start.
                              'borderRadius': '5px', 'cursor': 'pointer', 'fontWeight': 'bold', 'marginTop': '30px'})
         ])
     ])
+# --- END MODIFICATION ---
 
-# question_screen is UNCHANGED
-def question_screen(scenario_num, question_num):
-    questions = [
-        {'text': '1. Mental Demand: How mentally demanding was monitoring the robots during this segment?', 'type': 'slider', 'id': 'mental-demand', 'min': 0, 'max': 20, 'marks': {0: 'Very Low', 10: 'Moderate', 20: 'Very High'}},
-        {'text': '2. Physical Demand: How physically demanding was the task?', 'type': 'slider', 'id': 'physical-demand', 'min': 0, 'max': 20, 'marks': {0: 'Very Low', 10: 'Moderate', 20: 'Very High'}},
-        {'text': '3. Temporal Demand: How hurried or rushed was the pace of the task?', 'type': 'slider', 'id': 'temporal-demand', 'min': 0, 'max': 20, 'marks': {0: 'Very Low', 10: 'Moderate', 20: 'Very High'}},
-        {'text': '4. Performance: How successful were you in accomplishing what you were asked to do?', 'type': 'slider', 'id': 'performance', 'min': 0, 'max': 20, 'marks': {0: 'Perfect', 10: 'Moderate', 20: 'Failure'}},
-        {'text': '5. Effort: How hard did you have to work to accomplish your level of performance?', 'type': 'slider', 'id': 'effort', 'min': 0, 'max': 20, 'marks': {0: 'Very Low', 10: 'Moderate', 20: 'Very High'}},
-        {'text': '6. Frustration: How insecure, discouraged, irritated, stressed, and annoyed did you feel?', 'type': 'slider', 'id': 'frustration', 'min': 0, 'max': 20, 'marks': {0: 'Very Low', 10: 'Moderate', 20: 'Very High'}},
-        {'text': '7. Situation Awareness: How well did you understand what was happening with the robots?', 'type': 'scale', 'id': 'situation-awareness', 'options': ['1 - Very Poor', '2 - Poor', '3 - Fair', '4 - Good', '5 - Excellent']},
-        {'text': '8. How many robots did you observe replanning their routes during this segment? (This includes explicit "REPLANNING" messages or new routes being taken)', 'type': 'mcq', 'id': 'replan-count', 'options': ['0', '1', '2', '3', 'Not sure']},
-        {'text': '9. Cognitive Load: How difficult was it to keep track of all three robots simultaneously?', 'type': 'scale', 'id': 'cognitive-load', 'options': ['1 - Very Easy', '2 - Easy', '3 - Moderate', '4 - Difficult', '5 - Very Difficult']},
-        {'text': '10. Please describe any challenges, observations, or notable events from this segment:', 'type': 'open', 'id': 'open-response'}
-    ]
-    
+# --- NEW: create_pause_question_screen ---
+def create_pause_question_screen(scenario_num, question_idx):
+    """
+    Generates the layout for a single pause-point question.
+    question_idx is 0-based (0, 1, or 2).
+    """
+    question_num = question_idx + 1
+    try:
+        question_data = SCENARIO_CONTENT[scenario_num]['questions'][question_idx]
+    except Exception:
+        question_data = {
+            "text": "Error: Could not load question.",
+            "options": ["Continue"]
+        }
+        
     return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh',
-                          'padding': '40px', 'fontFamily': 'Arial', 'overflowY': 'auto'}, children=[
+                          'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center',
+                          'justifyContent': 'center', 'fontFamily': 'Arial'}, children=[
         html.Div(style={'backgroundColor': '#2b2b2b', 'padding': '40px', 'borderRadius': '10px',
-                       'maxWidth': '1000px', 'margin': '0 auto'}, children=[
-            html.H2(f"Scenario {scenario_num} - Questionnaire #{question_num}",
+                       'maxWidth': '1000px', 'margin': '0 auto', 'width': '90%'}, children=[
+            html.H2(f"Scenario {scenario_num} - Question #{question_num}",
                    style={'color': '#00ff88', 'marginBottom': '40px'}),
-            html.Div([
-                html.Div([
-                    html.P(q['text'], style={'fontWeight': 'bold', 'marginBottom': '15px', 'fontSize': '16px', 'marginTop': '25px'}),
-                    dcc.Slider(
-                        id={'type': 'question', 'id': q['id']}, min=q['min'], max=q['max'], value=q['min'],
-                        marks=q['marks'], step=1, tooltip={"placement": "bottom", "always_visible": False}
-                    ) if q['type'] == 'slider' else (
-                        dcc.RadioItems(
-                            id={'type': 'question', 'id': q['id']},
-                            options=[{'label': opt, 'value': opt} for opt in q['options']],
-                            labelStyle={'display': 'block', 'marginBottom': '10px', 'cursor': 'pointer'},
-                            style={'marginBottom': '20px'}
-                        ) if q['type'] in ['scale', 'mcq'] else dcc.Textarea(
-                            id={'type': 'question', 'id': q['id']}, placeholder='Type your response here...',
-                            style={'width': '100%', 'minHeight': '100px', 'padding': '10px', 'fontSize': '14px',
-                                  'borderRadius': '5px', 'marginBottom': '20px', 'border': '1px solid #444',
-                                  'backgroundColor': '#1a1a1a', 'color': 'white'}
-                        )
-                    )
-                ], style={'marginBottom': '20px'}) for q in questions
-            ]),
-            html.Button('Continue', id='submit-questions-btn', n_clicks=0,
+            html.P(question_data['text'], style={'fontWeight': 'bold', 'marginBottom': '25px', 'fontSize': '18px'}),
+            dcc.RadioItems(
+                id='pause-question-radio',
+                options=[{'label': opt, 'value': opt} for opt in question_data['options']],
+                labelStyle={'display': 'block', 'marginBottom': '15px', 'cursor': 'pointer', 'fontSize': '16px'},
+                style={'marginBottom': '20px'}
+            ),
+            html.Button('Continue', id='submit-pause-question-btn', n_clicks=0,
                        style={'padding': '15px 40px', 'fontSize': '18px', 'backgroundColor': '#00ff88',
                              'color': '#1e1e1e', 'border': 'none', 'borderRadius': '5px',
                              'cursor': 'pointer', 'fontWeight': 'bold', 'marginTop': '30px'})
         ])
     ])
+# --- END NEW FUNCTION ---
 
-# post_study_questionnaire is UNCHANGED
+# --- NEW: create_post_scenario_questionnaire ---
+def create_post_scenario_questionnaire(scenario_num, run_number, total_runs):
+    """
+    Generates the 6-question NASA-TLX-like questionnaire for the end of a run.
+    """
+    questions = [
+        {'id': 'mental_demand', 'text': 'Mental Demand: How mentally demanding was monitoring the robots during this segment?', 'options': ['1 - Very Low', '2 - Low', '3 - Moderate', '4 - High', '5 - Very High']},
+        {'id': 'physical_demand', 'text': 'Physical Demand: How physically demanding was the task (e.g., mouse clicks, visual tracking)?', 'options': ['1 - Very Low', '2 - Low', '3 - Moderate', '4 - High', '5 - Very High']},
+        {'id': 'temporal_demand', 'text': 'Temporal Demand: How hurried or rushed did the pace of the task feel?', 'options': ['1 - Very Low', '2 - Low', '3 - Moderate', '4 - High', '5 - Very High']},
+        {'id': 'performance', 'text': 'Performance: How successful were you in accomplishing what you were asked to do?', 'options': ['1 - Very Poor', '2 - Poor', '3 - Moderate', '4 - Good', '5 - Excellent']},
+        {'id': 'effort', 'text': 'Effort: How hard did you have to work to achieve your level of performance?', 'options': ['1 - Very Low', '2 - Low', '3 - Moderate', '4 - High', '5 - Very High']},
+        {'id': 'frustration', 'text': 'Frustration: How irritated, stressed, or discouraged did you feel during this segment?', 'options': ['1 - Very Low', '2 - Low', '3 - Moderate', '4D - High', '5 - Very High']},
+    ]
+
+    return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh',
+                          'padding': '40px', 'fontFamily': 'Arial', 'overflowY': 'auto'}, children=[
+        html.Div(style={'backgroundColor': '#2b2b2b', 'padding': '40px', 'borderRadius': '10px',
+                       'maxWidth': '1000px', 'margin': '0 auto'}, children=[
+            html.H2(f"End of Run {run_number}/{total_runs} (Scenario {scenario_num}) - Questionnaire",
+                   style={'color': '#00ff88', 'marginBottom': '40px'}),
+            html.Div([
+                html.Div([
+                    html.P(q['text'], style={'fontWeight': 'bold', 'marginBottom': '15px', 'fontSize': '16px', 'marginTop': '25px'}),
+                    dcc.RadioItems(
+                        id={'type': 'post-scenario-question', 'id': q['id']},
+                        options=[{'label': opt, 'value': opt} for opt in q['options']],
+                        labelStyle={'display': 'block', 'marginBottom': '10px', 'cursor': 'pointer'},
+                        style={'marginBottom': '20px'}
+                    )
+                ], style={'marginBottom': '20px'}) for q in questions
+            ]),
+            html.Button('Submit and Continue', id='submit-post-scenario-btn', n_clicks=0,
+                       style={'padding': '15px 40px', 'fontSize': '18px', 'backgroundColor': '#00ff88',
+                             'color': '#1e1e1e', 'border': 'none', 'borderRadius': '5px',
+                             'cursor': 'pointer', 'fontWeight': 'bold', 'marginTop': '30px'})
+        ])
+    ])
+# --- END NEW FUNCTION ---
+
+
+# --- MODIFIED: post_study_questionnaire ---
 def post_study_questionnaire():
     questions = [
-        {'text': '1. Which view mode did you find more helpful for monitoring the robots?', 'type': 'mcq', 'id': 'preferred-view', 'options': ['Simulator View (Map + Log)', 'Textual Overview', 'Both Equally', 'Neither']},
-        {'text': '2. How helpful was the assistance framework (which provided richer "REPLANNING" alerts and status messages) in understanding robot behavior?', 'type': 'scale', 'id': 'framework-helpfulness', 'options': ['1 - Not Helpful', '2 - Slightly Helpful', '3 - Moderately Helpful', '4 - Very Helpful', '5 - Extremely Helpful']},
-        {'text': '3. Overall Mental Workload: How would you rate the overall mental workload of this study?', 'type': 'slider', 'id': 'overall-workload', 'min': 0, 'max': 20, 'marks': {0: 'Very Low', 10: 'Moderate', 20: 'Very High'}},
-        {'text': '4. How stressed did you feel during the study overall?', 'type': 'scale', 'id': 'overall-stress', 'options': ['1 - Not at all', '2 - Slightly', '3 - Moderately', '4 - Very', '5 - Extremely']},
-        {'text': '5. Did you find the replanning notifications (the "REPLANNING" messages) useful when they appeared?', 'type': 'scale', 'id': 'notification-usefulness', 'options': ['1 - Not Useful', '2 - Slightly Useful', '3 - Moderately Useful', '4 - Very Useful', '5 - Extremely Useful']},
-        {'text': '6. How confident were you in your understanding of the robot states throughout the study?', 'type': 'scale', 'id': 'confidence-level', 'options': ['1 - Not Confident', '2 - Slightly Confident', '3 - Moderately Confident', '4 - Very Confident', '5 - Extremely Confident']},
-        {'text': '7. What was the most challenging aspect of monitoring the multi-agent system?', 'type': 'open', 'id': 'challenging-aspect'},
-        {'text': '8. What improvements would you suggest for the monitoring interface?', 'type': 'open', 'id': 'improvements'},
-        {'text': '9. Any additional comments or feedback about the study:', 'type': 'open', 'id': 'additional-comments'}
+        {'text': 'How effective were the update messages in helping you understand the robots\' behavior?', 'type': 'scale', 'id': 'effectiveness', 'options': ['1 - Not at all effective', '2', '3', '4', '5 - Extremely effective']},
+        {'text': 'How did this differ between demonstration types?', 'type': 'open', 'id': 'effectiveness_detail'},
+        {'text': 'How easy was it to tell why a robot replanned or changed its route?', 'type': 'scale', 'id': 'replan_clarity', 'options': ['1 - Very difficult', '2', '3', '4', '5 - Very easy']},
+        {'text': 'What, if anything, was confusing about the robots\' behavior or the updates you received? How did this differ between demonstration types?', 'type': 'open', 'id': 'confusion_detail'},
+        {'text': 'Do you have any additional thoughts or feedback about the communication styles or the interface overall?', 'type': 'open', 'id': 'final_feedback'}
     ]
     
     return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh',
@@ -615,22 +1035,19 @@ def post_study_questionnaire():
         html.Div(style={'backgroundColor': '#2b2b2b', 'padding': '40px', 'borderRadius': '10px',
                        'maxWidth': '1000px', 'margin': '0 auto'}, children=[
             html.H2("Final Questionnaire", style={'color': '#00ff88', 'marginBottom': '20px'}),
-            html.P("Thank you for completing all scenarios! Please answer these final questions about your overall experience.",
+            html.P("You may end the evaluation here. If you are willing to answer additional questions to assist in our understanding of your experience, please continue forward.",
                   style={'marginBottom': '40px', 'fontSize': '16px'}),
             html.Div([
                 html.Div([
                     html.P(q['text'], style={'fontWeight': 'bold', 'marginBottom': '15px', 'fontSize': '16px', 'marginTop': '25px'}),
-                    dcc.Slider(
-                        id={'type': 'post-question', 'id': q['id']}, min=q['min'], max=q['max'], value=q['min'],
-                        marks=q['marks'], step=1, tooltip={"placement": "bottom", "always_visible": False}
-                    ) if q['type'] == 'slider' else (
+                    (
                         dcc.RadioItems(
-                            id={'type': 'post-question', 'id': q['id']},
+                            id={'type': 'post-study-question', 'id': q['id']},
                             options=[{'label': opt, 'value': opt} for opt in q['options']],
-                            labelStyle={'display': 'block', 'marginBottom': '10px', 'cursor': 'pointer'},
+                            labelStyle={'display': 'inline-block', 'marginRight': '20px', 'cursor': 'pointer'},
                             style={'marginBottom': '20px'}
-                        ) if q['type'] in ['scale', 'mcq'] else dcc.Textarea(
-                            id={'type': 'post-question', 'id': q['id']}, placeholder='Type your response here...',
+                        ) if q['type'] == 'scale' else dcc.Textarea(
+                            id={'type': 'post-study-question', 'id': q['id']}, placeholder='Type your response here...',
                             style={'width': '100%', 'minHeight': '100px', 'padding': '10px', 'fontSize': '14px',
                                   'borderRadius': '5px', 'marginBottom': '20px', 'border': '1px solid #444',
                                   'backgroundColor': '#1a1a1a', 'color': 'white'}
@@ -644,6 +1061,7 @@ def post_study_questionnaire():
                              'cursor': 'pointer', 'fontWeight': 'bold', 'marginTop': '30px'})
         ])
     ])
+# --- END MODIFICATION ---
 
 # create_simulation_layout is UNCHANGED
 def create_simulation_layout():
@@ -937,7 +1355,7 @@ def start_study(n_clicks, name):
     
     study_state = {
         'current_run_idx': 0,
-        'current_question_idx': 0,
+        'current_question_idx': 0, # This now tracks pause points (0, 1, 2)
         'phase': 'briefing',
         'segment_start_time': None
     }
@@ -1010,6 +1428,7 @@ def load_data_and_start_simulation(layout_signal, study_state, participant_data)
     start_frame = 0
     pause_points = PAUSE_POINTS.get(scenario_num, [100, 200, 300])
     if study_state['current_question_idx'] > 0:
+        # This logic resumes from the correct frame *after* a pause
         start_frame = pause_points[study_state['current_question_idx'] - 1] + 1
     
     max_frames = len(frames) - 1 if frames else 0
@@ -1033,7 +1452,7 @@ def control_animation(study_state):
     return True, True # --- MODIFIED: Disable both ---
 # --- END MODIFICATION ---
 
-# update_frame_and_check_pause is UNCHANGED
+# --- MODIFIED: update_frame_and_check_pause ---
 @app.callback(
     Output('current-frame-store', 'data', allow_duplicate=True),
     Output('page-content', 'children', allow_duplicate=True),
@@ -1049,31 +1468,41 @@ def update_frame_and_check_pause(n_intervals, current_frame, scenario_data, stud
     if not study_state or study_state.get('phase') != 'simulation' or not participant_data or not scenario_data:
         raise PreventUpdate
     
-    next_frame = current_frame + 1
     max_frames = len(scenario_data) - 1
-    
-    if current_frame >= max_frames:
-        new_state = study_state.copy()
-        new_state['phase'] = 'paused_at_end'
-        print("Reached end of frames, pausing.")
-        return no_update, no_update, new_state
-    
     current_run_idx = study_state['current_run_idx']
     current_run_info = participant_data['track'][current_run_idx]
     scenario_num = current_run_info[0]
+    total_runs = len(participant_data['track'])
     
+    # --- NEW LOGIC: Check for end of simulation FIRST ---
+    if current_frame >= max_frames:
+        new_state = study_state.copy()
+        new_state['phase'] = 'post_scenario_questions' # <-- New phase
+        print("Reached end of frames. Moving to Post-Scenario Questionnaire.")
+        # Show post-scenario questionnaire
+        new_page = create_post_scenario_questionnaire(scenario_num, current_run_idx + 1, total_runs)
+        return no_update, new_page, new_state
+    # --- END NEW LOGIC ---
+
+    # --- Check for pause points ---
     pause_points = PAUSE_POINTS.get(scenario_num, [100, 200, 300])
-    if study_state['current_question_idx'] < len(pause_points):
-        current_pause_point = pause_points[study_state['current_question_idx']]
+    current_question_idx = study_state['current_question_idx']
+    
+    if current_question_idx < len(pause_points):
+        current_pause_point = pause_points[current_question_idx]
         if current_frame == current_pause_point:
             # PAUSE!
             new_study_state = study_state.copy()
-            new_study_state['phase'] = 'questions'
-            print(f"Pausing at frame {current_frame} for question set {study_state['current_question_idx'] + 1}")
-            return no_update, question_screen(scenario_num, study_state['current_question_idx'] + 1), new_study_state
+            new_study_state['phase'] = 'questions' # Phase is now 'questions'
+            print(f"Pausing at frame {current_frame} for question set {current_question_idx + 1}")
+            # Show the new pause question screen
+            new_page = create_pause_question_screen(scenario_num, current_question_idx)
+            return no_update, new_page, new_study_state
     
     # No pause, just advance the frame
+    next_frame = current_frame + 1
     return next_frame, no_update, no_update
+# --- END MODIFICATION ---
 
 # programmatically_switch_view is UNCHANGED
 @app.callback(
@@ -1087,6 +1516,7 @@ def programmatically_switch_view(study_state, participant_data):
     if not study_state or not participant_data:
         return {'display': 'none'}, {'display': 'none'}, ""
     
+    # Only show header if we are in simulation phase
     if study_state.get('phase') != 'simulation':
         return {'display': 'none'}, {'display': 'none'}, ""
     
@@ -1210,10 +1640,12 @@ def update_simulation_views(frame_idx, study_state,
         robot_id = f'robot{i}'
         if robot_id in robots_dict:
             raw_robot_data = robots_dict[robot_id]
+            # --- ADD 'Quadrant' and 'Bad_Terrain' to keys ---
             rmm_keys_to_select = [
                 "state", "plan_index", "x", "y", "mission_time",
                 "Current_weather", "Battery_status", "Momentarily_offline",
-                "Replan_flag", "target_package_id", "plan", "immediate_goal_x", "immediate_goal_y"
+                "Replan_flag", "target_package_id", "plan", "immediate_goal_x", "immediate_goal_y",
+                "Quadrant", "Bad_Terrain" # <-- ADDED
             ]
             selected_robot_rmm_array = {'id': robot_id}
             for key in rmm_keys_to_select:
@@ -1241,22 +1673,134 @@ def update_simulation_views(frame_idx, study_state,
                 
                 current_hmms[robot_id] = updated_hmm_array
                 
+                
                 if sync_occurred:
                     any_sync_occurred = True
                     
                     # --- MODIFIED: Call new data function ---
-                    new_message_data, message_type, message_text = create_rich_status_message_data(
+                    new_message_data, message_type, message_text_for_log = create_rich_status_message_data(
                         robot_info,
                         sim_time,
                         packages,
-                        selected_robot_hmm_array,
-                        selected_robot_rmm_array,
+                        selected_robot_hmm_array, # Pass previous HMM
+                        selected_robot_rmm_array, # Pass current RMM
                         scenario_num
                     )
                     
-                    is_new_message = False
-                    msg_id = new_message_data['message_id'] # <-- Get ID from data
+                    # --- NEW: Check for skipped message (e.g., carrying N/A) ---
+                    if new_message_data is None:
+                        continue # Skip message generation for this robot
+                    # --- END NEW ---
+
+                    # --- MODIFICATION: Check for duplicates ---
+                    current_robot_history = new_robot_message_outputs[i-1]
+                    is_duplicate = False
+                    if current_robot_history:
+                        # Compare the new details_msg (list) to the previous one
+                        if new_message_data['details_msg'] == current_robot_history[0]['details_msg']:
+                            is_duplicate = True
                     
+                    if not is_duplicate:
+                        is_new_message = False
+                        msg_id = new_message_data['message_id'] # <-- Get ID from data
+                        
+                        if msg_id not in new_message_timestamps:
+                            appear_time = time.time()
+                            new_message_timestamps[msg_id] = appear_time
+                            is_new_message = True
+                            
+                            log_entry = create_message_log_entry(
+                                message_id=msg_id,
+                                robot_id=robot_id,
+                                scenario_num=scenario_num,
+                                condition_idx=condition_idx,
+                                frame_idx=frame_idx,
+                                sim_time=sim_time,
+                                message_type=message_type,
+                                message_text=message_text_for_log, # <-- Use flattened string for log
+                                participant_id=participant_data.get('id'),
+                                appear_time=appear_time,
+                                robot_state=robot_info.get('state'),
+                                robot_x=robot_info.get('x'),
+                                robot_y=robot_info.get('y')
+                            )
+                            new_all_message_logs.append(log_entry)
+                        
+                        # --- Create the component for the Map UI (which needs 'new-message') ---
+                        new_message_div = render_message_component(
+                            new_message_data,
+                            current_open_message_ids,
+                            is_new=is_new_message # <-- Pass blink status
+                        )
+                        
+                        newly_generated_messages_for_feed.append(new_message_div)
+                        
+                        # --- MODIFIED: Update the Text UI *store* with *data*, not components ---
+                        
+                        # 1. Start new history with new *data*
+                        updated_history_data = [new_message_data]
+                        
+                        # 2. Get old history *data* from store
+                        current_hist_data = histories[i-1] if isinstance(histories[i-1], list) else ([histories[i-1]] if histories[i-1] else [])
+                        
+                        # 3. Extend
+                        updated_history_data.extend(current_hist_data)
+                        
+                        # 4. Set output to store
+                        new_robot_message_outputs[i-1] = updated_history_data
+                        # --- END TEXT UI STORE MODIFICATION ---
+    
+    # --- vvv NEW LOGIC FOR PACKAGE DISCOVERY vvv ---
+    if frame_idx > 0:
+        current_packages = current_frame_data.get('packages', [])
+        prev_packages_list = scenario_data[frame_idx - 1].get('packages', [])
+        prev_packages_dict = {p['id']: p for p in prev_packages_list}
+
+        for pkg in current_packages:
+            if pkg['id'].startswith('d'):
+                prev_pkg = prev_packages_dict.get(pkg['id'])
+                
+                current_discovered = pkg.get('Discovered', 0) == 1
+                prev_discovered = prev_pkg.get('Discovered', 0) == 1 if prev_pkg else False
+
+                if current_discovered and not prev_discovered:
+                    # A 'd' package was just discovered!
+                    pkg_id = pkg['id']
+                    discovered_by = pkg.get('Discovered_by', 'N/A')
+                    assigned_to = pkg.get('Assigned_to', 'N/A')
+                    
+                    # Build the message text
+                    message_text_list = []
+                    if discovered_by != 'N/A' and discovered_by == assigned_to:
+                         message_text_list = [
+                             "Package ", html.Strong(pkg_id), " discovered by robot and it is en route to collect it."
+                         ]
+                    elif discovered_by != assigned_to and assigned_to != 'N/A':
+                        message_text_list = [
+                            "Package ", html.Strong(pkg_id), f" discovered by {discovered_by}. ",
+                            f"Assigned to {assigned_to}."
+                        ]
+                    else:
+                        message_text_list = [
+                            "Package ", html.Strong(pkg_id), f" discovered by {discovered_by}."
+                        ]
+                    
+                    message_text_for_log = " ".join([str(item) for item in message_text_list])
+
+                    # Create message data
+                    msg_id = f"{pkg_id}-discovered-{sim_time:.2f}"
+                    message_type = "discovery"
+                    
+                    new_message_data = {
+                        'message_id': msg_id,
+                        'robot_id_title': "System", # Or pkg_id.title()
+                        'status_icon': '📣', # Discovery icon
+                        'status_text': 'PACKAGE DISCOVERED',
+                        'status_class_suffix': 'on-track', # Use green style
+                        'time_str': datetime.now().strftime('%I:%M:%S %p'),
+                        'details_msg': message_text_list
+                    }
+
                     if msg_id not in new_message_timestamps:
                         appear_time = time.time()
                         new_message_timestamps[msg_id] = appear_time
@@ -1264,47 +1808,41 @@ def update_simulation_views(frame_idx, study_state,
                         
                         log_entry = create_message_log_entry(
                             message_id=msg_id,
-                            robot_id=robot_id,
+                            robot_id="System", # Log as System event
                             scenario_num=scenario_num,
                             condition_idx=condition_idx,
                             frame_idx=frame_idx,
                             sim_time=sim_time,
                             message_type=message_type,
-                            message_text=message_text,
+                            message_text=message_text_for_log, # <-- Use flattened string
                             participant_id=participant_data.get('id'),
                             appear_time=appear_time,
-                            robot_state=robot_info.get('state'),
-                            robot_x=robot_info.get('x'),
-                            robot_y=robot_info.get('y')
+                            robot_state="N/A",
+                            robot_x=pkg.get('x'),
+                            robot_y=pkg.get('y')
                         )
                         new_all_message_logs.append(log_entry)
-                    
-                    # --- Create the component for the Map UI (which needs 'new-message') ---
-                    new_message_div = render_message_component(
-                        new_message_data,
-                        current_open_message_ids,
-                        is_new=is_new_message # <-- Pass blink status
-                    )
-                    
-                    newly_generated_messages_for_feed.append(new_message_div)
-                    
-                    # --- MODIFIED: Update the Text UI *store* with *data*, not components ---
-                    
-                    # 1. Start new history with new *data*
-                    updated_history_data = [new_message_data]
-                    
-                    # 2. Get old history *data* from store
-                    current_hist_data = histories[i-1] if isinstance(histories[i-1], list) else ([histories[i-1]] if histories[i-1] else [])
-                    
-                    # 3. Extend
-                    updated_history_data.extend(current_hist_data)
-                    
-                    # 4. Set output to store
-                    new_robot_message_outputs[i-1] = updated_history_data
-                    # --- END TEXT UI STORE MODIFICATION ---
+
+                        new_message_div = render_message_component(
+                            new_message_data,
+                            current_open_message_ids,
+                            is_new=is_new_message
+                        )
+                        # Add to the start of the list
+                        newly_generated_messages_for_feed.insert(0, new_message_div)
+
+                        # --- MODIFICATION: Add to Text View logs ---
+                        if discovered_by == 'robot1':
+                            new_robot_message_outputs[0].insert(0, new_message_data)
+                        elif discovered_by == 'robot2':
+                            new_robot_message_outputs[1].insert(0, new_message_data)
+                        elif discovered_by == 'robot3':
+                            new_robot_message_outputs[2].insert(0, new_message_data)
+                        # --- END MODIFICATION ---
+    # --- ^^^ END PACKAGE DISCOVERY LOGIC ^^^ ---
     
     updated_all_messages = newly_generated_messages_for_feed + (all_messages_history or [])
-    updated_all_messages = updated_all_messages[:100]
+    updated_all_messages = updated_all_messages[:100] # Trim
     
     new_interval = SLOW_INTERVAL_MS if any_sync_occurred and framework_mode == 'with_framework' else UPDATE_INTERVAL_MS
     
@@ -1316,7 +1854,7 @@ def update_simulation_views(frame_idx, study_state,
         new_robot_message_outputs[2],
         frame_idx, frame_idx, frame_idx,
         current_hmms,
-        updated_all_messages, updated_all_messages,
+        updated_all_messages, updated_all_messages, # Pass component list to UI and store
         new_interval,
         current_open_message_ids, # Pass back the same list
         new_message_timestamps,
@@ -1470,25 +2008,87 @@ def log_graph_click(clickData, interactions, participant_data, study_state, fram
     new_interactions.append(interaction_entry)
     return new_interactions
 
-# --- MODIFIED submit_questions (to save message logs) ---
+# --- NEW: submit_pause_question ---
 @app.callback(
     Output('page-content', 'children', allow_duplicate=True),
     Output('responses-store', 'data', allow_duplicate=True),
     Output('study-state-store', 'data', allow_duplicate=True),
-    Input('submit-questions-btn', 'n_clicks'),
+    Input('submit-pause-question-btn', 'n_clicks'),
     State('study-state-store', 'data'),
     State('participant-store', 'data'),
     State('responses-store', 'data'),
-    State({'type': 'question', 'id': ALL}, 'value'),
-    State({'type': 'question', 'id': ALL}, 'id'),
-    State('interaction-log-store', 'data'),
-    State('all-message-logs-store', 'data'), # <-- ADDED
+    State('pause-question-radio', 'value'),
     prevent_initial_call=True
 )
-def submit_questions(n_clicks, study_state, participant_data, responses, q_values, q_ids, interactions, all_message_logs):
+def submit_pause_question(n_clicks, study_state, participant_data, responses, answer_value):
+    if n_clicks == 0 or not study_state or not participant_data or not answer_value:
+        # Don't let them continue without selecting an answer
+        return no_update, no_update, no_update
+    
+    current_run_idx = study_state['current_run_idx']
+    current_run_info = participant_data['track'][current_run_idx]
+    scenario_num = current_run_info[0]
+    condition_idx = current_run_info[1]
+    question_idx = study_state['current_question_idx'] # 0, 1, or 2
+    
+    # Get the question text for logging
+    try:
+        question_text = SCENARIO_CONTENT[scenario_num]['questions'][question_idx]['text']
+    except Exception:
+        question_text = "N/A"
+
+    response_entry = {
+        'timestamp': datetime.now().isoformat(),
+        'type': 'pause_question',
+        'run_number': current_run_idx + 1,
+        'scenario': scenario_num,
+        'condition': condition_idx,
+        'pause_point': question_idx + 1,
+        'question': question_text,
+        'answer': answer_value
+    }
+    
+    new_responses = (responses or []) + [response_entry]
+    
+    # --- Update state and return to simulation ---
+    new_study_state = study_state.copy()
+    new_study_state['current_question_idx'] += 1 # Move to next pause point index (e.g., 0 -> 1)
+    new_study_state['phase'] = 'simulation'
+    new_study_state['segment_start_time'] = datetime.now().isoformat() # Reset segment time
+    
+    print(f"Logged pause question {question_idx + 1}. Resuming simulation.")
+    
+    # Return to the simulation layout. The `load_data` callback will
+    # use the new 'current_question_idx' to start from the correct frame.
+    return create_simulation_layout(), new_responses, new_study_state
+# --- END NEW CALLBACK ---
+
+
+# --- NEW: submit_post_scenario_questions ---
+@app.callback(
+    Output('page-content', 'children', allow_duplicate=True),
+    Output('responses-store', 'data', allow_duplicate=True),
+    Output('study-state-store', 'data', allow_duplicate=True),
+    Input('submit-post-scenario-btn', 'n_clicks'),
+    State('study-state-store', 'data'),
+    State('participant-store', 'data'),
+    State('responses-store', 'data'),
+    State({'type': 'post-scenario-question', 'id': ALL}, 'value'),
+    State({'type': 'post-scenario-question', 'id': ALL}, 'id'),
+    State('interaction-log-store', 'data'),
+    State('all-message-logs-store', 'data'),
+    prevent_initial_call=True
+)
+def submit_post_scenario_questions(n_clicks, study_state, participant_data, responses, q_values, q_ids, interactions, all_message_logs):
     if n_clicks == 0 or not study_state or not participant_data:
         raise PreventUpdate
-    
+        
+    # Check if all questions are answered
+    if not all(q_values):
+        print("User tried to submit post-scenario questions without answering all.")
+        # We could add an error message here, but for now just prevent update
+        return no_update, no_update, no_update
+
     # Get info for the run we *just finished*
     current_run_idx = study_state['current_run_idx']
     current_run_info = participant_data['track'][current_run_idx]
@@ -1497,67 +2097,56 @@ def submit_questions(n_clicks, study_state, participant_data, responses, q_value
     view_type, framework_mode = get_condition_names(condition_idx)
     
     answer_dict = {q_id['id']: val for q_id, val in zip(q_ids, q_values)}
-    ordered_answers = [
-        answer_dict.get('mental-demand'), answer_dict.get('physical-demand'),
-        answer_dict.get('temporal-demand'), answer_dict.get('performance'),
-        answer_dict.get('effort'), answer_dict.get('frustration'),
-        answer_dict.get('situation-awareness'), answer_dict.get('replan-count'),
-        answer_dict.get('cognitive-load'), answer_dict.get('open-response')
-    ]
     
     response_entry = {
         'timestamp': datetime.now().isoformat(),
+        'type': 'post_scenario', # <-- New type
         'segment_start_time': study_state.get('segment_start_time'),
         'run_number': current_run_idx + 1,
         'scenario': scenario_num,
         'condition': condition_idx,
         'view_type': view_type,
         'framework': framework_mode,
-        'question_set': study_state['current_question_idx'] + 1,
-        'answers': ordered_answers
+        'answers': answer_dict # Save the whole dict
     }
     
-    new_responses = responses + [response_entry]
+    new_responses = (responses or []) + [response_entry]
     
     try:
-        print(f"Incrementally saving data for {participant_data.get('id')}.")
+        print(f"Incrementally saving data for {participant_data.get('id')} after Run {current_run_idx + 1}.")
+        # Save JSON (which has pause Qs) and CSV (which has post-scenario Qs)
         save_study_data(participant_data, new_responses, interactions)
-        # --- NEW: Save message logs incrementally ---
         save_message_logs(participant_data, all_message_logs, study_state)
     except Exception as e:
         print(f"Error during incremental save: {e}")
     
+    # --- NOW, advance to the next run or end the study ---
     new_study_state = study_state.copy()
-    new_study_state['current_question_idx'] += 1
-    pause_points = PAUSE_POINTS.get(scenario_num, [100, 200, 300])
+    new_study_state['current_run_idx'] += 1
+    new_study_state['current_question_idx'] = 0 # Reset for next run
+    total_runs = len(participant_data['track'])
     
-    if new_study_state['current_question_idx'] < len(pause_points):
-        # Go back to simulation (mid-run)
-        new_study_state['phase'] = 'simulation'
-        new_study_state['segment_start_time'] = datetime.now().isoformat()
-        return create_simulation_layout(), new_responses, new_study_state
-    else:
-        # Finished all segments for this run
-        new_study_state['current_run_idx'] += 1
-        new_study_state['current_question_idx'] = 0
-        total_runs = len(participant_data['track'])
+    if new_study_state['current_run_idx'] < total_runs:
+        # Go to briefing for *next* run
+        new_study_state['phase'] = 'briefing'
+        next_run_idx = new_study_state['current_run_idx']
+        next_run_info = participant_data['track'][next_run_idx]
+        next_scenario_num = next_run_info[0]
+        next_condition_idx = next_run_info[1]
+        next_view_type, next_framework = get_condition_names(next_condition_idx)
         
-        if new_study_state['current_run_idx'] < total_runs:
-            # Go to briefing for *next* run
-            new_study_state['phase'] = 'briefing'
-            next_run_idx = new_study_state['current_run_idx']
-            next_run_info = participant_data['track'][next_run_idx]
-            next_scenario_num = next_run_info[0]
-            next_condition_idx = next_run_info[1]
-            next_view_type, next_framework = get_condition_names(next_condition_idx)
-            return briefing_screen(next_run_idx + 1, total_runs, next_scenario_num, next_view_type, next_framework), new_responses, new_study_state
-        else:
-            # Finished all runs
-            new_study_state['phase'] = 'post_study'
-            return post_study_questionnaire(), new_responses, new_study_state
-# --- END REPLACED CALLBACK ---
+        print(f"Moving to briefing for Run {next_run_idx + 1}")
+        
+        return briefing_screen(next_run_idx + 1, total_runs, next_scenario_num, next_view_type, next_framework), new_responses, new_study_state
+    else:
+        # Finished all runs
+        new_study_state['phase'] = 'post_study'
+        print("All runs complete. Moving to Post-Study Questionnaire.")
+        return post_study_questionnaire(), new_responses, new_study_state
+# --- END NEW CALLBACK ---
 
-# --- MODIFIED submit_final_questionnaire (to save message logs) ---
+
+# --- MODIFIED: submit_final_questionnaire ---
 @app.callback(
     Output('page-content', 'children', allow_duplicate=True),
     Input('submit-final-btn', 'n_clicks'),
@@ -1566,8 +2155,8 @@ def submit_questions(n_clicks, study_state, participant_data, responses, q_value
     State('responses-store', 'data'),
     State('interaction-log-store', 'data'),
     State('all-message-logs-store', 'data'), # <-- ADDED
-    State({'type': 'post-question', 'id': ALL}, 'value'),
-    State({'type': 'post-question', 'id': ALL}, 'id'),
+    State({'type': 'post-study-question', 'id': ALL}, 'value'),
+    State({'type': 'post-study-question', 'id': ALL}, 'id'),
     prevent_initial_call=True
 )
 def submit_final_questionnaire(n_clicks, participant_data, study_state, responses, interactions, all_message_logs, post_values, post_ids):
@@ -1580,12 +2169,15 @@ def submit_final_questionnaire(n_clicks, participant_data, study_state, response
         'type': 'post_study',
         'answers': answer_dict
     }
-    final_responses = responses + [post_response]
+    final_responses = (responses or []) + [post_response]
     
     print("Saving final study data...")
     try:
+        # Save all data one last time
+        # Note: save_study_data will just write the *last* post-scenario response
+        # to the CSV, which is fine since it was already written.
+        # The main thing is saving the final_responses to the JSON.
         save_study_data(participant_data, final_responses, interactions)
-        # --- NEW: Save final message logs ---
         save_message_logs(participant_data, all_message_logs, study_state)
     except Exception as e:
         print(f"Error during final save: {e}")
@@ -1697,4 +2289,4 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
     # --- END MODIFICATION ---
     
     # Use debug=False for actual study deployment
-    app.run(debug=False, host='0.0.0.0', port=9164)
+    app.run(debug=False, host='0.0.0.0', port=9760)
