@@ -66,21 +66,21 @@ THRESHOLD_VALUES = {
 }
 
 SCENARIO_CONFIG = {
-    1: {'total_time': 332.0, 'total_steps': 236},
-    2: {'total_time': 307.0, 'total_steps': 212},
-    3: {'total_time': 362.0, 'total_steps': 417},
-    4: {'total_time': 358.0, 'total_steps': 373},
-    5: {'total_time': 363.0, 'total_steps': 399},
-    6: {'total_time': 398.0, 'total_steps': 441}
+    1: {'total_time': 335.0, 'total_steps': 245},
+    2: {'total_time': 300.0, 'total_steps': 361},
+    3: {'total_time': 360.0, 'total_steps': 417},
+    4: {'total_time': 350.0, 'total_steps': 372},
+    5: {'total_time': 370.0, 'total_steps': 400},
+    6: {'total_time': 400.0, 'total_steps': 441}
 }
 
 PAUSE_POINTS = {
-    1: [10, 160, 220],
-    2: [10, 100, 140],
-    3: [10, 120, 170],
-    4: [10, 100, 150],
-    5: [10, 140, 190],
-    6: [10, 130, 180]
+    1: [117, 154, 237],
+    2: [53, 115, 336],
+    3: [142, 208, 353],
+    4: [20, 101, 329],
+    5: [119, 130, 383],
+    6: [140, 175, 322]
 }
 
 # --- 24-COMBINATION STUDY DESIGN ---
