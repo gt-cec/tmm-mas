@@ -1,0 +1,93 @@
+
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+.robot-column { display: flex; flex-direction: column; gap: 15px; flex: 1; height: 100%; }
+.robot-card-top {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    padding: 10px 20px;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    flex-shrink: 0;
+}
+
+.robot-card-bottom {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-height: 0;
+}
+
+.message-box {
+    height: 100%;
+    overflow-y: auto;
+    padding-right: 10px;
+    flex-grow: 1;
+}
+
+/* This class is for the Map View's log */
+.message-box-dark-theme {
+    height: 100%;
+    overflow-y: auto;
+    padding-right: 10px;
+    flex-grow: 1;
+}
+
+.divider { text-align: center; color: #aaa; font-size: 0.9em; margin: 15px 0; }
+.divider::before, .divider::after { content: ' ― '; }
+
+.robot-card-top .rc-slider-track { background-color: #007bff !important; height: 12px;}
+.robot-card-top .rc-slider-rail { background-color: #e9ecef !important; height: 12px;}
+.robot-card-top .rc-slider-mark-text { color: #555; font-weight: bold; }
+.robot-card-top .rc-slider-disabled .rc-slider-handle { display: none; }
+
+/* Base style for all message containers */
+.message-container-details {
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 13px;
+    border: 1px solid #ddd;
+    color: #212529;
+    background-color: #f8f9fa; /* Default light background */
+}
+
+.message-container-details summary {
+    cursor: pointer;
+    outline: none;
+    display: block;
+}
+
+.message-container-details summary::-webkit-details-marker {
+    display: none;
+}
+
+/* Specific background colors via classes */
+.message-container-details.replan {
+    background-color: #ffdede; /* Red for replan */
+    border-color: #ffb0b0;
+}
+
+.message-container-details.on-track {
+    background-color: #e0f5e1; /* Green for on-track */
+    border-color: #b0dcb0;
+}
+
+.message-container-details.stationary {
+    background-color: #fff9c4; /* Yellow for stationary */
+    border-color: #e0dcb0;
+}
+
+/* Animation for new messages */
+@keyframes flash-border {
+    0% { box-shadow: 0 0 10px 3px #00ff88; }
+    100% { box-shadow: none; }
+}
+
+.message-container-details.new-message {
+    animation: flash-border 1.2s ease-out;
+}
