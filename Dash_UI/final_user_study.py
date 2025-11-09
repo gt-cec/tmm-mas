@@ -991,7 +991,7 @@ def create_post_scenario_questionnaire(scenario_num, run_number, total_runs):
         {'id': 'temporal_demand', 'text': 'Temporal Demand: How hurried or rushed did the pace of the task feel?', 'options': ['1 - Very Low', '2 - Low', '3 - Moderate', '4 - High', '5 - Very High']},
         {'id': 'performance', 'text': 'Performance: How successful were you in accomplishing what you were asked to do?', 'options': ['1 - Very Poor', '2 - Poor', '3 - Moderate', '4 - Good', '5 - Excellent']},
         {'id': 'effort', 'text': 'Effort: How hard did you have to work to achieve your level of performance?', 'options': ['1 - Very Low', '2 - Low', '3 - Moderate', '4 - High', '5 - Very High']},
-        {'id': 'frustration', 'text': 'Frustration: How irritated, stressed, or discouraged did you feel during this segment?', 'options': ['1 - Very Low', '2 - Low', '3 - Moderate', '4D - High', '5 - Very High']},
+        {'id': 'frustration', 'text': 'Frustration: How irritated, stressed, or discouraged did you feel during this segment?', 'options': ['1 - Very Low', '2 - Low', '3 - Moderate', '4 - High', '5 - Very High']},
     ]
 
     return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh',
