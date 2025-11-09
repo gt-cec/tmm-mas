@@ -53,7 +53,7 @@ GRID_HEIGHT = 20
 UPDATE_INTERVAL_MS = 1000
 SLOW_INTERVAL_MS = 2000
 # --- NEW: Fast interval for click polling ---
-CLICK_POLL_INTERVAL_MS = 100 
+CLICK_POLL_INTERVAL_MS = 1000
 
 # --- ADDED CONSTANTS for participant counting ---
 PARTICIPANT_COUNT_FILE = 'study_data/participant_count.txt'
@@ -2299,4 +2299,4 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
     # --- END MODIFICATION ---
     
     # Use debug=False for actual study deployment
-    app.run(debug=False, host='0.0.0.0', port=9760)
+    app.run(debug=False, host='0.0.0.0', port=9761)

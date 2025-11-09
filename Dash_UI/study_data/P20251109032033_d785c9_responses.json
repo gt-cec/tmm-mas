@@ -1,49 +1,49 @@
 [
   {
-    "timestamp": "2025-11-09T01:57:43.938718",
+    "timestamp": "2025-11-09T03:22:56.517556",
     "type": "pause_question",
     "run_number": 1,
     "scenario": 1,
-    "condition": 0,
+    "condition": 1,
     "pause_point": 1,
     "question": "Has more than one package been discovered?",
     "answer": "Yes"
   },
   {
-    "timestamp": "2025-11-09T01:58:48.533989",
+    "timestamp": "2025-11-09T03:23:36.664567",
     "type": "pause_question",
     "run_number": 1,
     "scenario": 1,
-    "condition": 0,
+    "condition": 1,
     "pause_point": 2,
     "question": "Which quadrant has most packages been discovered?",
     "answer": "NE"
   },
   {
-    "timestamp": "2025-11-09T02:01:31.383290",
+    "timestamp": "2025-11-09T03:25:07.599263",
     "type": "pause_question",
     "run_number": 1,
     "scenario": 1,
-    "condition": 0,
+    "condition": 1,
     "pause_point": 3,
     "question": "Which containment zone will robot 3 deliver its package to?",
-    "answer": "c. Robot 3 will go to the NE quadrant and deliver its package in the NW"
+    "answer": "b. Robot 3 will remain in the SW quadrant and deliver its package in the SW"
   },
   {
-    "timestamp": "2025-11-09T02:01:47.504319",
+    "timestamp": "2025-11-09T03:25:22.842892",
     "type": "post_scenario",
-    "segment_start_time": "2025-11-09T02:01:31.383300",
+    "segment_start_time": "2025-11-09T03:25:07.599272",
     "run_number": 1,
     "scenario": 1,
-    "condition": 0,
+    "condition": 1,
     "view_type": "map",
-    "framework": "with_framework",
+    "framework": "without_framework",
     "answers": {
-      "mental_demand": "3 - Moderate",
-      "physical_demand": "3 - Moderate",
-      "temporal_demand": "3 - Moderate",
-      "performance": "3 - Moderate",
-      "effort": "3 - Moderate",
+      "mental_demand": "4 - High",
+      "physical_demand": "4 - High",
+      "temporal_demand": "4 - High",
+      "performance": "2 - Poor",
+      "effort": "5 - Very High",
       "frustration": "3 - Moderate"
     }
   }
