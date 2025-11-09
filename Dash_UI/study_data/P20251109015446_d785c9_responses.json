@@ -1,0 +1,50 @@
+[
+  {
+    "timestamp": "2025-11-09T01:57:43.938718",
+    "type": "pause_question",
+    "run_number": 1,
+    "scenario": 1,
+    "condition": 0,
+    "pause_point": 1,
+    "question": "Has more than one package been discovered?",
+    "answer": "Yes"
+  },
+  {
+    "timestamp": "2025-11-09T01:58:48.533989",
+    "type": "pause_question",
+    "run_number": 1,
+    "scenario": 1,
+    "condition": 0,
+    "pause_point": 2,
+    "question": "Which quadrant has most packages been discovered?",
+    "answer": "NE"
+  },
+  {
+    "timestamp": "2025-11-09T02:01:31.383290",
+    "type": "pause_question",
+    "run_number": 1,
+    "scenario": 1,
+    "condition": 0,
+    "pause_point": 3,
+    "question": "Which containment zone will robot 3 deliver its package to?",
+    "answer": "c. Robot 3 will go to the NE quadrant and deliver its package in the NW"
+  },
+  {
+    "timestamp": "2025-11-09T02:01:47.504319",
+    "type": "post_scenario",
+    "segment_start_time": "2025-11-09T02:01:31.383300",
+    "run_number": 1,
+    "scenario": 1,
+    "condition": 0,
+    "view_type": "map",
+    "framework": "with_framework",
+    "answers": {
+      "mental_demand": "3 - Moderate",
+      "physical_demand": "3 - Moderate",
+      "temporal_demand": "3 - Moderate",
+      "performance": "3 - Moderate",
+      "effort": "3 - Moderate",
+      "frustration": "3 - Moderate"
+    }
+  }
+]

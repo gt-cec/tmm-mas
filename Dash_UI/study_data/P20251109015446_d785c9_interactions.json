@@ -1,0 +1,35 @@
+[
+  {
+    "timestamp_iso": "2025-11-09T02:01:36.656000",
+    "timestamp_unix": 1762671696.656,
+    "participant": "P20251109015446_d785c9",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 242,
+    "type": "message_click",
+    "message_id": "robot2-305.13",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-09T02:01:37.789000",
+    "timestamp_unix": 1762671697.789,
+    "participant": "P20251109015446_d785c9",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 243,
+    "type": "message_click",
+    "message_id": "robot1-305.13",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-09T02:01:38.645000",
+    "timestamp_unix": 1762671698.645,
+    "participant": "P20251109015446_d785c9",
+    "scenario": 1,
+    "condition": 0,
+    "frame": 244,
+    "type": "message_click",
+    "message_id": "robot3-305.13",
+    "action": "opened"
+  }
+]
