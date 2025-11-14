@@ -1,5 +1,3 @@
-
-
 import dash
 from dash import dcc, html, Input, Output, State, callback_context, no_update
 from dash.dependencies import ALL
@@ -62,8 +60,19 @@ PARTICIPANT_COUNT_LOCK = 'study_data/participant_count.lock'
 
 THRESHOLD_VALUES = {
     'with_framework': {1: 5, 2: 12, 3: 15, 4: 9, 5: 10, 6: 11},
-    'without_framework': {1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}
+    'without_framework': {1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1} # This is now IGNORED by the new logic
 }
+
+# --- NEW: Frame intervals for 'without_framework' mode ---
+WITHOUT_FRAMEWORK_INTERVALS = {
+    1: 10,
+    2: 15,
+    3: 20,
+    4: 30,
+    5: 25,
+    6: 20
+}
+# --- END NEW ---
 
 SCENARIO_CONFIG = {
     1: {'total_time': 335.0, 'total_steps': 245},
@@ -481,7 +490,7 @@ def save_study_data(participant_data, responses, interactions):
 
 
 # --- Figure and Component Creation ---
-# --- vvv MODIFICATIONS BELOW vvv ---
+# --- vvv *** MAJOR MODIFICATION: create_figure_for_frame *** vvv ---
 def create_figure_for_frame(static_data, frame_data):
     fig = go.Figure()
 
@@ -490,7 +499,21 @@ def create_figure_for_frame(static_data, frame_data):
         xaxis=dict(range=[0, GRID_WIDTH], autorange=True, showgrid=True, gridcolor='rgba(100,100,100,0.3)', zeroline=False, dtick=10),
         yaxis=dict(range=[0, GRID_HEIGHT], autorange=True, showgrid=True, gridcolor='rgba(100,100,100,0.3)', zeroline=False),
         plot_bgcolor='#ffffff', paper_bgcolor='#ffffff', font=dict(color='black'),
-        showlegend=False, margin=dict(l=0, r=0, t=0, b=0), uirevision='constant',
+        # --- MODIFIED: Show legend and style it ---
+        showlegend=True,
+        legend=dict(
+            title='Legend',
+            orientation='v',
+            yanchor='top',
+            y=1,
+            xanchor='left',
+            x=1.02,
+            bgcolor='rgba(255,255,255,0.7)',
+            bordercolor='Black',
+            borderwidth=1
+        ),
+        # --- END MODIFICATION ---
+        margin=dict(l=0, r=0, t=0, b=0), uirevision='constant',
         annotations=[
             go.layout.Annotation(
                 x=2.5, y=17.5, text="NW", showarrow=False,
@@ -510,6 +533,28 @@ def create_figure_for_frame(static_data, frame_data):
             )
         ]
     )
+    
+    # --- NEW: Add dummy traces for the new legend items ---
+    # These traces have no data (x=[None]) but will populate the legend.
+    fig.add_trace(go.Scatter(
+        x=[None], y=[None], # No data
+        mode='markers',
+        marker=dict(color='rgb(173, 216, 230)', size=10, symbol='square'),
+        name='Bad Weather Zone'
+    ))
+    fig.add_trace(go.Scatter(
+        x=[None], y=[None], # No data
+        mode='markers',
+        marker=dict(color='rgb(128, 128, 128)', size=10, symbol='square'),
+        name='Rough Terrain Zone'
+    ))
+    fig.add_trace(go.Scatter(
+        x=[None], y=[None], # No data
+        mode='markers',
+        marker=dict(color='rgb(255, 255, 0)', size=10, symbol='circle'), # Use circle as per user
+        name='Charging Station'
+    ))
+    # --- END NEW ---
 
     walls_data = frame_data.get('walls', []) if frame_data else static_data.get('walls', [])
     zones_data = frame_data.get('zones', []) if frame_data else static_data.get('zones', [])
@@ -520,8 +565,10 @@ def create_figure_for_frame(static_data, frame_data):
         wall_coords = sorted(wall.items())
         wall_x = [v for k, v in wall_coords if k.startswith('x')]
         wall_y = [v for k, v in wall_coords if k.startswith('y')]
+        # --- MODIFIED: Added showlegend=False ---
         fig.add_trace(go.Scatter(x=wall_x, y=wall_y, mode='lines',
-                                 line=dict(color='black', width=2), hoverinfo='none'))
+                                 line=dict(color='black', width=2), hoverinfo='none',
+                                 showlegend=False))
 
     for zone in zones_data:
         color_str = zone.get('color', 'rgba(0,0,0,0)')
@@ -530,8 +577,10 @@ def create_figure_for_frame(static_data, frame_data):
         zone_coords = sorted(zone.items())
         zone_x = [v for k, v in zone_coords if k.startswith('x')]
         zone_y = [v for k, v in zone_coords if k.startswith('y')]
+        # --- MODIFIED: Added showlegend=False ---
         fig.add_trace(go.Scatter(x=zone_x, y=zone_y, fill="toself", fillcolor=color_str,
-                                 line=dict(width=0), mode='lines', hoverinfo='none'))
+                                 line=dict(width=0), mode='lines', hoverinfo='none',
+                                 showlegend=False))
 
     edge_x, edge_y = [], []
     for edge in edges_data:
@@ -541,8 +590,10 @@ def create_figure_for_frame(static_data, frame_data):
     if nodes_data:
         node_x = [node[0] for node in nodes_data]
         node_y = [node[1] for node in nodes_data]
+        # --- MODIFIED: Added showlegend=False ---
         fig.add_trace(go.Scatter(x=node_x, y=node_y, mode='markers',
-                                 marker=dict(size=4, color='rgba(50, 50, 150, 0.8)'), hoverinfo='none'))
+                                 marker=dict(size=4, color='rgba(50, 50, 150, 0.8)'), hoverinfo='none',
+                                 showlegend=False))
 
     if frame_data:
         robots = [{'id': rid, **rdata} for rid, rdata in frame_data.get('robots', {}).items()]
@@ -565,24 +616,25 @@ def create_figure_for_frame(static_data, frame_data):
                 }
                 traces['colors'].append(color_map.get(r_state, 'grey'))
 
+            # --- MODIFIED: Added name for legend ---
             fig.add_trace(go.Scatter(x=traces['x'], y=traces['y'], mode='markers+text',
+                                     name='Robot', # <-- ADDED
                                      marker=dict(size=40, color=traces['colors'], line=dict(width=2, color='white')),
                                      text=traces['texts'], textposition='middle center',
                                      textfont=dict(color='white', size=12, family="Arial Black"),
                                      hovertext=traces['hovers'], hoverinfo='text'))
 
-        # ===== FIXED PACKAGE RENDERING SECTION =====
+        # ===== MODIFIED PACKAGE RENDERING SECTION (for Legend) =====
         if packages:
-            pkg_x = []
-            pkg_y = []
-            pkg_texts = []
-            pkg_hovers = []
-            pkg_colors = []
-            pkg_symbols = []
+            # --- 1. Initialize lists for each package type ---
+            # Gold Square (Known 'p' packages OR Carried packages)
+            known_pkg_x, known_pkg_y, known_pkg_texts, known_pkg_hovers = [], [], [], []
+            # Gold Triangle (Discovered 'd' packages)
+            discovered_d_pkg_x, discovered_d_pkg_y, discovered_d_pkg_texts, discovered_d_pkg_hovers = [], [], [], []
+            # Green Triangle (Undiscovered 'd' packages)
+            undiscovered_d_pkg_x, undiscovered_d_pkg_y, undiscovered_d_pkg_texts, undiscovered_d_pkg_hovers = [], [], [], []
 
             robot_pos = {r['id']: (r['x'], r['y']) for r in robots}
-
-            # Track plotted coordinates to avoid duplicates
             plotted_coords = set()
 
             for p in packages:
@@ -591,70 +643,91 @@ def create_figure_for_frame(static_data, frame_data):
                 is_d_package = p['id'].startswith('d')
 
                 if is_d_package:
-                    # 'd' packages default to 0 (undiscovered) if 'Discovered' key is missing
                     is_discovered = p.get('Discovered', 0) == 1
                 else:
-                    # 'p' packages are ALWAYS treated as discovered
                     is_discovered = True
 
-                # Get position
                 if is_carried:
                     px, py = robot_pos.get(carried_by_robot, (p.get('x', 0), p.get('y', 0)))
                 else:
                     px, py = p.get('x', 0), p.get('y', 0)
 
-                # Create coordinate key for duplicate checking
                 coord_key = (round(px, 2), round(py, 2), is_carried)
-
-                # Skip if this coordinate already has a package plotted
                 if coord_key in plotted_coords:
                     continue
-
                 plotted_coords.add(coord_key)
+                
+                pkg_text = p['id'][-1]
 
-                pkg_x.append(px)
-                pkg_y.append(py)
-                pkg_texts.append(p['id'][-1])
-
-                # Determine color and shape based on state
+                # --- 2. Sort data into the correct list ---
                 if is_carried:
-                    pkg_colors.append('gold')
-                    pkg_symbols.append('square')
-                    pkg_hovers.append(f"Package {p['id']}, Carried by {carried_by_robot}")
+                    known_pkg_x.append(px)
+                    known_pkg_y.append(py)
+                    known_pkg_texts.append(pkg_text)
+                    known_pkg_hovers.append(f"Package {p['id']}, Carried by {carried_by_robot}")
+                
                 elif is_d_package:
                     if is_discovered:
-                        # 'd' package that is now discovered
-                        pkg_colors.append('gold')  # yellow
-                        pkg_symbols.append('triangle-up')  # triangle
-                        pkg_hovers.append(f"Package {p['id']}, On Ground (Discovered 'd' package)")
+                        # Discovered 'd' package (Gold Triangle)
+                        discovered_d_pkg_x.append(px)
+                        discovered_d_pkg_y.append(py)
+                        discovered_d_pkg_texts.append(pkg_text)
+                        discovered_d_pkg_hovers.append(f"Package {p['id']}, On Ground (Discovered 'd' package)")
                     else:
-                        # 'd' package that is still undiscovered
-                        pkg_colors.append('lightgreen')  # green
-                        pkg_symbols.append('triangle-up')  # triangle
-                        pkg_hovers.append(f"Package {p['id']}, On Ground (Undiscovered 'd' package)")
-                else:  # 'p' package (always discovered)
-                    pkg_colors.append('gold')
-                    pkg_symbols.append('square')
-                    pkg_hovers.append(f"Package {p['id']}, On Ground (Pre-known 'p' package)")
+                        # Undiscovered 'd' package (Green Triangle)
+                        undiscovered_d_pkg_x.append(px)
+                        undiscovered_d_pkg_y.append(py)
+                        undiscovered_d_pkg_texts.append(pkg_text)
+                        undiscovered_d_pkg_hovers.append(f"Package {p['id']}, On Ground (Undiscovered 'd' package)")
+                
+                else: # 'p' package (Gold Square)
+                    known_pkg_x.append(px)
+                    known_pkg_y.append(py)
+                    known_pkg_texts.append(pkg_text)
+                    known_pkg_hovers.append(f"Package {p['id']}, On Ground (Pre-known 'p' package)")
 
-            fig.add_trace(go.Scatter(
-                x=pkg_x,
-                y=pkg_y,
-                mode='markers+text',
-                marker=dict(
-                    size=20,
-                    color=pkg_colors,
-                    symbol=pkg_symbols,
-                    line=dict(width=1, color='black')
-                ),
-                text=pkg_texts,
-                textposition='middle center',
-                textfont=dict(color='black', size=10, family="Arial Black"),
-                hovertext=pkg_hovers,
-                hoverinfo='text'
-            ))
+            # --- 3. Add a separate trace for each package type ---
+            
+            # Gold Square (Known/Carried)
+            if known_pkg_x:
+                fig.add_trace(go.Scatter(
+                    x=known_pkg_x, y=known_pkg_y,
+                    name='Package (Known/Carried)',
+                    mode='markers+text',
+                    marker=dict(size=20, color='gold', symbol='square', line=dict(width=1, color='black')),
+                    text=known_pkg_texts, textposition='middle center',
+                    textfont=dict(color='black', size=10, family="Arial Black"),
+                    hovertext=known_pkg_hovers, hoverinfo='text'
+                ))
+
+            # Gold Triangle (Discovered 'd')
+            if discovered_d_pkg_x:
+                fig.add_trace(go.Scatter(
+                    x=discovered_d_pkg_x, y=discovered_d_pkg_y,
+                    name="Package (Discovered 'd')",
+                    mode='markers+text',
+                    marker=dict(size=20, color='gold', symbol='triangle-up', line=dict(width=1, color='black')),
+                    text=discovered_d_pkg_texts, textposition='middle center',
+                    textfont=dict(color='black', size=10, family="Arial Black"),
+                    hovertext=discovered_d_pkg_hovers, hoverinfo='text'
+                ))
+
+            # Green Triangle (Undiscovered 'd')
+            if undiscovered_d_pkg_x:
+                fig.add_trace(go.Scatter(
+                    x=undiscovered_d_pkg_x, y=undiscovered_d_pkg_y,
+                    name="Package (Undiscovered 'd')",
+                    mode='markers+text',
+                    marker=dict(size=20, color='lightgreen', symbol='triangle-up', line=dict(width=1, color='black')),
+                    text=undiscovered_d_pkg_texts, textposition='middle center',
+                    textfont=dict(color='black', size=10, family="Arial Black"),
+                    hovertext=undiscovered_d_pkg_hovers, hoverinfo='text'
+                ))
+        # ===== END MODIFIED SECTION =====
 
     return fig
+# --- ^^^ *** END MAJOR MODIFICATION *** ^^^ ---
+
 
 # --- vvv MODIFICATIONS vvv ---
 def create_rich_status_message_data(robot_data, sim_time, all_packages, selected_robot_hmm_array, selected_robot_rmm_array, scenario_id):
@@ -1543,7 +1616,7 @@ def programmatically_switch_view(study_state, participant_data):
     return map_style, text_style, header_text
 
 # --- *** MAJOR MODIFICATION: update_simulation_views *** ---
-# --- This callback now saves DATA to stores, not components ---
+# --- This callback now implements the new 'without_framework' logic ---
 @app.callback(
     Output('simulation-graph', 'figure'),
     # --- MODIFIED: Outputs are to stores, not UI ---
@@ -1622,23 +1695,27 @@ def update_simulation_views(frame_idx, study_state,
     current_frame_data = scenario_data[frame_idx]
     fig = create_figure_for_frame(static_map_data, current_frame_data)
     
-    mission_time_threshold = THRESHOLD_VALUES[framework_mode].get(scenario_num, 1)
+    # --- THIS IS ONLY USED FOR 'with_framework' NOW ---
+    mission_time_threshold = THRESHOLD_VALUES['with_framework'].get(scenario_num, 1)
+    
     robots_dict = current_frame_data.get('robots', {})
     packages = current_frame_data.get('packages', [])
-    
-    
     
     # --- MODIFIED: hist1, hist2, hist3 now come from stores (and contain DATA, not components) ---
     histories = [hist1, hist2, hist3]
     # This will hold the new DATA lists for the stores
     new_robot_message_outputs = [histories[0] or [], histories[1] or [], histories[2] or []]
     sim_time = current_frame_data.get('simulator time', 0)
-    any_sync_occurred = False
+    
+    # --- MODIFIED: This flag is now specific to 'with_framework' to control interval speed ---
+    any_sync_occurred_with_framework = False
+    
     newly_generated_messages_for_feed = []
     
     for i in range(1, 4):
         robot_id = f'robot{i}'
         if robot_id in robots_dict:
+            # --- 1. Get common robot data (needed for both modes) ---
             raw_robot_data = robots_dict[robot_id]
             # --- ADD 'Quadrant' and 'Bad_Terrain' to keys ---
             rmm_keys_to_select = [
@@ -1655,100 +1732,111 @@ def update_simulation_views(frame_idx, study_state,
             selected_robot_hmm_array = current_hmms.get(robot_id)
             robot_info = {**robots_dict[robot_id], 'id': robot_id}
             
-            if selected_robot_hmm_array:
-                try:
-                    updated_hmm_array, sync_occurred = dynamic_deviation_threshold_multi_logic(
-                        hmm_array=selected_robot_hmm_array,
-                        rmm_array=selected_robot_rmm_array,
-                        update_logic_functions={},
-                        uncertainty_factor_pos=0.1,
-                        uncertainty_factor_time=0.1,
-                        dynamic_threshold_mission_time=mission_time_threshold,
-                        robot_id=robot_id
-                    )
-                except Exception as e:
-                    print(f"Error in backend logic for {robot_id}: {e}")
-                    sync_occurred = False
-                    updated_hmm_array = selected_robot_hmm_array
-                
-                current_hmms[robot_id] = updated_hmm_array
-                
-                
-                if sync_occurred:
-                    any_sync_occurred = True
-                    
-                    # --- MODIFIED: Call new data function ---
-                    new_message_data, message_type, message_text_for_log = create_rich_status_message_data(
-                        robot_info,
-                        sim_time,
-                        packages,
-                        selected_robot_hmm_array, # Pass previous HMM
-                        selected_robot_rmm_array, # Pass current RMM
-                        scenario_num
-                    )
-                    
-                    # --- NEW: Check for skipped message (e.g., carrying N/A) ---
-                    if new_message_data is None:
-                        continue # Skip message generation for this robot
-                    # --- END NEW ---
-
-                    # --- MODIFICATION: Check for duplicates ---
-                    current_robot_history = new_robot_message_outputs[i-1]
-                    is_duplicate = False
-                    if current_robot_history:
-                        # Compare the new details_msg (list) to the previous one
-                        if new_message_data['details_msg'] == current_robot_history[0]['details_msg']:
-                            is_duplicate = True
-                    
-                    if not is_duplicate:
-                        is_new_message = False
-                        msg_id = new_message_data['message_id'] # <-- Get ID from data
-                        
-                        if msg_id not in new_message_timestamps:
-                            appear_time = time.time()
-                            new_message_timestamps[msg_id] = appear_time
-                            is_new_message = True
-                            
-                            log_entry = create_message_log_entry(
-                                message_id=msg_id,
-                                robot_id=robot_id,
-                                scenario_num=scenario_num,
-                                condition_idx=condition_idx,
-                                frame_idx=frame_idx,
-                                sim_time=sim_time,
-                                message_type=message_type,
-                                message_text=message_text_for_log, # <-- Use flattened string for log
-                                participant_id=participant_data.get('id'),
-                                appear_time=appear_time,
-                                robot_state=robot_info.get('state'),
-                                robot_x=robot_info.get('x'),
-                                robot_y=robot_info.get('y')
-                            )
-                            new_all_message_logs.append(log_entry)
-                        
-                        # --- Create the component for the Map UI (which needs 'new-message') ---
-                        new_message_div = render_message_component(
-                            new_message_data,
-                            current_open_message_ids,
-                            is_new=is_new_message # <-- Pass blink status
+            sync_occurred = False # Trigger for 'with_framework'
+            generate_message = False # Trigger for 'without_framework'
+            
+            # --- 2. Apply mode-specific logic ---
+            if framework_mode == 'with_framework':
+                if selected_robot_hmm_array:
+                    try:
+                        updated_hmm_array, sync_occurred = dynamic_deviation_threshold_multi_logic(
+                            hmm_array=selected_robot_hmm_array,
+                            rmm_array=selected_robot_rmm_array,
+                            update_logic_functions={},
+                            uncertainty_factor_pos=0.1,
+                            uncertainty_factor_time=0.1,
+                            dynamic_threshold_mission_time=mission_time_threshold,
+                            robot_id=robot_id
                         )
+                    except Exception as e:
+                        print(f"Error in backend logic for {robot_id}: {e}")
+                        sync_occurred = False
+                        updated_hmm_array = selected_robot_hmm_array
+                    
+                    current_hmms[robot_id] = updated_hmm_array # Update HMM
+                    if sync_occurred:
+                        any_sync_occurred_with_framework = True # Set flag for interval speed
+            
+            else: # framework_mode == 'without_framework'
+                # Get the interval from our new dictionary
+                interval = WITHOUT_FRAMEWORK_INTERVALS.get(scenario_num, 20) # Default to 20
+                if frame_idx > 0 and frame_idx % interval == 0:
+                    generate_message = True
+                # We DON'T run the logic, DON'T update the HMM, and DON'T set sync_occurred
+            
+            # --- 3. Generate message if *either* trigger is true ---
+            if sync_occurred or generate_message:
+                
+                # --- Create the message data ---
+                new_message_data, message_type, message_text_for_log = create_rich_status_message_data(
+                    robot_info,
+                    sim_time,
+                    packages,
+                    selected_robot_hmm_array, # Pass previous HMM (for 'with') or current HMM (for 'without')
+                    selected_robot_rmm_array, # Pass current RMM
+                    scenario_num
+                )
+                
+                # --- Check for skipped message (e.g., carrying N/A) ---
+                if new_message_data is None:
+                    continue # Skip message generation for this robot
+                
+                # --- Check for duplicates ---
+                current_robot_history = new_robot_message_outputs[i-1]
+                is_duplicate = False
+                if current_robot_history:
+                    # Compare the new details_msg (list) to the previous one
+                    if new_message_data['details_msg'] == current_robot_history[0]['details_msg']:
+                        is_duplicate = True
+                
+                if not is_duplicate:
+                    is_new_message = False
+                    msg_id = new_message_data['message_id'] # <-- Get ID from data
+                    
+                    if msg_id not in new_message_timestamps:
+                        appear_time = time.time()
+                        new_message_timestamps[msg_id] = appear_time
+                        is_new_message = True
                         
-                        newly_generated_messages_for_feed.append(new_message_div)
-                        
-                        # --- MODIFIED: Update the Text UI *store* with *data*, not components ---
-                        
-                        # 1. Start new history with new *data*
-                        updated_history_data = [new_message_data]
-                        
-                        # 2. Get old history *data* from store
-                        current_hist_data = histories[i-1] if isinstance(histories[i-1], list) else ([histories[i-1]] if histories[i-1] else [])
-                        
-                        # 3. Extend
-                        updated_history_data.extend(current_hist_data)
-                        
-                        # 4. Set output to store
-                        new_robot_message_outputs[i-1] = updated_history_data
-                        # --- END TEXT UI STORE MODIFICATION ---
+                        log_entry = create_message_log_entry(
+                            message_id=msg_id,
+                            robot_id=robot_id,
+                            scenario_num=scenario_num,
+                            condition_idx=condition_idx,
+                            frame_idx=frame_idx,
+                            sim_time=sim_time,
+                            message_type=message_type,
+                            message_text=message_text_for_log, # <-- Use flattened string for log
+                            participant_id=participant_data.get('id'),
+                            appear_time=appear_time,
+                            robot_state=robot_info.get('state'),
+                            robot_x=robot_info.get('x'),
+                            robot_y=robot_info.get('y')
+                        )
+                        new_all_message_logs.append(log_entry)
+                    
+                    # --- Create the component for the Map UI (which needs 'new-message') ---
+                    new_message_div = render_message_component(
+                        new_message_data,
+                        current_open_message_ids,
+                        is_new=is_new_message # <-- Pass blink status
+                    )
+                    
+                    newly_generated_messages_for_feed.append(new_message_div)
+                    
+                    # --- Update the Text UI *store* with *data*, not components ---
+                    
+                    # 1. Start new history with new *data*
+                    updated_history_data = [new_message_data]
+                    
+                    # 2. Get old history *data* from store
+                    current_hist_data = histories[i-1] if isinstance(histories[i-1], list) else ([histories[i-1]] if histories[i-1] else [])
+                    
+                    # 3. Extend
+                    updated_history_data.extend(current_hist_data)
+                    
+                    # 4. Set output to store
+                    new_robot_message_outputs[i-1] = updated_history_data
     
     # --- vvv NEW LOGIC FOR PACKAGE DISCOVERY vvv ---
     if frame_idx > 0:
@@ -1844,7 +1932,8 @@ def update_simulation_views(frame_idx, study_state,
     updated_all_messages = newly_generated_messages_for_feed + (all_messages_history or [])
     updated_all_messages = updated_all_messages[:100] # Trim
     
-    new_interval = SLOW_INTERVAL_MS if any_sync_occurred and framework_mode == 'with_framework' else UPDATE_INTERVAL_MS
+    # --- MODIFIED: Interval speed only changes if a 'with_framework' sync occurred ---
+    new_interval = SLOW_INTERVAL_MS if any_sync_occurred_with_framework else UPDATE_INTERVAL_MS
     
     return (
         fig,
@@ -1934,19 +2023,29 @@ def update_robot_3_ui(message_data_list, open_message_ids):
     return children
 # --- END NEW/MODIFIED CALLBACKS ---
 
-# update_snapshot is UNCHANGED
+# --- *** MODIFIED: update_snapshot (now creates a static map) *** ---
 @app.callback(
     Output('simulation-map-snapshot', 'figure'),
-    Input('simulation-graph', 'figure'),
+    Input('scenario-data-store', 'data'), # <-- CHANGED: Trigger on data load
     Input('study-state-store', 'data')
 )
-def update_snapshot(main_fig, study_state):
-    if not study_state or study_state.get('phase') != 'simulation':
+def update_snapshot(scenario_data, study_state): # <-- CHANGED: Argument is scenario_data
+    if not study_state or study_state.get('phase') != 'simulation' or not scenario_data:
         return no_update
-    if main_fig is None:
-        return initial_figure
-    snapshot_fig = go.Figure(main_fig)
-    for trace in snapshot_fig.data:
+    
+    # --- NEW LOGIC: Create figure from Frame 0 ---
+    try:
+        frame_0_data = scenario_data[0]
+    except Exception:
+        print("Error getting frame 0 for snapshot, using initial figure.")
+        return initial_figure # Fallback
+    
+    # Create the static figure from frame 0
+    static_fig = create_figure_for_frame(static_map_data, frame_0_data)
+    # --- END NEW LOGIC ---
+
+    # Apply scaling logic
+    for trace in static_fig.data:
         if hasattr(trace, 'marker') and trace.marker is not None:
             trace.marker.size = (
                 [s * 0.5 for s in trace.marker.size]
@@ -1957,13 +2056,15 @@ def update_snapshot(main_fig, study_state):
             )
         if hasattr(trace, 'line') and trace.line is not None:
             trace.line.width = trace.line.width * 0.5 if trace.line.width else 1
-    snapshot_fig.update_layout(
+    
+    static_fig.update_layout(
         margin=dict(l=0, r=0, t=20, b=0),
-        showlegend=False,
+        showlegend=False, # <-- MODIFIED: Keep legend OFF for this small map
         title=None,
         font=dict(size=8),
     )
-    return snapshot_fig
+    return static_fig
+# --- END MODIFICATION ---
 
 # log_graph_click is UNCHANGED
 @app.callback(
@@ -2299,5 +2400,5 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
     # --- END MODIFICATION ---
     
     # Use debug=False for actual study deployment
-    app.run(debug=False, host='0.0.0.0', port=9566)
+    app.run(debug=False, host='0.0.0.0', port=9562)
     # server = app.server

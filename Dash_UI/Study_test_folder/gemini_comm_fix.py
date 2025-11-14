@@ -1,5 +1,3 @@
-
-
 import dash
 from dash import dcc, html, Input, Output, State, callback_context, no_update
 from dash.dependencies import ALL
@@ -62,8 +60,19 @@ PARTICIPANT_COUNT_LOCK = 'study_data/participant_count.lock'
 
 THRESHOLD_VALUES = {
     'with_framework': {1: 5, 2: 12, 3: 15, 4: 9, 5: 10, 6: 11},
-    'without_framework': {1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}
+    'without_framework': {1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1} # This is now IGNORED by the new logic
 }
+
+# --- NEW: Frame intervals for 'without_framework' mode ---
+WITHOUT_FRAMEWORK_INTERVALS = {
+    1: 10,
+    2: 15,
+    3: 20,
+    4: 30,
+    5: 25,
+    6: 20
+}
+# --- END NEW ---
 
 SCENARIO_CONFIG = {
     1: {'total_time': 335.0, 'total_steps': 245},
@@ -123,9 +132,9 @@ SCENARIO_CONTENT = {
     1: {
         "briefing": """In this mission, three robots are working together to collect packages distributed throughout the environment and deliver them to two designated drop-off points. 
 
-Robot 1 is responsible for the southwest (SW) region. 
-Robot 2 is responsible for the northwest (NW) region. 
-Robot 3 acts as a support and exploration unit, assisting with package drop-offs and searching for the unassigned quadrants to locate any remaining packages. 
+Robot 1 is responsible for the southwest (SW) region and SW drop-off zone. 
+Robot 2 is responsible for the northwest (NW) region and NW drop-off zone. 
+Robot 3 acts as a support and exploration unit, assisting with package drop-offs in either region or searching for the unassigned quadrants to locate any remaining packages. 
 
 Robots 1 and 2 begin the mission with knowledge of four package locations within their respective regions. These are represented on the map as a yellow square. Robots will also discover packages along their journey. These are represented by green triangles. Robots will add these packages to their workload or the workload of one another as they are discovered. Robot 3 will adapt to assist where needed.""",
         "questions": [
@@ -138,7 +147,7 @@ Robots 1 and 2 begin the mission with knowledge of four package locations within
                 "options": ["SE", "SW", "NE", "NW"]
             },
             {
-                "text": "Which containment zone will robot 3 deliver its package to?",
+                "text": "Which drop-off zone zone will robot 3 deliver its package to?",
                 "options": [
                     "a. Robot 3 will leave the SW quadrant and deliver its package in the NW",
                     "b. Robot 3 will remain in the SW quadrant and deliver its package in the SW",
@@ -151,9 +160,9 @@ Robots 1 and 2 begin the mission with knowledge of four package locations within
     2: {
         "briefing": """In this mission, three robots are working together to collect packages distributed throughout the environment and deliver them to two designated drop-off points. 
 
-Robot 1 is responsible for the southwest (SW) region. 
-Robot 2 is responsible for the northwest (NW) region. 
-Robot 3 acts as a support and exploration unit, assisting with package drop-offs and searching for the unassigned quadrants to locate any remaining packages. 
+Robot 1 is responsible for the southwest (SW) region and SW drop-off zone. 
+Robot 2 is responsible for the northwest (NW) region and NW drop-off zone. 
+Robot 3 acts as a support and exploration unit, assisting with package drop-offs in either region or searching for the unassigned quadrants to locate any remaining packages. 
 
 Robots 1 and 2 begin the mission with knowledge of four package locations within their respective regions. These are represented on the map as a yellow square. Robots will also discover packages along their journey. These are represented by green triangles. Robots will add these packages to their workload or the workload of one another as they are discovered. Robot 3 will adapt to assist where needed.""",
         "questions": [
@@ -179,8 +188,8 @@ Robots 1 and 2 begin the mission with knowledge of four package locations within
     3: {
         "briefing": """In this mission, three robots are working together to collect packages distributed throughout the environment and deliver them to two designated drop-off points. 
 
-Robot 1 is responsible for the northwest (NW) region. 
-Robot 2 is responsible for the southeast (SE) region. 
+Robot 1 is responsible for the northwest (NW) region and NW drop-off zone. 
+Robot 2 is responsible for the southeast (SE) region and SE drop-off zone. 
 Robot 3 acts as a support and exploration unit, assisting with package drop-offs and searching for the unassigned quadrants to locate any remaining packages. 
 
 Robots 1 and 2 begin the mission with knowledge of four package locations within their respective regions. These are represented on the map as a yellow square. Robots will also discover packages along their journey. These are represented by green triangles. Robots will add these packages to their workload or the workload of one another as they are discovered. Robot 3 will adapt to assist where needed.""",
@@ -207,8 +216,8 @@ Robots 1 and 2 begin the mission with knowledge of four package locations within
     4: {
         "briefing": """In this mission, three robots are working together to collect packages distributed throughout the environment and deliver them to two designated drop-off points. 
 
-Robot 1 is responsible for the northwest (NW) region. 
-Robot 2 is responsible for the southeast (SE) region. 
+Robot 1 is responsible for the northwest (NW) region and NW drop-off zone. 
+Robot 2 is responsible for the southeast (SE) region and SE drop-off zone. 
 Robot 3 acts as a support and exploration unit, assisting with package drop-offs and searching for the unassigned quadrants to locate any remaining packages. 
 
 Robots 1 and 2 begin the mission with knowledge of four package locations within their respective regions. These are represented on the map as a yellow square. Robots will also discover packages along their journey. These are represented by green triangles. Robots will add these packages to their workload or the workload of one another as they are discovered. Robot 3 will adapt to assist where needed.""",
@@ -227,7 +236,7 @@ Robots 1 and 2 begin the mission with knowledge of four package locations within
                 ]
             },
             {
-                "text": "Which containment zone will robot 3 end its mission?",
+                "text": "Which drop-off zone will robot 3 end its mission?",
                 "options": ["SE", "SW", "NE", "NW"]
             }
         ]
@@ -235,8 +244,8 @@ Robots 1 and 2 begin the mission with knowledge of four package locations within
     5: {
         "briefing": """In this mission, three robots are working together to collect packages distributed throughout the environment and deliver them to two designated drop-off points. 
 
-Robot 1 is responsible for the northeast (NE) region. 
-Robot 2 is responsible for the southwest (SW) region. 
+Robot 1 is responsible for the northeast (NE) region and NE drop-off zone. 
+Robot 2 is responsible for the southwest (SW) region and drop-off zone. 
 Robot 3 acts as a support and exploration unit, assisting with package drop-offs and searching for the unassigned quadrants to locate any remaining packages. 
 
 Robots 1 and 2 begin the mission with knowledge of four package locations within their respective regions. These are represented on the map as a yellow square. Robots will also discover packages along their journey. These are represented by green triangles. Robots will add these packages to their workload or the workload of one another as they are discovered. Robot 3 will adapt to assist where needed.""",
@@ -264,8 +273,8 @@ Robots 1 and 2 begin the mission with knowledge of four package locations within
     6: {
         "briefing": """In this mission, three robots are working together to collect packages distributed throughout the environment and deliver them to two designated drop-off points. 
 
-Robot 1 is responsible for the northeast (NE) region. 
-Robot 2 is responsible for the southwest (SW) region. 
+Robot 1 is responsible for the northeast (NE) region and NE drop-off zone. 
+Robot 2 is responsible for the southwest (SW) region and drop-off zone. 
 Robot 3 acts as a support and exploration unit, assisting with package drop-offs and searching for the unassigned quadrants to locate any remaining packages. 
 
 Robots 1 and 2 begin the mission with knowledge of four package locations within their respective regions. These are represented on the map as a yellow square. Robots will also discover packages along their journey. These are represented by green triangles. Robots will add these packages to their workload or the workload of one another as they are discovered. Robot 3 will adapt to assist where needed.""",
@@ -279,7 +288,7 @@ Robots 1 and 2 begin the mission with knowledge of four package locations within
                 "options": [
                     "Both robots are experiencing poor weather",
                     "Both robots are experiencing rough terrain",
-                    "Robot 2 is experiencing poor weather, Robot 3 is experiencing rough terrain",
+                    "Robot 3 is experiencing poor weather, Robot 2 is experiencing rough terrain",
                     "Robot 2 is experiencing rough terrain, Robot 3 is experiencing poor weather" # Assuming this was the intended non-duplicate
                 ]
             },
@@ -289,7 +298,7 @@ Robots 1 and 2 begin the mission with knowledge of four package locations within
                     "Robot 3 will end its mission",
                     "Robot 3 will assist Robot 2 in the SE",
                     "Robot 3 will assist Robot 1 in the NW",
-                    "Robot 3 will recharge"
+                    "Robot 3 will return to the SE Quadrant"
                 ]
             }
         ]
@@ -481,7 +490,7 @@ def save_study_data(participant_data, responses, interactions):
 
 
 # --- Figure and Component Creation ---
-# --- vvv MODIFICATIONS BELOW vvv ---
+# --- vvv *** MAJOR MODIFICATION: create_figure_for_frame *** vvv ---
 def create_figure_for_frame(static_data, frame_data):
     fig = go.Figure()
 
@@ -490,7 +499,21 @@ def create_figure_for_frame(static_data, frame_data):
         xaxis=dict(range=[0, GRID_WIDTH], autorange=True, showgrid=True, gridcolor='rgba(100,100,100,0.3)', zeroline=False, dtick=10),
         yaxis=dict(range=[0, GRID_HEIGHT], autorange=True, showgrid=True, gridcolor='rgba(100,100,100,0.3)', zeroline=False),
         plot_bgcolor='#ffffff', paper_bgcolor='#ffffff', font=dict(color='black'),
-        showlegend=False, margin=dict(l=0, r=0, t=0, b=0), uirevision='constant',
+        # --- MODIFIED: Show legend and style it ---
+        showlegend=True,
+        legend=dict(
+            title='Legend',
+            orientation='v',
+            yanchor='top',
+            y=1,
+            xanchor='left',
+            x=1.02,
+            bgcolor='rgba(255,255,255,0.7)',
+            bordercolor='Black',
+            borderwidth=1
+        ),
+        # --- END MODIFICATION ---
+        margin=dict(l=0, r=0, t=0, b=0), uirevision='constant',
         annotations=[
             go.layout.Annotation(
                 x=2.5, y=17.5, text="NW", showarrow=False,
@@ -510,6 +533,28 @@ def create_figure_for_frame(static_data, frame_data):
             )
         ]
     )
+    
+    # --- NEW: Add dummy traces for the new legend items ---
+    # These traces have no data (x=[None]) but will populate the legend.
+    fig.add_trace(go.Scatter(
+        x=[None], y=[None], # No data
+        mode='markers',
+        marker=dict(color='rgb(173, 216, 230)', size=10, symbol='square'),
+        name='Bad Weather Zone'
+    ))
+    fig.add_trace(go.Scatter(
+        x=[None], y=[None], # No data
+        mode='markers',
+        marker=dict(color='rgb(128, 128, 128)', size=10, symbol='square'),
+        name='Rough Terrain Zone'
+    ))
+    fig.add_trace(go.Scatter(
+        x=[None], y=[None], # No data
+        mode='markers',
+        marker=dict(color='rgb(255, 255, 0)', size=10, symbol='circle'), # Use circle as per user
+        name='Charging Station/ Drop Off Zone' # <-- MODIFIED LEGEND NAME
+    ))
+    # --- END NEW ---
 
     walls_data = frame_data.get('walls', []) if frame_data else static_data.get('walls', [])
     zones_data = frame_data.get('zones', []) if frame_data else static_data.get('zones', [])
@@ -520,8 +565,10 @@ def create_figure_for_frame(static_data, frame_data):
         wall_coords = sorted(wall.items())
         wall_x = [v for k, v in wall_coords if k.startswith('x')]
         wall_y = [v for k, v in wall_coords if k.startswith('y')]
+        # --- MODIFIED: Added showlegend=False ---
         fig.add_trace(go.Scatter(x=wall_x, y=wall_y, mode='lines',
-                                 line=dict(color='black', width=2), hoverinfo='none'))
+                                 line=dict(color='black', width=2), hoverinfo='none',
+                                 showlegend=False))
 
     for zone in zones_data:
         color_str = zone.get('color', 'rgba(0,0,0,0)')
@@ -530,8 +577,10 @@ def create_figure_for_frame(static_data, frame_data):
         zone_coords = sorted(zone.items())
         zone_x = [v for k, v in zone_coords if k.startswith('x')]
         zone_y = [v for k, v in zone_coords if k.startswith('y')]
+        # --- MODIFIED: Added showlegend=False ---
         fig.add_trace(go.Scatter(x=zone_x, y=zone_y, fill="toself", fillcolor=color_str,
-                                 line=dict(width=0), mode='lines', hoverinfo='none'))
+                                 line=dict(width=0), mode='lines', hoverinfo='none',
+                                 showlegend=False))
 
     edge_x, edge_y = [], []
     for edge in edges_data:
@@ -541,8 +590,10 @@ def create_figure_for_frame(static_data, frame_data):
     if nodes_data:
         node_x = [node[0] for node in nodes_data]
         node_y = [node[1] for node in nodes_data]
+        # --- MODIFIED: Added showlegend=False ---
         fig.add_trace(go.Scatter(x=node_x, y=node_y, mode='markers',
-                                 marker=dict(size=4, color='rgba(50, 50, 150, 0.8)'), hoverinfo='none'))
+                                 marker=dict(size=4, color='rgba(50, 50, 150, 0.8)'), hoverinfo='none',
+                                 showlegend=False))
 
     if frame_data:
         robots = [{'id': rid, **rdata} for rid, rdata in frame_data.get('robots', {}).items()]
@@ -565,24 +616,25 @@ def create_figure_for_frame(static_data, frame_data):
                 }
                 traces['colors'].append(color_map.get(r_state, 'grey'))
 
+            # --- MODIFIED: Added name for legend ---
             fig.add_trace(go.Scatter(x=traces['x'], y=traces['y'], mode='markers+text',
+                                     name='Robot', # <-- ADDED
                                      marker=dict(size=40, color=traces['colors'], line=dict(width=2, color='white')),
                                      text=traces['texts'], textposition='middle center',
                                      textfont=dict(color='white', size=12, family="Arial Black"),
                                      hovertext=traces['hovers'], hoverinfo='text'))
 
-        # ===== FIXED PACKAGE RENDERING SECTION =====
+        # ===== MODIFIED PACKAGE RENDERING SECTION (for Legend) =====
         if packages:
-            pkg_x = []
-            pkg_y = []
-            pkg_texts = []
-            pkg_hovers = []
-            pkg_colors = []
-            pkg_symbols = []
+            # --- 1. Initialize lists for each package type ---
+            # Gold Square (Known 'p' packages OR Carried packages)
+            known_pkg_x, known_pkg_y, known_pkg_texts, known_pkg_hovers = [], [], [], []
+            # Gold Triangle (Discovered 'd' packages)
+            discovered_d_pkg_x, discovered_d_pkg_y, discovered_d_pkg_texts, discovered_d_pkg_hovers = [], [], [], []
+            # Green Triangle (Undiscovered 'd' packages)
+            undiscovered_d_pkg_x, undiscovered_d_pkg_y, undiscovered_d_pkg_texts, undiscovered_d_pkg_hovers = [], [], [], []
 
             robot_pos = {r['id']: (r['x'], r['y']) for r in robots}
-
-            # Track plotted coordinates to avoid duplicates
             plotted_coords = set()
 
             for p in packages:
@@ -591,70 +643,91 @@ def create_figure_for_frame(static_data, frame_data):
                 is_d_package = p['id'].startswith('d')
 
                 if is_d_package:
-                    # 'd' packages default to 0 (undiscovered) if 'Discovered' key is missing
                     is_discovered = p.get('Discovered', 0) == 1
                 else:
-                    # 'p' packages are ALWAYS treated as discovered
                     is_discovered = True
 
-                # Get position
                 if is_carried:
                     px, py = robot_pos.get(carried_by_robot, (p.get('x', 0), p.get('y', 0)))
                 else:
                     px, py = p.get('x', 0), p.get('y', 0)
 
-                # Create coordinate key for duplicate checking
                 coord_key = (round(px, 2), round(py, 2), is_carried)
-
-                # Skip if this coordinate already has a package plotted
                 if coord_key in plotted_coords:
                     continue
-
                 plotted_coords.add(coord_key)
+                
+                pkg_text = p['id'][-1]
 
-                pkg_x.append(px)
-                pkg_y.append(py)
-                pkg_texts.append(p['id'][-1])
-
-                # Determine color and shape based on state
+                # --- 2. Sort data into the correct list ---
                 if is_carried:
-                    pkg_colors.append('gold')
-                    pkg_symbols.append('square')
-                    pkg_hovers.append(f"Package {p['id']}, Carried by {carried_by_robot}")
+                    known_pkg_x.append(px)
+                    known_pkg_y.append(py)
+                    known_pkg_texts.append(pkg_text)
+                    known_pkg_hovers.append(f"Package {p['id']}, Carried by {carried_by_robot}")
+                
                 elif is_d_package:
                     if is_discovered:
-                        # 'd' package that is now discovered
-                        pkg_colors.append('gold')  # yellow
-                        pkg_symbols.append('triangle-up')  # triangle
-                        pkg_hovers.append(f"Package {p['id']}, On Ground (Discovered 'd' package)")
+                        # Discovered 'd' package (Gold Triangle)
+                        discovered_d_pkg_x.append(px)
+                        discovered_d_pkg_y.append(py)
+                        discovered_d_pkg_texts.append(pkg_text)
+                        discovered_d_pkg_hovers.append(f"Package {p['id']}, On Ground (Discovered 'd' package)")
                     else:
-                        # 'd' package that is still undiscovered
-                        pkg_colors.append('lightgreen')  # green
-                        pkg_symbols.append('triangle-up')  # triangle
-                        pkg_hovers.append(f"Package {p['id']}, On Ground (Undiscovered 'd' package)")
-                else:  # 'p' package (always discovered)
-                    pkg_colors.append('gold')
-                    pkg_symbols.append('square')
-                    pkg_hovers.append(f"Package {p['id']}, On Ground (Pre-known 'p' package)")
+                        # Undiscovered 'd' package (Green Triangle)
+                        undiscovered_d_pkg_x.append(px)
+                        undiscovered_d_pkg_y.append(py)
+                        undiscovered_d_pkg_texts.append(pkg_text)
+                        undiscovered_d_pkg_hovers.append(f"Package {p['id']}, On Ground (Undiscovered 'd' package)")
+                
+                else: # 'p' package (Gold Square)
+                    known_pkg_x.append(px)
+                    known_pkg_y.append(py)
+                    known_pkg_texts.append(pkg_text)
+                    known_pkg_hovers.append(f"Package {p['id']}, On Ground (Pre-known 'p' package)")
 
-            fig.add_trace(go.Scatter(
-                x=pkg_x,
-                y=pkg_y,
-                mode='markers+text',
-                marker=dict(
-                    size=20,
-                    color=pkg_colors,
-                    symbol=pkg_symbols,
-                    line=dict(width=1, color='black')
-                ),
-                text=pkg_texts,
-                textposition='middle center',
-                textfont=dict(color='black', size=10, family="Arial Black"),
-                hovertext=pkg_hovers,
-                hoverinfo='text'
-            ))
+            # --- 3. Add a separate trace for each package type ---
+            
+            # Gold Square (Known/Carried)
+            if known_pkg_x:
+                fig.add_trace(go.Scatter(
+                    x=known_pkg_x, y=known_pkg_y,
+                    name='Package (Known/Carried)',
+                    mode='markers+text',
+                    marker=dict(size=20, color='gold', symbol='square', line=dict(width=1, color='black')),
+                    text=known_pkg_texts, textposition='middle center',
+                    textfont=dict(color='black', size=10, family="Arial Black"),
+                    hovertext=known_pkg_hovers, hoverinfo='text'
+                ))
+
+            # Gold Triangle (Discovered 'd')
+            if discovered_d_pkg_x:
+                fig.add_trace(go.Scatter(
+                    x=discovered_d_pkg_x, y=discovered_d_pkg_y,
+                    name="Package (Discovered 'd')",
+                    mode='markers+text',
+                    marker=dict(size=20, color='gold', symbol='triangle-up', line=dict(width=1, color='black')),
+                    text=discovered_d_pkg_texts, textposition='middle center',
+                    textfont=dict(color='black', size=10, family="Arial Black"),
+                    hovertext=discovered_d_pkg_hovers, hoverinfo='text'
+                ))
+
+            # Green Triangle (Undiscovered 'd')
+            if undiscovered_d_pkg_x:
+                fig.add_trace(go.Scatter(
+                    x=undiscovered_d_pkg_x, y=undiscovered_d_pkg_y,
+                    name="Package (Undiscovered 'd')",
+                    mode='markers+text',
+                    marker=dict(size=20, color='lightgreen', symbol='triangle-up', line=dict(width=1, color='black')),
+                    text=undiscovered_d_pkg_texts, textposition='middle center',
+                    textfont=dict(color='black', size=10, family="Arial Black"),
+                    hovertext=undiscovered_d_pkg_hovers, hoverinfo='text'
+                ))
+        # ===== END MODIFIED SECTION =====
 
     return fig
+# --- ^^^ *** END MAJOR MODIFICATION *** ^^^ ---
+
 
 # --- vvv MODIFICATIONS vvv ---
 def create_rich_status_message_data(robot_data, sim_time, all_packages, selected_robot_hmm_array, selected_robot_rmm_array, scenario_id):
@@ -671,42 +744,62 @@ def create_rich_status_message_data(robot_data, sim_time, all_packages, selected
         'stationary': {'text': 'STATIONARY', 'color': '#fff9c4', 'icon': '⏸️', 'class_suffix': 'stationary'}
     }
 
+    # --- MODIFICATION 4: Mission Time/ETA Calculation ---
     plan_index = selected_robot_rmm_array.get('plan_index', 0)
+    mission_time = selected_robot_rmm_array.get('mission_time', 0) # Get mission time
     scenario_config = SCENARIO_CONFIG.get(scenario_id, {'total_time': 300.0, 'total_steps': 100})
-    total_expected_time = scenario_config['total_time']
     total_steps = scenario_config['total_steps']
-    time_per_step = total_expected_time / total_steps if total_steps > 0 else 0
-    time_difference = (plan_index * time_per_step) - sim_time if plan_index > 0 else 0
-
-    time_status_text = ""
-    # --- MODIFICATION: Changed threshold from 0.1 to 1.0 ---
-    if abs(time_difference) >= 1.0:
-        time_status_text = f"Robot is {int(abs(time_difference))} seconds {'ahead' if time_difference > 0 else 'behind'} of schedule."
+    time_per_step = scenario_config['total_time'] / total_steps if total_steps > 0 else 0
+    
+    # Calculate ETA: Remaining steps * Time per step
+    # Use plan_index to find remaining length of plan
+    plan_list = selected_robot_rmm_array.get('plan', [])
+    remaining_steps = len(plan_list) - plan_index
+    eta_seconds = int(remaining_steps * time_per_step)
+    
+    # Create the mission time/ETA status text (only time-related detail)
+    time_status_text = f"Mission Time: {int(mission_time)} seconds. Estimated Time to Goal: {eta_seconds} seconds."
+    # --- END MODIFICATION 4 ---
 
     feature_alerts = []
     
     # Weather Check
     hmm_weather = int(selected_robot_hmm_array.get('Current_weather', 1)) if selected_robot_hmm_array else 1
     rmm_weather = int(selected_robot_rmm_array.get('Current_weather', 1))
+    
+    # Collect icons for summary (MODIFICATION 5 prep)
+    summary_icons = []
+    if rmm_weather == 0:
+        summary_icons.append("⛈️") # Lightning icon for bad weather
+        
     if hmm_weather != rmm_weather:
-        feature_alerts.append("Weather has turned bad." if rmm_weather == 0 else "Weather has improved.")
+        if rmm_weather == 0:
+            feature_alerts.append("Encountering bad weather.")
+        else:
+            feature_alerts.append("Weather has improved.")
 
-    # --- 2. ADD BAD TERRAIN CHECK ---
+    # --- MODIFICATION 3 & 5: ADD BAD TERRAIN CHECK (and collect icon data) ---
     hmm_terrain = int(selected_robot_hmm_array.get('Bad_Terrain', 1)) if selected_robot_hmm_array else 1
     rmm_terrain = int(selected_robot_rmm_array.get('Bad_Terrain', 1))
+    
+    if rmm_terrain == 0:
+        summary_icons.append("⛰️") # Mountain icon for rough terrain
+        
     if hmm_terrain != rmm_terrain:
         if rmm_terrain == 0 and hmm_terrain == 1:
             feature_alerts.append("Encountering rough terrain.")
         elif rmm_terrain == 1 and hmm_terrain == 0:
-            feature_alerts.append("Terrain has cleared.")
+            # MODIFICATION 3: Simplified text
+            feature_alerts.append("Terrain cleared.") 
     # --- END TERRAIN CHECK ---
 
-    # --- 3. UPDATE BATTERY STATUS LOGIC ---
+    # --- MODIFICATION 3: UPDATE BATTERY STATUS LOGIC ---
     hmm_battery = int(selected_robot_hmm_array.get('Battery_status', 1)) if selected_robot_hmm_array else 1
     rmm_battery = int(selected_robot_rmm_array.get('Battery_status', 1))
     if hmm_battery != rmm_battery:
         if rmm_battery == 0: 
             feature_alerts.append("Battery is low/depleting.")
+            summary_icons.append("🔋")
         elif rmm_battery == 1: 
             feature_alerts.append("Battery is good.")
     # --- END BATTERY LOGIC ---
@@ -715,22 +808,31 @@ def create_rich_status_message_data(robot_data, sim_time, all_packages, selected
     hmm_offline = int(selected_robot_hmm_array.get('Momentarily_offline', 0)) if selected_robot_hmm_array else 0
     rmm_offline = int(selected_robot_rmm_array.get('Momentarily_offline', 0))
     if hmm_offline != rmm_offline:
-        feature_alerts.append("Robot is momentarily offline." if rmm_offline == 1 else "Robot is back online.")
-
+        if rmm_offline == 1:
+            feature_alerts.append("Robot is momentarily offline.")
+            summary_icons.append("🚫")
+        else:
+             feature_alerts.append("Robot is back online.")
+             
     feature_text = " ".join(feature_alerts)
 
     status_key = 'stationary'
-    details_msg = ""
-
-    time_and_features = []
-    if time_status_text: time_and_features.append(time_status_text)
-    if feature_text: time_and_features.append(feature_text)
-    combined_info = " ".join(time_and_features).strip()
-
-    # --- MODIFICATION: details_msg is now a list of components ---
-    details_msg = []
     
-    # --- 4. ADD QUADRANT TO ALL DETAIL MESSAGES ---
+    # --- MODIFICATION 4: Move Mission Time/ETA to top of list ---
+    details_msg = [time_status_text]
+    # --- END MODIFICATION 4 ---
+
+    combined_info = " ".join(feature_alerts).strip()
+
+    # --- MODIFICATION 1: Skip message if carrying N/A ---
+    # We do this check here for "carrying" state
+    if state == 'carrying':
+        pkg_id = next((p['id'] for p in all_packages if p.get('carried_by') == robot_id), "N/A")
+        if pkg_id == "N/A":
+            return None, None, None
+        
+    # --- MODIFICATION 2: REMOVE COORDINATE DETAILS & Update Text ---
+    
     if robot_data.get('replan_flag') == True:
         status_key = 'replan'
         pkg_id_text = []
@@ -739,83 +841,67 @@ def create_rich_status_message_data(robot_data, sim_time, all_packages, selected
             if pkg_id: 
                 pkg_id_text = [" Carrying ", html.Strong(pkg_id), "."]
         
-        details_msg = [
+        details_msg.extend([ # Append after Mission Time/ETA
             f"Route recalculated.",
             *pkg_id_text,
-            f" Current Position is (X{x:.0f}, Y{y:.0f}) in the ",
+            f" Robot is in the ",
             html.Strong(quadrant),
-            " quadrant", # <-- ADDED
-            f". {combined_info}"
-        ]
+            " quadrant.",
+            (f" {combined_info}" if combined_info else "")
+        ])
     elif state == 'carrying':
         status_key = 'on_track'
         pkg_id = next((p['id'] for p in all_packages if p.get('carried_by') == robot_id), "N/A")
         
-        # --- NEW: SKIP MESSAGE IF CARRYING N/A ---
-        if pkg_id == "N/A":
-            return None, None, None
-        # --- END NEW ---
-        
-        plan = robot_data.get('plan', [])
-        dest_x, dest_y = (plan[-1][0], plan[-1][1]) if plan else (x, y)
-        
-        details_msg = [
+        # We already checked for "N/A" above (MODIFICATION 1)
+        # plan = robot_data.get('plan', []) # No longer needed
+
+        details_msg.extend([ # Append after Mission Time/ETA
             "Transporting ",
             html.Strong(pkg_id),
-            f" to Position (X{dest_x:.0f}, Y{dest_y:.0f}). Currently at Position (X{x:.0f}, Y{y:.0f}) in the ",
+            f" to drop-off zone. Currently in the ",
             html.Strong(quadrant),
-            " quadrant", # <-- ADDED
-            f". {feature_text}"
-        ]
+            " quadrant.",
+            (f" {feature_text}" if feature_text else "")
+        ])
     elif state == 'moving':
         status_key = 'on_track'
         pkg_id = robot_data.get('target_package_id', "package")
-        goal_x, goal_y = robot_data.get('immediate_goal_x', x), robot_data.get('immediate_goal_y', y)
+        # goal_x, goal_y = robot_data.get('immediate_goal_x', x), robot_data.get('immediate_goal_y', y) # No longer needed
 
-        # --- MODIFICATION: Condense message if at destination & fix "package package" ---
-        if round(x) == round(goal_x) and round(y) == round(goal_y):
-             details_msg = [
-                "Moving to acquire ", # <-- FIXED
-                pkg_id, # <-- FIXED (no strong)
-                f" at Position (X{goal_x:.0f}, Y{goal_y:.0f}) in the ",
-                html.Strong(quadrant),
-                " quadrant", # <-- ADDED
-                f". {feature_text}"
-            ]
-        else:
-            details_msg = [
-                "Moving to acquire ", # <-- FIXED
-                pkg_id, # <-- FIXED (no strong)
-                f" at Position (X{goal_x:.0f}, Y{goal_y:.0f}). Currently at Position (X{x:.0f}, Y{y:.0f}) in the ",
-                html.Strong(quadrant),
-                " quadrant", # <-- ADDED
-                f". {feature_text}"
-            ]
+        details_msg.extend([ # Append after Mission Time/ETA
+            "Moving to acquire ",
+            pkg_id,
+            f". Currently in the ",
+            html.Strong(quadrant),
+            " quadrant.",
+            (f" {feature_text}" if feature_text else "")
+        ])
     elif state == 'waiting':
         status_key = 'stationary'
-        details_msg = [
-            f"Robot is awaiting task at Position (X{x:.0f}, Y{y:.0f}) in the ",
+        details_msg.extend([ # Append after Mission Time/ETA
+            f"Robot is awaiting task in the ",
             html.Strong(quadrant),
-            " quadrant", # <-- ADDED
-            f". {combined_info}"
-        ]
+            " quadrant.",
+            (f" {combined_info}" if combined_info else "")
+        ])
     elif state == 'all_tasks_complete':
         status_key = 'on_track' # Use 'on_track' style (green)
-        details_msg = [
-            f"All tasks complete. Robot is at Position (X{x:.0f}, Y{y:.0f}) in the ",
+        details_msg.extend([ # Append after Mission Time/ETA
+            f"All tasks complete. Robot is in the ",
             html.Strong(quadrant),
-            " quadrant", # <-- ADDED
-            f". {feature_text}"
-        ]
+            " quadrant.",
+            (f" {feature_text}" if feature_text else "")
+        ])
     else:
         status_key = 'stationary'
-        details_msg = [
-            f"Robot in unknown state '{state}' at Position (X{x:.0f}, Y{y:.0f}) in the ",
+        details_msg.extend([ # Append after Mission Time/ETA
+            f"Robot in unknown state '{state}' in the ",
             html.Strong(quadrant),
-            " quadrant", # <-- ADDED
-            f". {combined_info}"
-        ]
-    # --- END QUADRANT ADDITION ---
+            " quadrant.",
+            (f" {combined_info}" if combined_info else "")
+        ])
+    # --- END MODIFICATION 2 ---
 
     status_info = status_map[status_key]
     
@@ -823,16 +909,24 @@ def create_rich_status_message_data(robot_data, sim_time, all_packages, selected
     final_status_icon = status_info['icon']
     if state == 'all_tasks_complete':
         final_status_text = 'TASKS COMPLETE'
-        final_status_icon = '🎉' 
+        final_status_icon = '🎉'
+        
+    # --- MODIFICATION 5: Add feature icons to the summary display text ---
+    # Append the combined feature icons to the status text
+    if summary_icons:
+        icon_string = " ".join(summary_icons)
+        final_status_text = f"{icon_string} {final_status_text}"
+    # --- END MODIFICATION 5 ---
+
     # --- RETURN DATA, NOT COMPONENT ---
     return {
         'message_id': message_id,
         'robot_id_title': robot_id.title(),
         'status_icon': final_status_icon,
-        'status_text': final_status_text,
+        'status_text': final_status_text, # Contains the new feature icons
         'status_class_suffix': status_info['class_suffix'],
         'time_str': time_str,
-        'details_msg': details_msg  #<-- This is now a list
+        'details_msg': details_msg  # <-- This is now a list
     }, status_key, " ".join([str(item) for item in details_msg]) # <-- Log a flattened string
 # --- ^^^ END MODIFICATIONS ^^^ ---
 
@@ -850,11 +944,13 @@ def render_message_component(message_data, open_message_ids, is_new=False):
         
     summary = html.Summary(
         html.Div([
+            # MODIFICATION 5: The icons are now inside status_text, combine icon and text here
             html.Span(message_data['status_icon'], style={'marginRight': '10px', 'fontSize': '1.5em'}),
             html.Strong(f"{message_data['robot_id_title']}: {message_data['status_text']}")
         ], style={'display': 'flex', 'alignItems': 'center', 'fontSize': '1.2em', 'fontWeight': 'bold'}) #<-- Made 1.2em
     )
 
+    # MODIFICATION 4/2: details_msg list is handled correctly by dash/html.P
     details_content = html.Div([
         html.P(message_data['time_str'], style={'fontSize': '0.9em', 'color': '#555', 'margin': '10px 0 5px 0'}),
         html.P(message_data['details_msg'], style={'fontSize': '1.1em', 'margin': '5px 0 0 0'}) #<-- This now correctly handles the list
@@ -878,7 +974,38 @@ server = app.server
 static_map_data = load_static_data('static_map_data.json')
 initial_figure = create_figure_for_frame(static_map_data, None)
 
-# --- Study Screen Layouts ---
+# --- NEW: Consent Screen Function ---
+def consent_screen():
+    consent_text = """
+You are invited to take part in a research study led by the Cognitive Engineering Center at the Georgia Institute of Technology. The goal of this study is to evaluate a prototype interface that helps a human operator monitor and understand the behavior of a swarm of autonomous robots through system-generated updates. Your session will last about 45–60 minutes. You will watch several short video demonstrations and answer questions about your understanding and overall experience. You will receive \$20 for completing the session.
+
+The risks are minimal and similar to those encountered in everyday activities. There are no direct benefits to you, but your participation will help improve human–robot communication systems.
+
+Your responses will be kept confidential. Any information shared publicly will not include identifying details. De-identified data may be used for future research.
+
+Taking part in this study is completely voluntary. You may stop participating at any time without penalty. However, to receive the full \$20 compensation, you must complete the entire session.
+
+If you have questions about your rights as a participant, contact the Georgia Tech Office of Research Integrity Assurance at IRB@gatech.edu.
+"""
+    return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh',
+                          'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center',
+                          'justifyContent': 'center', 'fontFamily': 'Arial', 'padding': '20px'}, children=[
+        html.H1("Consent Acknowledgment", style={'color': '#00ff88', 'marginBottom': '30px'}),
+        html.Div(style={'backgroundColor': '#2b2b2b', 'padding': '40px', 'borderRadius': '10px',
+                       'maxWidth': '800px', 'width': '100%', 'maxHeight': '70vh', 'overflowY': 'auto'}, children=[
+            dcc.Markdown(consent_text, style={'whiteSpace': 'pre-wrap', 'lineHeight': '1.8',
+                                          'fontSize': '16px', 'marginBottom': '30px'}),
+            html.P(html.Strong("By continuing, you acknowledge that you have read this information and consent to participate."),
+                   style={'marginBottom': '20px', 'fontSize': '16px'}),
+            html.Button('Acknowledge and Continue', id='acknowledge-consent-btn', n_clicks=0,
+                       style={'width': '100%', 'padding': '15px', 'fontSize': '18px',
+                             'backgroundColor': '#00ff88', 'color': '#1e1e1e', 'border': 'none',
+                             'borderRadius': '5px', 'cursor': 'pointer', 'fontWeight': 'bold'})
+        ])
+    ])
+# --- END NEW FUNCTION ---
+
+
 # welcome_screen is UNCHANGED
 def welcome_screen():
     return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh',
@@ -957,6 +1084,17 @@ def create_pause_question_screen(scenario_num, question_idx):
             "text": "Error: Could not load question.",
             "options": ["Continue"]
         }
+
+    # --- START CONDITIONAL LOGIC FOR CHECKLIST/RADIOITEMS ---
+    # The two specific multi-select questions: (Scenario 3, Question 1) and (Scenario 6, Question 1)
+    multi_select_questions = [
+        (3, 0), # Scenario 3, Question 1 (index 0)
+        (6, 0)  # Scenario 6, Question 1 (index 0)
+    ]
+    
+    question_key = (scenario_num, question_idx)
+    InputComponent = dcc.Checklist if question_key in multi_select_questions else dcc.RadioItems
+    # --- END CONDITIONAL LOGIC ---
         
     return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh',
                           'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center',
@@ -966,12 +1104,15 @@ def create_pause_question_screen(scenario_num, question_idx):
             html.H2(f"Scenario {scenario_num} - Question #{question_num}",
                    style={'color': '#00ff88', 'marginBottom': '40px'}),
             html.P(question_data['text'], style={'fontWeight': 'bold', 'marginBottom': '25px', 'fontSize': '18px'}),
-            dcc.RadioItems(
+            
+            # --- Use the conditionally selected component ---
+            InputComponent(
                 id='pause-question-radio',
                 options=[{'label': opt, 'value': opt} for opt in question_data['options']],
                 labelStyle={'display': 'block', 'marginBottom': '15px', 'cursor': 'pointer', 'fontSize': '16px'},
                 style={'marginBottom': '20px'}
             ),
+            
             html.Button('Continue', id='submit-pause-question-btn', n_clicks=0,
                        style={'padding': '15px 40px', 'fontSize': '18px', 'backgroundColor': '#00ff88',
                              'color': '#1e1e1e', 'border': 'none', 'borderRadius': '5px',
@@ -1306,7 +1447,7 @@ def log_message_clicks(click_data_json_array, interactions, all_message_logs,
 # --- END MODIFICATION ---
 # --- Callbacks ---
 
-# start_study is UNCHANGED
+# start_study is now modified to route through consent
 @app.callback(
     Output('page-content', 'children'),
     Output('participant-store', 'data'),
@@ -1356,19 +1497,41 @@ def start_study(n_clicks, name):
     study_state = {
         'current_run_idx': 0,
         'current_question_idx': 0, # This now tracks pause points (0, 1, 2)
-        'phase': 'briefing',
+        'phase': 'consent', # <-- NEW PHASE
         'segment_start_time': None
     }
     
-    first_run_info = assigned_track[0]
+    # --- MODIFIED: Return consent_screen ---
+    return consent_screen(), participant_data, study_state, ""
+
+# --- NEW: acknowledge_consent callback transitions to briefing_screen ---
+@app.callback(
+    Output('page-content', 'children', allow_duplicate=True),
+    Input('acknowledge-consent-btn', 'n_clicks'),
+    State('study-state-store', 'data'),
+    State('participant-store', 'data'),
+    prevent_initial_call=True
+)
+def acknowledge_consent(n_clicks, study_state, participant_data):
+    if n_clicks is None or n_clicks == 0:
+        raise PreventUpdate
+
+    if not study_state or not participant_data:
+        # Fallback if somehow stores are empty
+        return welcome_screen()
+
+    # Get parameters to call briefing_screen
+    current_run_idx = study_state['current_run_idx']
+    total_runs = len(participant_data['track'])
+    first_run_info = participant_data['track'][current_run_idx]
     scenario_num = first_run_info[0]
     condition_idx = first_run_info[1]
     view_type, framework_mode = get_condition_names(condition_idx)
-    total_runs = len(assigned_track)
     
-    return briefing_screen(1, total_runs, scenario_num, view_type, framework_mode), participant_data, study_state, ""
+    # Return the briefing screen (the next step in the flow)
+    return briefing_screen(current_run_idx + 1, total_runs, scenario_num, view_type, framework_mode)
 
-# begin_scenario is UNCHANGED
+# begin_scenario is UNCHANGED (now handles the transition from briefing to simulation)
 @app.callback(
     Output('page-content', 'children', allow_duplicate=True),
     Output('study-state-store', 'data', allow_duplicate=True),
@@ -1409,7 +1572,7 @@ def begin_scenario(n_clicks, study_state, participant_data):
     prevent_initial_call=True
 )
 def load_data_and_start_simulation(layout_signal, study_state, participant_data):
-    if not study_state or not participant_data or study_state.get('phase') != 'simulation':
+    if not study_state or study_state.get('phase') != 'simulation' or not participant_data:
         raise PreventUpdate
     print("load_data_and_start_simulation firing...")
     
@@ -1543,7 +1706,7 @@ def programmatically_switch_view(study_state, participant_data):
     return map_style, text_style, header_text
 
 # --- *** MAJOR MODIFICATION: update_simulation_views *** ---
-# --- This callback now saves DATA to stores, not components ---
+# --- This callback now implements the new 'without_framework' logic ---
 @app.callback(
     Output('simulation-graph', 'figure'),
     # --- MODIFIED: Outputs are to stores, not UI ---
@@ -1622,23 +1785,27 @@ def update_simulation_views(frame_idx, study_state,
     current_frame_data = scenario_data[frame_idx]
     fig = create_figure_for_frame(static_map_data, current_frame_data)
     
-    mission_time_threshold = THRESHOLD_VALUES[framework_mode].get(scenario_num, 1)
+    # --- THIS IS ONLY USED FOR 'with_framework' NOW ---
+    mission_time_threshold = THRESHOLD_VALUES['with_framework'].get(scenario_num, 1)
+    
     robots_dict = current_frame_data.get('robots', {})
     packages = current_frame_data.get('packages', [])
-    
-    
     
     # --- MODIFIED: hist1, hist2, hist3 now come from stores (and contain DATA, not components) ---
     histories = [hist1, hist2, hist3]
     # This will hold the new DATA lists for the stores
     new_robot_message_outputs = [histories[0] or [], histories[1] or [], histories[2] or []]
     sim_time = current_frame_data.get('simulator time', 0)
-    any_sync_occurred = False
+    
+    # --- MODIFIED: This flag is now specific to 'with_framework' to control interval speed ---
+    any_sync_occurred_with_framework = False
+    
     newly_generated_messages_for_feed = []
     
     for i in range(1, 4):
         robot_id = f'robot{i}'
         if robot_id in robots_dict:
+            # --- 1. Get common robot data (needed for both modes) ---
             raw_robot_data = robots_dict[robot_id]
             # --- ADD 'Quadrant' and 'Bad_Terrain' to keys ---
             rmm_keys_to_select = [
@@ -1655,107 +1822,186 @@ def update_simulation_views(frame_idx, study_state,
             selected_robot_hmm_array = current_hmms.get(robot_id)
             robot_info = {**robots_dict[robot_id], 'id': robot_id}
             
-            if selected_robot_hmm_array:
-                try:
-                    updated_hmm_array, sync_occurred = dynamic_deviation_threshold_multi_logic(
-                        hmm_array=selected_robot_hmm_array,
-                        rmm_array=selected_robot_rmm_array,
-                        update_logic_functions={},
-                        uncertainty_factor_pos=0.1,
-                        uncertainty_factor_time=0.1,
-                        dynamic_threshold_mission_time=mission_time_threshold,
-                        robot_id=robot_id
-                    )
-                except Exception as e:
-                    print(f"Error in backend logic for {robot_id}: {e}")
-                    sync_occurred = False
-                    updated_hmm_array = selected_robot_hmm_array
-                
-                current_hmms[robot_id] = updated_hmm_array
-                
-                
-                if sync_occurred:
-                    any_sync_occurred = True
-                    
-                    # --- MODIFIED: Call new data function ---
-                    new_message_data, message_type, message_text_for_log = create_rich_status_message_data(
-                        robot_info,
-                        sim_time,
-                        packages,
-                        selected_robot_hmm_array, # Pass previous HMM
-                        selected_robot_rmm_array, # Pass current RMM
-                        scenario_num
-                    )
-                    
-                    # --- NEW: Check for skipped message (e.g., carrying N/A) ---
-                    if new_message_data is None:
-                        continue # Skip message generation for this robot
-                    # --- END NEW ---
-
-                    # --- MODIFICATION: Check for duplicates ---
-                    current_robot_history = new_robot_message_outputs[i-1]
-                    is_duplicate = False
-                    if current_robot_history:
-                        # Compare the new details_msg (list) to the previous one
-                        if new_message_data['details_msg'] == current_robot_history[0]['details_msg']:
-                            is_duplicate = True
-                    
-                    if not is_duplicate:
-                        is_new_message = False
-                        msg_id = new_message_data['message_id'] # <-- Get ID from data
-                        
-                        if msg_id not in new_message_timestamps:
-                            appear_time = time.time()
-                            new_message_timestamps[msg_id] = appear_time
-                            is_new_message = True
-                            
-                            log_entry = create_message_log_entry(
-                                message_id=msg_id,
-                                robot_id=robot_id,
-                                scenario_num=scenario_num,
-                                condition_idx=condition_idx,
-                                frame_idx=frame_idx,
-                                sim_time=sim_time,
-                                message_type=message_type,
-                                message_text=message_text_for_log, # <-- Use flattened string for log
-                                participant_id=participant_data.get('id'),
-                                appear_time=appear_time,
-                                robot_state=robot_info.get('state'),
-                                robot_x=robot_info.get('x'),
-                                robot_y=robot_info.get('y')
-                            )
-                            new_all_message_logs.append(log_entry)
-                        
-                        # --- Create the component for the Map UI (which needs 'new-message') ---
-                        new_message_div = render_message_component(
-                            new_message_data,
-                            current_open_message_ids,
-                            is_new=is_new_message # <-- Pass blink status
+            sync_occurred = False # Trigger for 'with_framework'
+            generate_message = False # Trigger for 'without_framework'
+            
+            # --- 2. Apply mode-specific logic ---
+            if framework_mode == 'with_framework':
+                if selected_robot_hmm_array:
+                    try:
+                        updated_hmm_array, sync_occurred = dynamic_deviation_threshold_multi_logic(
+                            hmm_array=selected_robot_hmm_array,
+                            rmm_array=selected_robot_rmm_array,
+                            update_logic_functions={},
+                            uncertainty_factor_pos=0.1,
+                            uncertainty_factor_time=0.1,
+                            dynamic_threshold_mission_time=mission_time_threshold,
+                            robot_id=robot_id
                         )
+                    except Exception as e:
+                        print(f"Error in backend logic for {robot_id}: {e}")
+                        sync_occurred = False
+                        updated_hmm_array = selected_robot_hmm_array
+                    
+                    current_hmms[robot_id] = updated_hmm_array # Update HMM
+                    if sync_occurred:
+                        any_sync_occurred_with_framework = True # Set flag for interval speed
+            
+            else: # framework_mode == 'without_framework'
+                # Get the interval from our new dictionary
+                interval = WITHOUT_FRAMEWORK_INTERVALS.get(scenario_num, 20) # Default to 20
+                if frame_idx > 0 and frame_idx % interval == 0:
+                    generate_message = True
+                # We DON'T run the logic, DON'T update the HMM, and DON'T set sync_occurred
+            
+            # --- 3. Generate message if *either* trigger is true ---
+            if sync_occurred or generate_message:
+                
+                # --- Create the message data (MODIFIED LOGIC HERE) ---
+                new_message_data, message_type, message_text_for_log = create_rich_status_message_data(
+                    robot_info,
+                    sim_time,
+                    packages,
+                    selected_robot_hmm_array, # Pass previous HMM (for 'with') or current HMM (for 'without')
+                    selected_robot_rmm_array, # Pass current RMM
+                    scenario_num
+                )
+                
+                # --- Check for skipped message (e.g., carrying N/A) (MODIFICATION 1) ---
+                if new_message_data is None:
+                    continue # Skip message generation for this robot
+                
+                # --- Check for duplicates ---
+                current_robot_history = new_robot_message_outputs[i-1]
+                is_duplicate = False
+                if current_robot_history:
+                    # Compare the new details_msg (list) to the previous one
+                    if new_message_data['details_msg'] == current_robot_history[0]['details_msg']:
+                        is_duplicate = True
+                
+                if not is_duplicate:
+                    is_new_message = False
+                    msg_id = new_message_data['message_id'] # <-- Get ID from data
+                    
+                    if msg_id not in new_message_timestamps:
+                        appear_time = time.time()
+                        new_message_timestamps[msg_id] = appear_time
+                        is_new_message = True
                         
-                        newly_generated_messages_for_feed.append(new_message_div)
-                        
-                        # --- MODIFIED: Update the Text UI *store* with *data*, not components ---
-                        
-                        # 1. Start new history with new *data*
-                        updated_history_data = [new_message_data]
-                        
-                        # 2. Get old history *data* from store
-                        current_hist_data = histories[i-1] if isinstance(histories[i-1], list) else ([histories[i-1]] if histories[i-1] else [])
-                        
-                        # 3. Extend
-                        updated_history_data.extend(current_hist_data)
-                        
-                        # 4. Set output to store
-                        new_robot_message_outputs[i-1] = updated_history_data
-                        # --- END TEXT UI STORE MODIFICATION ---
+                        log_entry = create_message_log_entry(
+                            message_id=msg_id,
+                            robot_id=robot_id,
+                            scenario_num=scenario_num,
+                            condition_idx=condition_idx,
+                            frame_idx=frame_idx,
+                            sim_time=sim_time,
+                            message_type=message_type,
+                            message_text=message_text_for_log, # <-- Use flattened string for log
+                            participant_id=participant_data.get('id'),
+                            appear_time=appear_time,
+                            robot_state=robot_info.get('state'),
+                            robot_x=robot_info.get('x'),
+                            robot_y=robot_info.get('y')
+                        )
+                        new_all_message_logs.append(log_entry)
+                    
+                    # --- Create the component for the Map UI (which needs 'new-message') ---
+                    new_message_div = render_message_component(
+                        new_message_data,
+                        current_open_message_ids,
+                        is_new=is_new_message # <-- Pass blink status
+                    )
+                    
+                    newly_generated_messages_for_feed.append(new_message_div)
+                    
+                    # --- Update the Text UI *store* with *data*, not components ---
+                    
+                    # 1. Start new history with new *data*
+                    updated_history_data = [new_message_data]
+                    
+                    # 2. Get old history *data* from store
+                    current_hist_data = histories[i-1] if isinstance(histories[i-1], list) else ([histories[i-1]] if histories[i-1] else [])
+                    
+                    # 3. Extend
+                    updated_history_data.extend(current_hist_data)
+                    
+                    # 4. Set output to store
+                    new_robot_message_outputs[i-1] = updated_history_data
     
-    # --- vvv NEW LOGIC FOR PACKAGE DISCOVERY vvv ---
+    # --- vvv MODIFICATION 6: ADD PACKAGE ASSIGNED LOGIC vvv ---
     if frame_idx > 0:
         current_packages = current_frame_data.get('packages', [])
         prev_packages_list = scenario_data[frame_idx - 1].get('packages', [])
         prev_packages_dict = {p['id']: p for p in prev_packages_list}
 
+        for pkg in current_packages:
+            # Check for Assignment Event (Only for packages that are not yet carried)
+            current_assigned = pkg.get('Assigned_to')
+            prev_assigned = prev_packages_dict.get(pkg['id'], {}).get('Assigned_to')
+            
+            # Check if it was unassigned/Null before AND is now assigned to a robot
+            if (prev_assigned in ['Null', None] or prev_assigned == '') and current_assigned.startswith('robot') and pkg.get('carried_by') in ['Null', None]:
+                pkg_id = pkg['id']
+                assigned_to = current_assigned
+                
+                # Build the message text
+                message_text_list = [
+                    "Package ", html.Strong(pkg_id), f" has been assigned to ", html.Strong(assigned_to), " for collection."
+                ]
+                message_text_for_log = " ".join([str(item) for item in message_text_list])
+
+                # Create message data
+                msg_id = f"{pkg_id}-assigned-{sim_time:.2f}"
+                message_type = "assignment"
+                
+                new_message_data = {
+                    'message_id': msg_id,
+                    'robot_id_title': "System",
+                    'status_icon': '🔗', # Assignment icon
+                    'status_text': 'PACKAGE ASSIGNED',
+                    'status_class_suffix': 'on-track',
+                    'time_str': datetime.now().strftime('%I:%M:%S %p'),
+                    'details_msg': message_text_list
+                }
+                
+                if msg_id not in new_message_timestamps:
+                    appear_time = time.time()
+                    new_message_timestamps[msg_id] = appear_time
+                    is_new_message = True
+                    
+                    log_entry = create_message_log_entry(
+                        message_id=msg_id,
+                        robot_id="System",
+                        scenario_num=scenario_num,
+                        condition_idx=condition_idx,
+                        frame_idx=frame_idx,
+                        sim_time=sim_time,
+                        message_type=message_type,
+                        message_text=message_text_for_log,
+                        participant_id=participant_data.get('id'),
+                        appear_time=appear_time,
+                        robot_state="N/A",
+                        robot_x=pkg.get('x'),
+                        robot_y=pkg.get('y')
+                    )
+                    new_all_message_logs.append(log_entry)
+
+                    new_message_div = render_message_component(
+                        new_message_data,
+                        current_open_message_ids,
+                        is_new=is_new_message
+                    )
+                    # Add to the start of the feed
+                    newly_generated_messages_for_feed.insert(0, new_message_div)
+
+                    # Also add to the assigned robot's log for the Text View
+                    robot_index = int(assigned_to[-1]) - 1
+                    if 0 <= robot_index < 3:
+                        new_robot_message_outputs[robot_index].insert(0, new_message_data)
+                        
+    # --- Package Discovery Logic (same as before, but runs after assignment check) ---
+    # The original discovery logic is retained here, ensuring its message handling is also updated.
+    
         for pkg in current_packages:
             if pkg['id'].startswith('d'):
                 prev_pkg = prev_packages_dict.get(pkg['id'])
@@ -1777,8 +2023,8 @@ def update_simulation_views(frame_idx, study_state,
                          ]
                     elif discovered_by != assigned_to and assigned_to != 'N/A':
                         message_text_list = [
-                            "Package ", html.Strong(pkg_id), f" discovered by {discovered_by}. ",
-                            f"Assigned to {assigned_to}."
+                            "Package ", html.Strong(pkg_id), f" discovered by {discovered_by}.",
+                            f" Assigned to {assigned_to}."
                         ]
                     else:
                         message_text_list = [
@@ -1831,20 +2077,18 @@ def update_simulation_views(frame_idx, study_state,
                         # Add to the start of the list
                         newly_generated_messages_for_feed.insert(0, new_message_div)
 
-                        # --- MODIFICATION: Add to Text View logs ---
-                        if discovered_by == 'robot1':
-                            new_robot_message_outputs[0].insert(0, new_message_data)
-                        elif discovered_by == 'robot2':
-                            new_robot_message_outputs[1].insert(0, new_message_data)
-                        elif discovered_by == 'robot3':
-                            new_robot_message_outputs[2].insert(0, new_message_data)
-                        # --- END MODIFICATION ---
-    # --- ^^^ END PACKAGE DISCOVERY LOGIC ^^^ ---
+                        # Add to the discovering robot's log for the Text View
+                        if discovered_by.startswith('robot'):
+                            robot_index = int(discovered_by[-1]) - 1
+                            if 0 <= robot_index < 3:
+                                new_robot_message_outputs[robot_index].insert(0, new_message_data)
+    # --- ^^^ END MODIFICATION 6 ---
     
     updated_all_messages = newly_generated_messages_for_feed + (all_messages_history or [])
     updated_all_messages = updated_all_messages[:100] # Trim
     
-    new_interval = SLOW_INTERVAL_MS if any_sync_occurred and framework_mode == 'with_framework' else UPDATE_INTERVAL_MS
+    # --- MODIFIED: Interval speed only changes if a 'with_framework' sync occurred ---
+    new_interval = SLOW_INTERVAL_MS if any_sync_occurred_with_framework else UPDATE_INTERVAL_MS
     
     return (
         fig,
@@ -1934,19 +2178,29 @@ def update_robot_3_ui(message_data_list, open_message_ids):
     return children
 # --- END NEW/MODIFIED CALLBACKS ---
 
-# update_snapshot is UNCHANGED
+# --- *** MODIFIED: update_snapshot (now creates a static map) *** ---
 @app.callback(
     Output('simulation-map-snapshot', 'figure'),
-    Input('simulation-graph', 'figure'),
+    Input('scenario-data-store', 'data'), # <-- CHANGED: Trigger on data load
     Input('study-state-store', 'data')
 )
-def update_snapshot(main_fig, study_state):
-    if not study_state or study_state.get('phase') != 'simulation':
+def update_snapshot(scenario_data, study_state): # <-- CHANGED: Argument is scenario_data
+    if not study_state or study_state.get('phase') != 'simulation' or not scenario_data:
         return no_update
-    if main_fig is None:
-        return initial_figure
-    snapshot_fig = go.Figure(main_fig)
-    for trace in snapshot_fig.data:
+    
+    # --- NEW LOGIC: Create figure from Frame 0 ---
+    try:
+        frame_0_data = scenario_data[0]
+    except Exception:
+        print("Error getting frame 0 for snapshot, using initial figure.")
+        return initial_figure # Fallback
+    
+    # Create the static figure from frame 0
+    static_fig = create_figure_for_frame(static_map_data, frame_0_data)
+    # --- END NEW LOGIC ---
+
+    # Apply scaling logic
+    for trace in static_fig.data:
         if hasattr(trace, 'marker') and trace.marker is not None:
             trace.marker.size = (
                 [s * 0.5 for s in trace.marker.size]
@@ -1957,13 +2211,15 @@ def update_snapshot(main_fig, study_state):
             )
         if hasattr(trace, 'line') and trace.line is not None:
             trace.line.width = trace.line.width * 0.5 if trace.line.width else 1
-    snapshot_fig.update_layout(
+    
+    static_fig.update_layout(
         margin=dict(l=0, r=0, t=20, b=0),
-        showlegend=False,
+        showlegend=False, # <-- MODIFIED: Keep legend OFF for this small map
         title=None,
         font=dict(size=8),
     )
-    return snapshot_fig
+    return static_fig
+# --- END MODIFICATION ---
 
 # log_graph_click is UNCHANGED
 @app.callback(
@@ -2296,8 +2552,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
     animation: flash-border 1.2s ease-out;
 }
 """)
-    # --- END MODIFICATION ---
     
     # Use debug=False for actual study deployment
-    app.run(debug=False, host='0.0.0.0', port=9566)
+    app.run(debug=False, host='0.0.0.0', port=9532)
     # server = app.server

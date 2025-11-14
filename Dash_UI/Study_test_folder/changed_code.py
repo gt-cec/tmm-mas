@@ -1,5 +1,3 @@
-
-
 import dash
 from dash import dcc, html, Input, Output, State, callback_context, no_update
 from dash.dependencies import ALL
@@ -62,8 +60,19 @@ PARTICIPANT_COUNT_LOCK = 'study_data/participant_count.lock'
 
 THRESHOLD_VALUES = {
     'with_framework': {1: 5, 2: 12, 3: 15, 4: 9, 5: 10, 6: 11},
-    'without_framework': {1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}
+    'without_framework': {1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1} # This is now IGNORED by the new logic
 }
+
+# --- NEW: Frame intervals for 'without_framework' mode ---
+WITHOUT_FRAMEWORK_INTERVALS = {
+    1: 10,
+    2: 15,
+    3: 20,
+    4: 30,
+    5: 25,
+    6: 20
+}
+# --- END NEW ---
 
 SCENARIO_CONFIG = {
     1: {'total_time': 335.0, 'total_steps': 245},
@@ -1543,7 +1552,7 @@ def programmatically_switch_view(study_state, participant_data):
     return map_style, text_style, header_text
 
 # --- *** MAJOR MODIFICATION: update_simulation_views *** ---
-# --- This callback now saves DATA to stores, not components ---
+# --- This callback now implements the new 'without_framework' logic ---
 @app.callback(
     Output('simulation-graph', 'figure'),
     # --- MODIFIED: Outputs are to stores, not UI ---
@@ -1622,23 +1631,27 @@ def update_simulation_views(frame_idx, study_state,
     current_frame_data = scenario_data[frame_idx]
     fig = create_figure_for_frame(static_map_data, current_frame_data)
     
-    mission_time_threshold = THRESHOLD_VALUES[framework_mode].get(scenario_num, 1)
+    # --- THIS IS ONLY USED FOR 'with_framework' NOW ---
+    mission_time_threshold = THRESHOLD_VALUES['with_framework'].get(scenario_num, 1)
+    
     robots_dict = current_frame_data.get('robots', {})
     packages = current_frame_data.get('packages', [])
-    
-    
     
     # --- MODIFIED: hist1, hist2, hist3 now come from stores (and contain DATA, not components) ---
     histories = [hist1, hist2, hist3]
     # This will hold the new DATA lists for the stores
     new_robot_message_outputs = [histories[0] or [], histories[1] or [], histories[2] or []]
     sim_time = current_frame_data.get('simulator time', 0)
-    any_sync_occurred = False
+    
+    # --- MODIFIED: This flag is now specific to 'with_framework' to control interval speed ---
+    any_sync_occurred_with_framework = False
+    
     newly_generated_messages_for_feed = []
     
     for i in range(1, 4):
         robot_id = f'robot{i}'
         if robot_id in robots_dict:
+            # --- 1. Get common robot data (needed for both modes) ---
             raw_robot_data = robots_dict[robot_id]
             # --- ADD 'Quadrant' and 'Bad_Terrain' to keys ---
             rmm_keys_to_select = [
@@ -1655,100 +1668,111 @@ def update_simulation_views(frame_idx, study_state,
             selected_robot_hmm_array = current_hmms.get(robot_id)
             robot_info = {**robots_dict[robot_id], 'id': robot_id}
             
-            if selected_robot_hmm_array:
-                try:
-                    updated_hmm_array, sync_occurred = dynamic_deviation_threshold_multi_logic(
-                        hmm_array=selected_robot_hmm_array,
-                        rmm_array=selected_robot_rmm_array,
-                        update_logic_functions={},
-                        uncertainty_factor_pos=0.1,
-                        uncertainty_factor_time=0.1,
-                        dynamic_threshold_mission_time=mission_time_threshold,
-                        robot_id=robot_id
-                    )
-                except Exception as e:
-                    print(f"Error in backend logic for {robot_id}: {e}")
-                    sync_occurred = False
-                    updated_hmm_array = selected_robot_hmm_array
-                
-                current_hmms[robot_id] = updated_hmm_array
-                
-                
-                if sync_occurred:
-                    any_sync_occurred = True
-                    
-                    # --- MODIFIED: Call new data function ---
-                    new_message_data, message_type, message_text_for_log = create_rich_status_message_data(
-                        robot_info,
-                        sim_time,
-                        packages,
-                        selected_robot_hmm_array, # Pass previous HMM
-                        selected_robot_rmm_array, # Pass current RMM
-                        scenario_num
-                    )
-                    
-                    # --- NEW: Check for skipped message (e.g., carrying N/A) ---
-                    if new_message_data is None:
-                        continue # Skip message generation for this robot
-                    # --- END NEW ---
-
-                    # --- MODIFICATION: Check for duplicates ---
-                    current_robot_history = new_robot_message_outputs[i-1]
-                    is_duplicate = False
-                    if current_robot_history:
-                        # Compare the new details_msg (list) to the previous one
-                        if new_message_data['details_msg'] == current_robot_history[0]['details_msg']:
-                            is_duplicate = True
-                    
-                    if not is_duplicate:
-                        is_new_message = False
-                        msg_id = new_message_data['message_id'] # <-- Get ID from data
-                        
-                        if msg_id not in new_message_timestamps:
-                            appear_time = time.time()
-                            new_message_timestamps[msg_id] = appear_time
-                            is_new_message = True
-                            
-                            log_entry = create_message_log_entry(
-                                message_id=msg_id,
-                                robot_id=robot_id,
-                                scenario_num=scenario_num,
-                                condition_idx=condition_idx,
-                                frame_idx=frame_idx,
-                                sim_time=sim_time,
-                                message_type=message_type,
-                                message_text=message_text_for_log, # <-- Use flattened string for log
-                                participant_id=participant_data.get('id'),
-                                appear_time=appear_time,
-                                robot_state=robot_info.get('state'),
-                                robot_x=robot_info.get('x'),
-                                robot_y=robot_info.get('y')
-                            )
-                            new_all_message_logs.append(log_entry)
-                        
-                        # --- Create the component for the Map UI (which needs 'new-message') ---
-                        new_message_div = render_message_component(
-                            new_message_data,
-                            current_open_message_ids,
-                            is_new=is_new_message # <-- Pass blink status
+            sync_occurred = False # Trigger for 'with_framework'
+            generate_message = False # Trigger for 'without_framework'
+            
+            # --- 2. Apply mode-specific logic ---
+            if framework_mode == 'with_framework':
+                if selected_robot_hmm_array:
+                    try:
+                        updated_hmm_array, sync_occurred = dynamic_deviation_threshold_multi_logic(
+                            hmm_array=selected_robot_hmm_array,
+                            rmm_array=selected_robot_rmm_array,
+                            update_logic_functions={},
+                            uncertainty_factor_pos=0.1,
+                            uncertainty_factor_time=0.1,
+                            dynamic_threshold_mission_time=mission_time_threshold,
+                            robot_id=robot_id
                         )
+                    except Exception as e:
+                        print(f"Error in backend logic for {robot_id}: {e}")
+                        sync_occurred = False
+                        updated_hmm_array = selected_robot_hmm_array
+                    
+                    current_hmms[robot_id] = updated_hmm_array # Update HMM
+                    if sync_occurred:
+                        any_sync_occurred_with_framework = True # Set flag for interval speed
+            
+            else: # framework_mode == 'without_framework'
+                # Get the interval from our new dictionary
+                interval = WITHOUT_FRAMEWORK_INTERVALS.get(scenario_num, 20) # Default to 20
+                if frame_idx > 0 and frame_idx % interval == 0:
+                    generate_message = True
+                # We DON'T run the logic, DON'T update the HMM, and DON'T set sync_occurred
+            
+            # --- 3. Generate message if *either* trigger is true ---
+            if sync_occurred or generate_message:
+                
+                # --- Create the message data ---
+                new_message_data, message_type, message_text_for_log = create_rich_status_message_data(
+                    robot_info,
+                    sim_time,
+                    packages,
+                    selected_robot_hmm_array, # Pass previous HMM (for 'with') or current HMM (for 'without')
+                    selected_robot_rmm_array, # Pass current RMM
+                    scenario_num
+                )
+                
+                # --- Check for skipped message (e.g., carrying N/A) ---
+                if new_message_data is None:
+                    continue # Skip message generation for this robot
+                
+                # --- Check for duplicates ---
+                current_robot_history = new_robot_message_outputs[i-1]
+                is_duplicate = False
+                if current_robot_history:
+                    # Compare the new details_msg (list) to the previous one
+                    if new_message_data['details_msg'] == current_robot_history[0]['details_msg']:
+                        is_duplicate = True
+                
+                if not is_duplicate:
+                    is_new_message = False
+                    msg_id = new_message_data['message_id'] # <-- Get ID from data
+                    
+                    if msg_id not in new_message_timestamps:
+                        appear_time = time.time()
+                        new_message_timestamps[msg_id] = appear_time
+                        is_new_message = True
                         
-                        newly_generated_messages_for_feed.append(new_message_div)
-                        
-                        # --- MODIFIED: Update the Text UI *store* with *data*, not components ---
-                        
-                        # 1. Start new history with new *data*
-                        updated_history_data = [new_message_data]
-                        
-                        # 2. Get old history *data* from store
-                        current_hist_data = histories[i-1] if isinstance(histories[i-1], list) else ([histories[i-1]] if histories[i-1] else [])
-                        
-                        # 3. Extend
-                        updated_history_data.extend(current_hist_data)
-                        
-                        # 4. Set output to store
-                        new_robot_message_outputs[i-1] = updated_history_data
-                        # --- END TEXT UI STORE MODIFICATION ---
+                        log_entry = create_message_log_entry(
+                            message_id=msg_id,
+                            robot_id=robot_id,
+                            scenario_num=scenario_num,
+                            condition_idx=condition_idx,
+                            frame_idx=frame_idx,
+                            sim_time=sim_time,
+                            message_type=message_type,
+                            message_text=message_text_for_log, # <-- Use flattened string for log
+                            participant_id=participant_data.get('id'),
+                            appear_time=appear_time,
+                            robot_state=robot_info.get('state'),
+                            robot_x=robot_info.get('x'),
+                            robot_y=robot_info.get('y')
+                        )
+                        new_all_message_logs.append(log_entry)
+                    
+                    # --- Create the component for the Map UI (which needs 'new-message') ---
+                    new_message_div = render_message_component(
+                        new_message_data,
+                        current_open_message_ids,
+                        is_new=is_new_message # <-- Pass blink status
+                    )
+                    
+                    newly_generated_messages_for_feed.append(new_message_div)
+                    
+                    # --- Update the Text UI *store* with *data*, not components ---
+                    
+                    # 1. Start new history with new *data*
+                    updated_history_data = [new_message_data]
+                    
+                    # 2. Get old history *data* from store
+                    current_hist_data = histories[i-1] if isinstance(histories[i-1], list) else ([histories[i-1]] if histories[i-1] else [])
+                    
+                    # 3. Extend
+                    updated_history_data.extend(current_hist_data)
+                    
+                    # 4. Set output to store
+                    new_robot_message_outputs[i-1] = updated_history_data
     
     # --- vvv NEW LOGIC FOR PACKAGE DISCOVERY vvv ---
     if frame_idx > 0:
@@ -1844,7 +1868,8 @@ def update_simulation_views(frame_idx, study_state,
     updated_all_messages = newly_generated_messages_for_feed + (all_messages_history or [])
     updated_all_messages = updated_all_messages[:100] # Trim
     
-    new_interval = SLOW_INTERVAL_MS if any_sync_occurred and framework_mode == 'with_framework' else UPDATE_INTERVAL_MS
+    # --- MODIFIED: Interval speed only changes if a 'with_framework' sync occurred ---
+    new_interval = SLOW_INTERVAL_MS if any_sync_occurred_with_framework else UPDATE_INTERVAL_MS
     
     return (
         fig,
