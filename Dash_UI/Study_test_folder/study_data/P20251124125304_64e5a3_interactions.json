@@ -1,0 +1,200 @@
+[
+  {
+    "timestamp_iso": "2025-11-24T12:57:23.261000",
+    "timestamp_unix": 1764007043.261,
+    "participant": "P20251124125304_64e5a3",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 12,
+    "type": "message_click",
+    "message_id": "d4-discovered-35.13",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-24T12:57:24.241000",
+    "timestamp_unix": 1764007044.241,
+    "participant": "P20251124125304_64e5a3",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 13,
+    "type": "message_click",
+    "message_id": "d3-discovered-35.13",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-24T12:57:25.292000",
+    "timestamp_unix": 1764007045.292,
+    "participant": "P20251124125304_64e5a3",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 14,
+    "type": "message_click",
+    "message_id": "d1-discovered-35.13",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-24T12:57:26.036000",
+    "timestamp_unix": 1764007046.036,
+    "participant": "P20251124125304_64e5a3",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 15,
+    "type": "message_click",
+    "message_id": "d4-assigned-35.13",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-24T12:57:26.779000",
+    "timestamp_unix": 1764007046.779,
+    "participant": "P20251124125304_64e5a3",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 15,
+    "type": "message_click",
+    "message_id": "d3-assigned-35.13",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-24T12:57:27.427000",
+    "timestamp_unix": 1764007047.427,
+    "participant": "P20251124125304_64e5a3",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 16,
+    "type": "message_click",
+    "message_id": "d1-assigned-35.13",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-24T12:57:33.591000",
+    "timestamp_unix": 1764007053.591,
+    "participant": "P20251124125304_64e5a3",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 22,
+    "type": "message_click",
+    "message_id": "robot1-45.63",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-24T12:57:34.470000",
+    "timestamp_unix": 1764007054.47,
+    "participant": "P20251124125304_64e5a3",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 23,
+    "type": "message_click",
+    "message_id": "robot3-45.63",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-24T12:57:38.232000",
+    "timestamp_unix": 1764007058.232,
+    "participant": "P20251124125304_64e5a3",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 27,
+    "type": "message_click",
+    "message_id": "robot2-45.63",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-24T12:57:40.137000",
+    "timestamp_unix": 1764007060.137,
+    "participant": "P20251124125304_64e5a3",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 29,
+    "type": "message_click",
+    "message_id": "d9-assigned-50.13",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-24T12:57:40.916000",
+    "timestamp_unix": 1764007060.916,
+    "participant": "P20251124125304_64e5a3",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 29,
+    "type": "message_click",
+    "message_id": "d9-discovered-50.13",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-24T12:57:52.669000",
+    "timestamp_unix": 1764007072.669,
+    "participant": "P20251124125304_64e5a3",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 41,
+    "type": "message_click",
+    "message_id": "robot2-70.13",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-24T12:57:54.011000",
+    "timestamp_unix": 1764007074.011,
+    "participant": "P20251124125304_64e5a3",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 43,
+    "type": "message_click",
+    "message_id": "robot1-70.13",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-24T12:59:14.687000",
+    "timestamp_unix": 1764007154.687,
+    "participant": "P20251124125304_64e5a3",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 74,
+    "type": "message_click",
+    "message_id": "robot1-92.31",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-24T12:59:21.794000",
+    "timestamp_unix": 1764007161.794,
+    "participant": "P20251124125304_64e5a3",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 81,
+    "type": "message_click",
+    "message_id": "robot2-105.76",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-24T12:59:22.661000",
+    "timestamp_unix": 1764007162.661,
+    "participant": "P20251124125304_64e5a3",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 82,
+    "type": "message_click",
+    "message_id": "robot1-105.76",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-24T12:59:25.483000",
+    "timestamp_unix": 1764007165.483,
+    "participant": "P20251124125304_64e5a3",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 85,
+    "type": "message_click",
+    "message_id": "robot3-105.76",
+    "action": "opened"
+  },
+  {
+    "timestamp_iso": "2025-11-24T13:03:41.723000",
+    "timestamp_unix": 1764007421.723,
+    "participant": "P20251124125304_64e5a3",
+    "scenario": 3,
+    "condition": 1,
+    "frame": 293,
+    "type": "message_click",
+    "message_id": "robot2-233.01",
+    "action": "opened"
+  }
+]

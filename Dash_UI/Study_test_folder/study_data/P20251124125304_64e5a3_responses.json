@@ -1,0 +1,53 @@
+[
+  {
+    "timestamp": "2025-11-24T13:00:58.154867",
+    "type": "pause_question",
+    "run_number": 1,
+    "scenario": 3,
+    "condition": 1,
+    "pause_point": 1,
+    "question": "What is the status of Robot 2?",
+    "answer": [
+      "Replanning due to rough terrain",
+      "Recharging"
+    ]
+  },
+  {
+    "timestamp": "2025-11-24T13:02:17.356487",
+    "type": "pause_question",
+    "run_number": 1,
+    "scenario": 3,
+    "condition": 1,
+    "pause_point": 2,
+    "question": "What are the implications of robot 2 being caught in a bad weather system?",
+    "answer": "Robot 2\u2019s delivery will not be impacted"
+  },
+  {
+    "timestamp": "2025-11-24T13:05:02.073867",
+    "type": "pause_question",
+    "run_number": 1,
+    "scenario": 3,
+    "condition": 1,
+    "pause_point": 3,
+    "question": "Which robot is likely to deliver a package next?",
+    "answer": "Robot 3"
+  },
+  {
+    "timestamp": "2025-11-24T13:07:22.333806",
+    "type": "post_scenario",
+    "segment_start_time": "2025-11-24T13:05:02.073878",
+    "run_number": 1,
+    "scenario": 3,
+    "condition": 1,
+    "view_type": "map",
+    "framework": "without_framework",
+    "answers": {
+      "mental_demand": "5 - Very High",
+      "physical_demand": "4 - High",
+      "temporal_demand": "4 - High",
+      "performance": "3 - Moderate",
+      "effort": "4 - High",
+      "frustration": "4 - High"
+    }
+  }
+]
