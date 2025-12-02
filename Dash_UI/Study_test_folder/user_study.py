@@ -244,7 +244,7 @@ SCENARIO_CONTENT = {
 
             {"text": "What is the status of robot 2?", "options": ["Just picked up a package", "Just delivered a package", "Robot 2 is recharging", "Robot 2 is replanning"]},
 
-            {"text": "Given that robot 2 just delivered a package, what comes next?", "options": ["Robot 2 will head towards a different package in the NW quadrant", "Robot 2 will assist Robot 2 in the NW quadrant", "Robot 2 will head towards a different package in the SW quadrant", "Robot 2 will assist Robot 3 in the NE quadrant", "Robot 2 will search the NE and SE quadrants for remaining packages"]},
+            {"text": "Given that robot 2 just delivered a package, what comes next?", "options": ["Robot 2 will head towards a different package in the NW quadrant", "Robot 2 will assist Robot 1 in the NW quadrant", "Robot 2 will head towards a different package in the SW quadrant", "Robot 2 will assist Robot 3 in the NE quadrant", "Robot 2 will search the NE and SE quadrants for remaining packages"]},
 
             {"text": "Which robot is likely to finish its mission next?", "options": ["Robot 1", "Robot 2", "Robot 3", "Robot 1 and 2 simultaneously", "Robot 3 and 2 simultaneously"]}
 
