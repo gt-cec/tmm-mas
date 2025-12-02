@@ -96,7 +96,7 @@ THRESHOLD_VALUES = {
 
 WITHOUT_FRAMEWORK_INTERVALS = {
 
-    1: 10, 2: 15, 3: 20, 4: 30, 5: 25, 6: 20
+    1: 8, 2: 8, 3: 8, 4: 8, 5: 8, 6: 8
 
 }
 
