@@ -907,7 +907,8 @@ def create_rich_status_message_data(robot_data, sim_time, all_packages, selected
         status_text = f"{' '.join(summary_icons)} {status_text}"
     
     completed_pkgs = robot_data.get('total_completed_packages', 0)
-    status_text += f" | ETA: {eta_seconds}s | Pkgs: {completed_pkgs}/4"
+    # status_text += f" | ETA: {eta_seconds}s | Pkgs: {completed_pkgs}/4"
+    status_text += f"  Pkgs: {completed_pkgs}/4"
 
     # --- 5. Build Details Body ---
     details_msg = [f"Estimated Time to Goal: {eta_seconds} seconds."]
@@ -1070,64 +1071,96 @@ If you have questions about your rights as a participant, contact the Georgia Te
 
 
 
-# --- NEW: System Briefing Screen ---
+# # --- NEW: System Briefing Screen ---
+
+# def system_briefing_screen():
+
+#     text = """
+
+# In this study, you will act as a robot swarm operator. You will observe and interact with a simulated mission in which three robots work together to collect packages and deliver them to designated drop-off locations. Your role is to monitor their progress throughout the mission.
+
+
+
+# You will watch four short videos, each demonstrating different conditions. The main difference between them is their communication styles:
+
+
+
+# In one style, messages are sent only when the system identifies a meaningful change.
+
+# In the other, messages are sent routinely at regular intervals.
+
+
+
+# Additionally, you will experience two different visual layouts: one that includes a map view showing robot movements, and another that presents text-only updates describing their statuses.
+
+
+
+# The purpose of this study is to understand how different communication styles and visual layouts affect an operator’s ability to maintain awareness during a mission.
+
+
+
+# Your task is to stay aware of what is happening in the mission and monitor updates as you receive them. As the robots explore, they will send you information about what they encounter. Robots may replan their routes if a path becomes blocked or if environmental or technical factors cause delays. When a robot sends a message, you will see an indicator appear—click the indicator to view the message content. This interaction helps us track when you receive and acknowledge each update.
+
+# """
+
+#     return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh',
+
+#                           'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center',
+
+#                           'justifyContent': 'center', 'fontFamily': 'Arial', 'padding': '20px'}, children=[
+
+#         html.H1("System Briefing", style={'color': '#00ff88', 'marginBottom': '30px'}),
+
+#         html.Div(style={'backgroundColor': '#2b2b2b', 'padding': '40px', 'borderRadius': '10px',
+
+#                        'maxWidth': '800px', 'width': '100%', 'maxHeight': '70vh', 'overflowY': 'auto'}, children=[
+
+#             dcc.Markdown(text, style={'whiteSpace': 'pre-wrap', 'lineHeight': '1.8',
+
+#                                           'fontSize': '16px', 'marginBottom': '30px'}),
+
+#             html.Button('Continue to Training Video', id='acknowledge-system-briefing-btn', n_clicks=0,
+
+#                        style={'width': '100%', 'padding': '15px', 'fontSize': '18px',
+
+#                              'backgroundColor': '#00ff88', 'color': '#1e1e1e', 'border': 'none',
+
+#                              'borderRadius': '5px', 'cursor': 'pointer', 'fontWeight': 'bold'})
+
+#         ])
+
+#     ])
 
 def system_briefing_screen():
-
     text = """
-
 In this study, you will act as a robot swarm operator. You will observe and interact with a simulated mission in which three robots work together to collect packages and deliver them to designated drop-off locations. Your role is to monitor their progress throughout the mission.
-
-
 
 You will watch four short videos, each demonstrating different conditions. The main difference between them is their communication styles:
 
-
-
 In one style, messages are sent only when the system identifies a meaningful change.
-
 In the other, messages are sent routinely at regular intervals.
-
-
 
 Additionally, you will experience two different visual layouts: one that includes a map view showing robot movements, and another that presents text-only updates describing their statuses.
 
-
-
 The purpose of this study is to understand how different communication styles and visual layouts affect an operator’s ability to maintain awareness during a mission.
 
-
-
-Your task is to stay aware of what is happening in the mission and monitor updates as you receive them. As the robots explore, they will send you information about what they encounter. Robots may replan their routes if a path becomes blocked or if environmental or technical factors cause delays. When a robot sends a message, you will see an indicator appear—click the indicator to view the message content. This interaction helps us track when you receive and acknowledge each update.
-
+Your task is to stay aware of what is happening in the mission and monitor updates as you receive them. As the robots explore, they will send you information about what they encounter. Robots may replan their routes if a path becomes blocked or if environmental or technical factors cause delays. **<mark style="background-color: #00ff88; color: #1e1e1e; padding: 2px 4px; border-radius: 4px;">When a robot sends a message, you will see an indicator appear—click the indicator to view the message content.</mark>** This interaction helps us track when you receive and acknowledge each update.
 """
-
     return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh',
-
                           'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center',
-
                           'justifyContent': 'center', 'fontFamily': 'Arial', 'padding': '20px'}, children=[
-
         html.H1("System Briefing", style={'color': '#00ff88', 'marginBottom': '30px'}),
-
         html.Div(style={'backgroundColor': '#2b2b2b', 'padding': '40px', 'borderRadius': '10px',
-
                        'maxWidth': '800px', 'width': '100%', 'maxHeight': '70vh', 'overflowY': 'auto'}, children=[
-
-            dcc.Markdown(text, style={'whiteSpace': 'pre-wrap', 'lineHeight': '1.8',
-
-                                          'fontSize': '16px', 'marginBottom': '30px'}),
-
+            dcc.Markdown(text, 
+                         dangerously_allow_html=True,  # <--- Essential for the highlight to work
+                         style={'whiteSpace': 'pre-wrap', 'lineHeight': '1.8',
+                                'fontSize': '16px', 'marginBottom': '30px'}),
             html.Button('Continue to Training Video', id='acknowledge-system-briefing-btn', n_clicks=0,
-
                        style={'width': '100%', 'padding': '15px', 'fontSize': '18px',
-
                              'backgroundColor': '#00ff88', 'color': '#1e1e1e', 'border': 'none',
-
                              'borderRadius': '5px', 'cursor': 'pointer', 'fontWeight': 'bold'})
-
         ])
-
     ])
 
 
