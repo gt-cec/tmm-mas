@@ -72,8 +72,15 @@ CLICK_POLL_INTERVAL_MS = 1000
 
 # --- Constants ---
 # ... other constants ...
-TRAINING_VIDEO_URL = "https://www.youtube.com/embed/dQw4w9WgXcQ?si=DyjrA0IeEKRrsVx1"
+TRAINING_VIDEO_URL = "https://www.youtube.com/embed/d2aJuvjMlrs?si=M6_NDLwbvvqruKd8"
+
+# "https://www.youtube.com/embed/dQw4w9WgXcQ?si=DyjrA0IeEKRrsVx1"
 # <iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=DyjrA0IeEKRrsVx1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+
+
+
+# <iframe width="560" height="315" src="https://www.youtube.com/embed/d2aJuvjMlrs?si=M6_NDLwbvvqruKd8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 
 # https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1
@@ -122,15 +129,15 @@ SCENARIO_CONFIG = {
 
 PAUSE_POINTS = {
 
-    1: [117, 154, 237],
+    1: [117, 159, 237],
 
-    2: [53, 115, 336],
+    2: [43, 95, 317],
 
-    3: [142, 208, 353],
+    3: [176, 183, 391],
 
     4: [20, 101, 329],
 
-    5: [119, 130, 383],
+    5: [120, 143, 374],
 
     6: [140, 175, 322]
 
