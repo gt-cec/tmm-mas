@@ -46,10 +46,10 @@ pip install -r requirements.txt
 source venv/bin/activate
 
 # 2. Run the app using the simple development server
-python3 updated_user_study.py
+python3 user_study.py
 
 # 3. Open your web browser and go to:
-#    [http://127.0.0.1:9761](http://127.0.0.1:9761)
+#    [http://127.0.0.1:8033](http://127.0.0.1:9761)
 ```
 
 To stop the server, just press `Ctrl+C` in your terminal.
@@ -121,4 +121,5 @@ Your study is now **LIVE** at `https://your-stable-hri-domain.ngrok.io`. All dat
 
 ```
 ```
+
 
