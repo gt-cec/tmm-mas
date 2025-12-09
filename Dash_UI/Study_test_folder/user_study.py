@@ -3303,4 +3303,4 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 """)
 
     # Run the app using app.run instead of app.run_server
-    app.run(debug=False, host='0.0.0.0', port=8033)
+    app.run(debug=False, host='0.0.0.0', port=8080)
