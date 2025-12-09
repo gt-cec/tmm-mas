@@ -1708,30 +1708,59 @@ def create_simulation_layout():
 
 
 def thank_you_screen():
-
     return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh',
-
-                          'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center',
-
-                          'justifyContent': 'center', 'fontFamily': 'Arial'}, children=[
-
+                           'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center',
+                           'justifyContent': 'center', 'fontFamily': 'Arial'}, children=[
         html.H1("Thank You!", style={'color': '#00ff88', 'marginBottom': '30px'}),
-
         html.Div(style={'backgroundColor': '#2b2b2b', 'padding': '40px', 'borderRadius': '10px',
-
-                       'maxWidth': '600px', 'textAlign': 'center'}, children=[
-
+                        'maxWidth': '600px', 'textAlign': 'center'}, children=[
             html.H3("Study Complete", style={'marginBottom': '20px'}),
-
             html.P("Thank you for participating in this study. Your responses have been recorded.",
+                   style={'fontSize': '18px', 'lineHeight': '1.6'}),
+            
+            # --- NEW: Completion Code Section ---
+            html.Div(style={'marginTop': '30px', 'marginBottom': '30px', 'padding': '20px', 
+                            'backgroundColor': '#1e1e1e', 'borderRadius': '5px', 'border': '1px solid #00ff88'}, children=[
+                html.P("Your Completion Code is:", style={'color': '#aaa', 'marginBottom': '10px', 'fontSize': '16px'}),
+                # The code you provided:
+                html.H2("CUWHCZ1Z", style={'color': '#00ff88', 'margin': '0', 'fontSize': '32px', 'letterSpacing': '2px', 'fontWeight': 'bold'})
+            ]),
 
-                  style={'fontSize': '18px', 'lineHeight': '1.6'}),
-
+            html.P("Please copy this code and send this code to the researcher to receive your compensation.", 
+                   style={'fontSize': '16px', 'color': '#ccc', 'marginBottom': '10px'}),
+            
             html.P("You may now close this window.", style={'marginTop': '30px', 'color': '#888'})
-
         ])
-
     ])
+    
+    
+    
+
+# def thank_you_screen():
+
+#     return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh',
+
+#                           'display': 'flex', 'flexDirection': 'column', 'alignItems': 'center',
+
+#                           'justifyContent': 'center', 'fontFamily': 'Arial'}, children=[
+
+#         html.H1("Thank You!", style={'color': '#00ff88', 'marginBottom': '30px'}),
+
+#         html.Div(style={'backgroundColor': '#2b2b2b', 'padding': '40px', 'borderRadius': '10px',
+
+#                        'maxWidth': '600px', 'textAlign': 'center'}, children=[
+
+#             html.H3("Study Complete", style={'marginBottom': '20px'}),
+
+#             html.P("Thank you for participating in this study. Your responses have been recorded.",
+
+#                   style={'fontSize': '18px', 'lineHeight': '1.6'}),
+
+#             html.P("You may now close this window.", style={'marginTop': '30px', 'color': '#888'})
+
+#         ])
+
+#     ])
 
 
 
@@ -2080,7 +2109,7 @@ def start_study(n_clicks, name):
     }
 
     return consent_screen(), participant_data, study_state, ""
-
+    # return thank_you_screen(), participant_data, study_state, ""
 
 
 # --- NEW: Sequence Logic for new screens ---
