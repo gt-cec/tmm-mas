@@ -1,0 +1,6 @@
+ParticipantID,Name,ParticipantStartTime,RunNumber,Scenario,ConditionIndex,ViewType,Framework,ResponseTimestamp,MentalDemand,PhysicalDemand,TemporalDemand,Performance,Effort,Frustration
+P20251210012212_084b1f,Alagappan Swaminathan,2025-12-10T01:22:12.616438,1,1,0,map,with_framework,2025-12-10T01:30:13.087244,4 - High,3 - Moderate,3 - Moderate,4 - Good,4 - High,3 - Moderate
+P20251210012212_084b1f,Alagappan Swaminathan,2025-12-10T01:22:12.616438,2,2,3,text,without_framework,2025-12-10T01:37:03.255041,5 - Very High,4 - High,5 - Very High,3 - Moderate,4 - High,5 - Very High
+P20251210012212_084b1f,Alagappan Swaminathan,2025-12-10T01:22:12.616438,3,3,2,text,with_framework,2025-12-10T01:45:08.468014,4 - High,5 - Very High,4 - High,3 - Moderate,4 - High,3 - Moderate
+P20251210012212_084b1f,Alagappan Swaminathan,2025-12-10T01:22:12.616438,4,4,1,map,without_framework,2025-12-10T01:51:55.415114,3 - Moderate,4 - High,4 - High,4 - Good,4 - High,3 - Moderate
+P20251210012212_084b1f,Alagappan Swaminathan,2025-12-10T01:22:12.616438,4,4,1,map,without_framework,2025-12-10T01:51:55.415114,3 - Moderate,4 - High,4 - High,4 - Good,4 - High,3 - Moderate

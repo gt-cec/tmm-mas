@@ -1541,95 +1541,151 @@ def create_post_scenario_questionnaire(scenario_num, run_number, total_runs):
 
 
 
-def post_study_questionnaire():
+# def post_study_questionnaire():
 
-    questions = [
+#     questions = [
 
-        # --- NEW: Ranking Question ---
+#         # --- NEW: Ranking Question ---
 
-        {'text': 'Please rank the following demonstration types based on how useful they were for understanding and monitoring the robot swarm. (Please type your order preference below: Map–Improved, Map–Default, Text–Improved, Text–Default)', 'type': 'open', 'id': 'ranking'},
+#         {'text': 'Please rank the following demonstration types based on how useful they were for understanding and monitoring the robot swarm. (Please type your order preference below: Map–Improved, Map–Default, Text–Improved, Text–Default)', 'type': 'open', 'id': 'ranking'},
 
         
 
-        # --- NEW: Specific Improved + Map Questions ---
+#         # --- NEW: Specific Improved + Map Questions ---
 
-        {'text': 'The following questions pertain to your experience with the system that utilized our improved communication and the map view. How effective were the update messages in helping you understand the robots\' behavior?', 'type': 'scale', 'id': 'improved_map_effectiveness', 'options': ['1 - Not at all effective', '2', '3', '4', '5 - Extremely effective']},
+#         {'text': 'The following questions pertain to your experience with the system that utilized our improved communication and the map view. How effective were the update messages in helping you understand the robots\' behavior?', 'type': 'scale', 'id': 'improved_map_effectiveness', 'options': ['1 - Not at all effective', '2', '3', '4', '5 - Extremely effective']},
 
-        {'text': 'How did this differ between demonstration types?', 'type': 'open', 'id': 'improved_map_effectiveness_detail'},
+#         {'text': 'How did this differ between demonstration types?', 'type': 'open', 'id': 'improved_map_effectiveness_detail'},
 
-        {'text': 'How easy was it to tell why a robot replanned or changed its route? (1 = Very difficult | 5 = Very easy)', 'type': 'scale', 'id': 'replan_clarity', 'options': ['1 - Very difficult', '2', '3', '4', '5 - Very easy']},
+#         {'text': 'How easy was it to tell why a robot replanned or changed its route? (1 = Very difficult | 5 = Very easy)', 'type': 'scale', 'id': 'replan_clarity', 'options': ['1 - Very difficult', '2', '3', '4', '5 - Very easy']},
 
-        {'text': 'What, if anything, was confusing about the robots\' behavior or the updates you received? How did this differ between demonstration types?', 'type': 'open', 'id': 'confusion_detail'},
+#         {'text': 'What, if anything, was confusing about the robots\' behavior or the updates you received? How did this differ between demonstration types?', 'type': 'open', 'id': 'confusion_detail'},
 
-        {'text': 'Do you have any additional thoughts or feedback about the communication styles or the interface overall?', 'type': 'open', 'id': 'final_feedback'}
+#         {'text': 'Do you have any additional thoughts or feedback about the communication styles or the interface overall?', 'type': 'open', 'id': 'final_feedback'}
 
-    ]
+#     ]
 
     
 
+#     return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh',
+
+#                           'padding': '40px', 'fontFamily': 'Arial', 'overflowY': 'auto'}, children=[
+
+#         html.Div(style={'backgroundColor': '#2b2b2b', 'padding': '40px', 'borderRadius': '10px',
+
+#                        'maxWidth': '1000px', 'margin': '0 auto'}, children=[
+
+#             html.H2("Final Interview", style={'color': '#00ff88', 'marginBottom': '20px'}),
+
+#             html.P("You may end the evaluation here. If you are willing to answer additional questions to assist in our understanding of your experience, please continue forward.",
+
+#                   style={'marginBottom': '40px', 'fontSize': '16px'}),
+
+#             html.Div([
+
+#                 html.Div([
+
+#                     html.P(q['text'], style={'fontWeight': 'bold', 'marginBottom': '15px', 'fontSize': '16px', 'marginTop': '25px'}),
+
+#                     (
+
+#                         dcc.RadioItems(
+
+#                             id={'type': 'post-study-question', 'id': q['id']},
+
+#                             options=[{'label': opt, 'value': opt} for opt in q['options']],
+
+#                             labelStyle={'display': 'inline-block', 'marginRight': '20px', 'cursor': 'pointer'},
+
+#                             style={'marginBottom': '20px'}
+
+#                         ) if q['type'] == 'scale' else dcc.Textarea(
+
+#                             id={'type': 'post-study-question', 'id': q['id']}, placeholder='Type your response here...',
+
+#                             style={'width': '100%', 'minHeight': '100px', 'padding': '10px', 'fontSize': '14px',
+
+#                                   'borderRadius': '5px', 'marginBottom': '20px', 'border': '1px solid #444',
+
+#                                   'backgroundColor': '#1a1a1a', 'color': 'white'}
+
+#                         )
+
+#                     )
+
+#                 ], style={'marginBottom': '20px'}) for q in questions
+
+#             ]),
+
+#             html.Button('Submit and Complete Study', id='submit-final-btn', n_clicks=0,
+
+#                        style={'padding': '15px 40px', 'fontSize': '18px', 'backgroundColor': '#00ff88',
+
+#                              'color': '#1e1e1e', 'border': 'none', 'borderRadius': '5px',
+
+#                              'cursor': 'pointer', 'fontWeight': 'bold', 'marginTop': '30px'})
+
+#         ])
+
+#     ])
+
+
+def post_study_questionnaire():
+    questions = [
+        # --- Ranking Question ---
+        {'text': 'Please rank the following demonstration types based on how useful they were for understanding and monitoring the robot swarm. (Please type your order preference below: Map–Improved, Map–Default, Text–Improved, Text–Default)', 'type': 'open', 'id': 'ranking'},
+        
+        # --- Specific Improved + Map Questions ---
+        {'text': 'The following questions pertain to your experience with the system that utilized our improved communication and the map view. How effective were the update messages in helping you understand the robots\' behavior?', 'type': 'scale', 'id': 'improved_map_effectiveness', 'options': ['1 - Not at all effective', '2', '3', '4', '5 - Extremely effective']},
+        {'text': 'How did this differ between demonstration types?', 'type': 'open', 'id': 'improved_map_effectiveness_detail'},
+        {'text': 'How easy was it to tell why a robot replanned or changed its route? (1 = Very difficult | 5 = Very easy)', 'type': 'scale', 'id': 'replan_clarity', 'options': ['1 - Very difficult', '2', '3', '4', '5 - Very easy']},
+        {'text': 'What, if anything, was confusing about the robots\' behavior or the updates you received? How did this differ between demonstration types?', 'type': 'open', 'id': 'confusion_detail'},
+        {'text': 'Do you have any additional thoughts or feedback about the communication styles or the interface overall?', 'type': 'open', 'id': 'final_feedback'}
+    ]
+    
     return html.Div(style={'backgroundColor': '#1e1e1e', 'color': 'white', 'minHeight': '100vh',
-
                           'padding': '40px', 'fontFamily': 'Arial', 'overflowY': 'auto'}, children=[
-
         html.Div(style={'backgroundColor': '#2b2b2b', 'padding': '40px', 'borderRadius': '10px',
-
                        'maxWidth': '1000px', 'margin': '0 auto'}, children=[
-
-            html.H2("Final Interview", style={'color': '#00ff88', 'marginBottom': '20px'}),
-
-            html.P("You may end the evaluation here. If you are willing to answer additional questions to assist in our understanding of your experience, please continue forward.",
-
+            html.H2("Final Interview (Optional)", style={'color': '#00ff88', 'marginBottom': '20px'}),
+            html.P("You have completed the main study. You may end the evaluation here using the 'Skip' button, or answer the questions below to help us improve.",
                   style={'marginBottom': '40px', 'fontSize': '16px'}),
-
             html.Div([
-
                 html.Div([
-
                     html.P(q['text'], style={'fontWeight': 'bold', 'marginBottom': '15px', 'fontSize': '16px', 'marginTop': '25px'}),
-
                     (
-
                         dcc.RadioItems(
-
                             id={'type': 'post-study-question', 'id': q['id']},
-
                             options=[{'label': opt, 'value': opt} for opt in q['options']],
-
                             labelStyle={'display': 'inline-block', 'marginRight': '20px', 'cursor': 'pointer'},
-
                             style={'marginBottom': '20px'}
-
                         ) if q['type'] == 'scale' else dcc.Textarea(
-
                             id={'type': 'post-study-question', 'id': q['id']}, placeholder='Type your response here...',
-
                             style={'width': '100%', 'minHeight': '100px', 'padding': '10px', 'fontSize': '14px',
-
                                   'borderRadius': '5px', 'marginBottom': '20px', 'border': '1px solid #444',
-
                                   'backgroundColor': '#1a1a1a', 'color': 'white'}
-
                         )
-
                     )
-
                 ], style={'marginBottom': '20px'}) for q in questions
-
             ]),
-
-            html.Button('Submit and Complete Study', id='submit-final-btn', n_clicks=0,
-
-                       style={'padding': '15px 40px', 'fontSize': '18px', 'backgroundColor': '#00ff88',
-
-                             'color': '#1e1e1e', 'border': 'none', 'borderRadius': '5px',
-
-                             'cursor': 'pointer', 'fontWeight': 'bold', 'marginTop': '30px'})
-
+            
+            # --- BUTTON CONTAINER ---
+            html.Div(style={'display': 'flex', 'gap': '20px', 'marginTop': '30px'}, children=[
+                html.Button('Submit Answers', id='submit-final-btn', n_clicks=0,
+                           style={'padding': '15px 40px', 'fontSize': '18px', 'backgroundColor': '#00ff88',
+                                 'color': '#1e1e1e', 'border': 'none', 'borderRadius': '5px',
+                                 'cursor': 'pointer', 'fontWeight': 'bold'}),
+                
+                # NEW SKIP BUTTON
+                html.Button('Skip & Finish', id='skip-final-btn', n_clicks=0,
+                           style={'padding': '15px 40px', 'fontSize': '18px', 'backgroundColor': '#666',
+                                 'color': 'white', 'border': 'none', 'borderRadius': '5px',
+                                 'cursor': 'pointer', 'fontWeight': 'bold'})
+            ])
         ])
-
     ])
-
-
+    
+    
 
 def create_simulation_layout():
 
@@ -3199,9 +3255,51 @@ def submit_post_scenario_questions(n_clicks, study_state, participant_data, resp
 
         return post_study_questionnaire(), new_responses, new_study_state, 0 
 
+
+
+
+
+# @app.callback(
+#     Output('page-content', 'children', allow_duplicate=True),
+#     Input('submit-final-btn', 'n_clicks'),
+#     State('participant-store', 'data'),
+#     State('study-state-store', 'data'),
+#     State('responses-store', 'data'),
+#     State('interaction-log-store', 'data'),
+#     State('all-message-logs-store', 'data'),
+#     State({'type': 'post-study-question', 'id': ALL}, 'value'),
+#     State({'type': 'post-study-question', 'id': ALL}, 'id'),
+#     prevent_initial_call=True
+# )
+# def submit_final_questionnaire(n_clicks, participant_data, study_state, responses, interactions, all_message_logs, post_values, post_ids):
+#     if not participant_data:
+#         raise PreventUpdate
+    
+#     # Map answers to their IDs
+#     answer_dict = {q_id['id']: val for q_id, val in zip(post_ids, post_values)}
+    
+#     post_response = {
+#         'timestamp': datetime.now().isoformat(),
+#         'type': 'post_study',
+#         'answers': answer_dict
+#     }
+    
+#     final_responses = (responses or []) + [post_response]
+    
+#     try:
+#         # Save all data (interactions, message logs, and the appended responses JSON)
+#         save_study_data(participant_data, final_responses, interactions)
+#         save_message_logs(participant_data, all_message_logs, study_state)
+#     except Exception as e:
+#         print(f"Error during final save: {e}")
+        
+#     return thank_you_screen()
+
+
 @app.callback(
     Output('page-content', 'children', allow_duplicate=True),
     Input('submit-final-btn', 'n_clicks'),
+    Input('skip-final-btn', 'n_clicks'), # Added Skip Input
     State('participant-store', 'data'),
     State('study-state-store', 'data'),
     State('responses-store', 'data'),
@@ -3211,12 +3309,25 @@ def submit_post_scenario_questions(n_clicks, study_state, participant_data, resp
     State({'type': 'post-study-question', 'id': ALL}, 'id'),
     prevent_initial_call=True
 )
-def submit_final_questionnaire(n_clicks, participant_data, study_state, responses, interactions, all_message_logs, post_values, post_ids):
+def submit_final_questionnaire(submit_clicks, skip_clicks, participant_data, study_state, responses, interactions, all_message_logs, post_values, post_ids):
     if not participant_data:
         raise PreventUpdate
     
-    # Map answers to their IDs
-    answer_dict = {q_id['id']: val for q_id, val in zip(post_ids, post_values)}
+    # Determine which button triggered the callback
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        raise PreventUpdate
+    
+    button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    
+    answer_dict = {}
+
+    # If they clicked Submit, we gather the answers. 
+    # If they clicked Skip, we leave answer_dict empty or mark as skipped.
+    if button_id == 'submit-final-btn':
+        answer_dict = {q_id['id']: val for q_id, val in zip(post_ids, post_values)}
+    else:
+        answer_dict = {"status": "skipped_by_user"}
     
     post_response = {
         'timestamp': datetime.now().isoformat(),
