@@ -2541,6 +2541,12 @@ def programmatically_switch_view(study_state, participant_data):
     header_text = f"Run: {current_run_idx + 1} / {len(participant_data['track'])} | Scenario: {scenario_num} | View: {view_name} | Framework: {framework_name}"
 
     return map_style, text_style, header_text
+
+
+
+
+
+
 @app.callback(
     Output('simulation-graph', 'figure'),
     Output('robot-1-messages-store', 'data', allow_duplicate=True),
@@ -2571,7 +2577,7 @@ def programmatically_switch_view(study_state, participant_data):
 def update_simulation_views(frame_idx, study_state,
                             scenario_data, hmm_data,
                             participant_data, hist1, hist2, hist3,
-                            open_message_ids, all_messages_history,
+                            open_message_ids, all_messages_data_history, # Renamed to reflect it holds DATA
                             message_timestamps, all_message_logs):
     if not study_state or study_state.get('phase') != 'simulation':
         return (no_update,) * 14
@@ -2579,6 +2585,11 @@ def update_simulation_views(frame_idx, study_state,
     current_open_message_ids = list(set(open_message_ids)) if open_message_ids else []
     new_message_timestamps = message_timestamps.copy() if message_timestamps else {}
     new_all_message_logs = all_message_logs.copy() if all_message_logs else []
+    
+    # --- FIX: Ensure history is treated as data, clear if it contains leftover components ---
+    current_all_messages_data = all_messages_data_history or []
+    if current_all_messages_data and isinstance(current_all_messages_data[0], dict) and 'props' in current_all_messages_data[0]:
+        current_all_messages_data = [] # Reset if we detect old component data
     
     current_run_idx = study_state['current_run_idx']
     current_run_info = participant_data['track'][current_run_idx]
@@ -2593,8 +2604,9 @@ def update_simulation_views(frame_idx, study_state,
         current_fig = initial_figure
         try: current_fig = callback_context.outputs_list[0].get('value', initial_figure)
         except: pass
+        # Return current data safely
         return (current_fig, hist1 or [], hist2 or [], hist3 or [], frame_idx or 0, frame_idx or 0, frame_idx or 0,
-                hmm_data, all_messages_history or [], all_messages_history or [], UPDATE_INTERVAL_MS,
+                hmm_data, [], current_all_messages_data, UPDATE_INTERVAL_MS,
                 current_open_message_ids, new_message_timestamps, new_all_message_logs)
     
     current_hmms = hmm_data.copy() if hmm_data else {}
@@ -2609,7 +2621,9 @@ def update_simulation_views(frame_idx, study_state,
     new_robot_message_outputs = [histories[0] or [], histories[1] or [], histories[2] or []]
     sim_time = current_frame_data.get('simulator time', 0)
     any_sync_occurred_with_framework = False
-    newly_generated_messages_for_feed = []
+    
+    # --- FIX: Collect Data Dicts here, Render later ---
+    new_messages_data_list = [] 
     
     for i in range(1, 4):
         robot_id = f'robot{i}'
@@ -2652,7 +2666,7 @@ def update_simulation_views(frame_idx, study_state,
                 if frame_idx > 0 and frame_idx % interval == 0:
                     generate_message = True
 
-# Force Message if Task Complete (ONLY applies to framework mode now)
+            # Force Message if Task Complete
             if framework_mode == 'with_framework' and robot_info.get('state') == 'all_tasks_complete':
                 generate_message = True
 
@@ -2668,45 +2682,27 @@ def update_simulation_views(frame_idx, study_state,
                     should_send = False
                 else:
                     current_robot_history = new_robot_message_outputs[i-1]
-                    
                     if current_robot_history:
                         last_msg = current_robot_history[0]
-                        
                         current_core_state = new_message_data.get('core_state', 'unknown')
                         last_core_state = last_msg.get('core_state', 'unknown')
-                        
-                        # Compare features (e.g. did we add 'Low Battery' to 'Bad Weather'?)
                         current_features = set(new_message_data.get('feature_set', []))
                         last_features = set(last_msg.get('feature_set', []))
-                        
-                        # Compare package counts
                         current_pkgs = new_message_data.get('pkg_count', 0)
                         last_pkgs = last_msg.get('pkg_count', 0)
                         
-                        # --- GLOBAL RULE: Suppress consecutive 'complete' ---
                         if current_core_state == 'complete' and last_core_state == 'complete':
                             should_send = False
 
-                        # --- FRAMEWORK ONLY RULES ---
-                        # We only filter 'On Track' and 'Timing Updates' for the framework condition.
-                        # The 'without_framework' condition MUST remain spammy for the control comparison.
                         if framework_mode == 'with_framework' and should_send:
-                            
-                            # 1. Suppress if identical state (e.g. On Track -> On Track) AND no feature changes
                             if current_core_state == last_core_state:
                                 if current_features == last_features:
                                     should_send = False
-                            
-                            # 2. Suppress if we are just sending another Timing Update with no new features
                             if current_core_state == 'deviation' and last_core_state == 'deviation':
                                 if current_features == last_features:
                                     should_send = False
-                                    
-                            # 3. OVERRIDE: Always send if Package Count Changed
                             if current_pkgs != last_pkgs:
                                 should_send = True
-                                
-                            # 4. OVERRIDE: Always send if Features Changed (e.g. Battery added)
                             if current_features != last_features:
                                 should_send = True
 
@@ -2724,21 +2720,16 @@ def update_simulation_views(frame_idx, study_state,
                         )
                         new_all_message_logs.append(log_entry)
                     
-                    new_message_div = render_message_component(new_message_data, current_open_message_ids, is_new=True)
-                    newly_generated_messages_for_feed.append(new_message_div)
+                    # --- FIX: Append DATA, do not render yet ---
+                    new_messages_data_list.append(new_message_data)
                     
                     updated_history = [new_message_data] + (new_robot_message_outputs[i-1] or [])
                     new_robot_message_outputs[i-1] = updated_history
 
-# STRICT FIX: Only check for package events if we are in the framework condition.
-    # If without_framework, these instant alerts are suppressed.
+    # STRICT FIX: Only check for package events if we are in the framework condition.
     if frame_idx > 0 and framework_mode == 'with_framework':
         current_packages = current_frame_data.get('packages', [])
         prev_packages_list = scenario_data[frame_idx - 1].get('packages', [])
-        # ... (keep the indentation of the code below this line exactly as it was)
-    # if frame_idx > 0:
-    #     current_packages = current_frame_data.get('packages', [])
-    #     prev_packages_list = scenario_data[frame_idx - 1].get('packages', [])
         prev_packages_dict = {p['id']: p for p in prev_packages_list}
 
         for pkg in current_packages:
@@ -2764,8 +2755,10 @@ def update_simulation_views(frame_idx, study_state,
                         participant_id=participant_data.get('id'), appear_time=appear_time, robot_state="N/A", robot_x=pkg.get('x'), robot_y=pkg.get('y')
                     )
                     new_all_message_logs.append(log_entry)
-                    new_message_div = render_message_component(new_message_data, current_open_message_ids, is_new=True)
-                    newly_generated_messages_for_feed.insert(0, new_message_div)
+                    
+                    # --- FIX: Insert DATA at top ---
+                    new_messages_data_list.insert(0, new_message_data)
+                    
                     robot_index = int(assigned_to[-1]) - 1
                     if 0 <= robot_index < 3:
                         new_robot_message_outputs[robot_index].insert(0, new_message_data)
@@ -2803,20 +2796,319 @@ def update_simulation_views(frame_idx, study_state,
                             participant_id=participant_data.get('id'), appear_time=appear_time, robot_state="N/A", robot_x=pkg.get('x'), robot_y=pkg.get('y')
                         )
                         new_all_message_logs.append(log_entry)
-                        new_message_div = render_message_component(new_message_data, current_open_message_ids, is_new=True)
-                        newly_generated_messages_for_feed.insert(0, new_message_div)
+                        
+                        # --- FIX: Insert DATA at top ---
+                        new_messages_data_list.insert(0, new_message_data)
+                        
                         if discovered_by.startswith('robot'):
                             robot_index = int(discovered_by[-1]) - 1
                             if 0 <= robot_index < 3:
                                 new_robot_message_outputs[robot_index].insert(0, new_message_data)
 
-    updated_all_messages = newly_generated_messages_for_feed + (all_messages_history or [])
-    updated_all_messages = updated_all_messages[:100]
+    # --- FIX: Combine DATA lists and Render Components from Data ---
+    updated_all_messages_data = new_messages_data_list + current_all_messages_data
+    updated_all_messages_data = updated_all_messages_data[:100] # Keep history manageable
+    
+    # Render components here for the Feed
+    feed_children = [
+        render_message_component(
+            msg_data, 
+            current_open_message_ids, 
+            is_new=(msg_data in new_messages_data_list) # Simple check if it was just generated
+        ) 
+        for msg_data in updated_all_messages_data
+    ]
+    
     new_interval = SLOW_INTERVAL_MS if any_sync_occurred_with_framework else UPDATE_INTERVAL_MS
     
+    # Return feed_children for the Display, and updated_all_messages_data for the Store
     return (fig, new_robot_message_outputs[0], new_robot_message_outputs[1], new_robot_message_outputs[2],
-            frame_idx, frame_idx, frame_idx, current_hmms, updated_all_messages, updated_all_messages,
+            frame_idx, frame_idx, frame_idx, current_hmms, feed_children, updated_all_messages_data,
             new_interval, current_open_message_ids, new_message_timestamps, new_all_message_logs)
+    
+    
+    
+    
+    
+
+
+
+# @app.callback(
+#     Output('simulation-graph', 'figure'),
+#     Output('robot-1-messages-store', 'data', allow_duplicate=True),
+#     Output('robot-2-messages-store', 'data', allow_duplicate=True),
+#     Output('robot-3-messages-store', 'data', allow_duplicate=True),
+#     Output('robot-1-timeline', 'value'),
+#     Output('robot-2-timeline', 'value'),
+#     Output('robot-3-timeline', 'value'),
+#     Output('hmm-data-store', 'data', allow_duplicate=True),
+#     Output('all-messages-feed', 'children'),
+#     Output('all-messages-store', 'data', allow_duplicate=True),
+#     Output('animation-interval', 'interval'),
+#     Output('open-messages-store', 'data', allow_duplicate=True),
+#     Output('message-timestamps-store', 'data', allow_duplicate=True),
+#     Output('all-message-logs-store', 'data', allow_duplicate=True),
+#     Input('current-frame-store', 'data'),
+#     Input('study-state-store', 'data'),
+#     State('scenario-data-store', 'data'),
+#     State('hmm-data-store', 'data'),
+#     State('participant-store', 'data'),
+#     [State(f'robot-{i}-messages-store', 'data') for i in range(1, 4)],
+#     State('open-messages-store', 'data'),
+#     State('all-messages-store', 'data'),
+#     State('message-timestamps-store', 'data'),
+#     State('all-message-logs-store', 'data'),
+#     prevent_initial_call=True
+# )
+# def update_simulation_views(frame_idx, study_state,
+#                             scenario_data, hmm_data,
+#                             participant_data, hist1, hist2, hist3,
+#                             open_message_ids, all_messages_history,
+#                             message_timestamps, all_message_logs):
+#     if not study_state or study_state.get('phase') != 'simulation':
+#         return (no_update,) * 14
+    
+#     current_open_message_ids = list(set(open_message_ids)) if open_message_ids else []
+#     new_message_timestamps = message_timestamps.copy() if message_timestamps else {}
+#     new_all_message_logs = all_message_logs.copy() if all_message_logs else []
+    
+#     current_run_idx = study_state['current_run_idx']
+#     current_run_info = participant_data['track'][current_run_idx]
+#     scenario_num = current_run_info[0]
+#     condition_idx = current_run_info[1]
+#     view_type, framework_mode = get_condition_names(condition_idx)
+    
+#     if not all([scenario_data, hmm_data, study_state, participant_data]):
+#         return (no_update,) * 14
+    
+#     if frame_idx is None or frame_idx >= len(scenario_data):
+#         current_fig = initial_figure
+#         try: current_fig = callback_context.outputs_list[0].get('value', initial_figure)
+#         except: pass
+#         return (current_fig, hist1 or [], hist2 or [], hist3 or [], frame_idx or 0, frame_idx or 0, frame_idx or 0,
+#                 hmm_data, all_messages_history or [], all_messages_history or [], UPDATE_INTERVAL_MS,
+#                 current_open_message_ids, new_message_timestamps, new_all_message_logs)
+    
+#     current_hmms = hmm_data.copy() if hmm_data else {}
+#     current_frame_data = scenario_data[frame_idx]
+#     fig = create_figure_for_frame(static_map_data, current_frame_data)
+    
+#     mission_time_threshold = THRESHOLD_VALUES['with_framework'].get(scenario_num, 1)
+#     robots_dict = current_frame_data.get('robots', {})
+#     packages = current_frame_data.get('packages', [])
+    
+#     histories = [hist1, hist2, hist3]
+#     new_robot_message_outputs = [histories[0] or [], histories[1] or [], histories[2] or []]
+#     sim_time = current_frame_data.get('simulator time', 0)
+#     any_sync_occurred_with_framework = False
+#     newly_generated_messages_for_feed = []
+    
+#     for i in range(1, 4):
+#         robot_id = f'robot{i}'
+#         if robot_id in robots_dict:
+#             raw_robot_data = robots_dict[robot_id]
+#             rmm_keys_to_select = ["state", "plan_index", "x", "y", "mission_time", "Current_weather", "Battery_status", 
+#                                   "Momentarily_offline", "Replan_flag", "target_package_id", "plan", 
+#                                   "immediate_goal_x", "immediate_goal_y", "Quadrant", "Bad_Terrain"]
+#             selected_robot_rmm_array = {'id': robot_id}
+#             for key in rmm_keys_to_select:
+#                 selected_robot_rmm_array[key] = raw_robot_data.get(key)
+#             selected_robot_rmm_array['robot_time'] = sim_time
+            
+#             selected_robot_hmm_array = current_hmms.get(robot_id)
+#             robot_info = {**robots_dict[robot_id], 'id': robot_id}
+            
+#             sync_occurred = False 
+#             generate_message = False 
+            
+#             # 1. Update HMM Logic
+#             if framework_mode == 'with_framework':
+#                 if selected_robot_hmm_array:
+#                     try:
+#                         updated_hmm_array, sync_occurred = dynamic_deviation_threshold_multi_logic(
+#                             hmm_array=selected_robot_hmm_array,
+#                             rmm_array=selected_robot_rmm_array,
+#                             update_logic_functions={},
+#                             uncertainty_factor_pos=0.1,
+#                             uncertainty_factor_time=0.1,
+#                             dynamic_threshold_mission_time=mission_time_threshold,
+#                             robot_id=robot_id
+#                         )
+#                     except Exception:
+#                         sync_occurred = False
+#                         updated_hmm_array = selected_robot_hmm_array
+#                     current_hmms[robot_id] = updated_hmm_array 
+#                     if sync_occurred: any_sync_occurred_with_framework = True 
+#             else: 
+#                 interval = WITHOUT_FRAMEWORK_INTERVALS.get(scenario_num, 20) 
+#                 if frame_idx > 0 and frame_idx % interval == 0:
+#                     generate_message = True
+
+# # Force Message if Task Complete (ONLY applies to framework mode now)
+#             if framework_mode == 'with_framework' and robot_info.get('state') == 'all_tasks_complete':
+#                 generate_message = True
+
+#             # 2. Message Generation Attempt
+#             if sync_occurred or generate_message:
+#                 new_message_data, message_type, message_text_for_log = create_rich_status_message_data(
+#                     robot_info, sim_time, packages, selected_robot_hmm_array, selected_robot_rmm_array, scenario_num, framework_mode
+#                 )
+                
+#                 # --- SMART SUPPRESSION LOGIC ---
+#                 should_send = True
+#                 if new_message_data is None:
+#                     should_send = False
+#                 else:
+#                     current_robot_history = new_robot_message_outputs[i-1]
+                    
+#                     if current_robot_history:
+#                         last_msg = current_robot_history[0]
+                        
+#                         current_core_state = new_message_data.get('core_state', 'unknown')
+#                         last_core_state = last_msg.get('core_state', 'unknown')
+                        
+#                         # Compare features (e.g. did we add 'Low Battery' to 'Bad Weather'?)
+#                         current_features = set(new_message_data.get('feature_set', []))
+#                         last_features = set(last_msg.get('feature_set', []))
+                        
+#                         # Compare package counts
+#                         current_pkgs = new_message_data.get('pkg_count', 0)
+#                         last_pkgs = last_msg.get('pkg_count', 0)
+                        
+#                         # --- GLOBAL RULE: Suppress consecutive 'complete' ---
+#                         if current_core_state == 'complete' and last_core_state == 'complete':
+#                             should_send = False
+
+#                         # --- FRAMEWORK ONLY RULES ---
+#                         # We only filter 'On Track' and 'Timing Updates' for the framework condition.
+#                         # The 'without_framework' condition MUST remain spammy for the control comparison.
+#                         if framework_mode == 'with_framework' and should_send:
+                            
+#                             # 1. Suppress if identical state (e.g. On Track -> On Track) AND no feature changes
+#                             if current_core_state == last_core_state:
+#                                 if current_features == last_features:
+#                                     should_send = False
+                            
+#                             # 2. Suppress if we are just sending another Timing Update with no new features
+#                             if current_core_state == 'deviation' and last_core_state == 'deviation':
+#                                 if current_features == last_features:
+#                                     should_send = False
+                                    
+#                             # 3. OVERRIDE: Always send if Package Count Changed
+#                             if current_pkgs != last_pkgs:
+#                                 should_send = True
+                                
+#                             # 4. OVERRIDE: Always send if Features Changed (e.g. Battery added)
+#                             if current_features != last_features:
+#                                 should_send = True
+
+#                 if should_send:
+#                     msg_id = new_message_data['message_id'] 
+#                     if msg_id not in new_message_timestamps:
+#                         appear_time = time.time()
+#                         new_message_timestamps[msg_id] = appear_time
+                        
+#                         log_entry = create_message_log_entry(
+#                             message_id=msg_id, robot_id=robot_id, scenario_num=scenario_num, condition_idx=condition_idx,
+#                             frame_idx=frame_idx, sim_time=sim_time, message_type=message_type, message_text=message_text_for_log, 
+#                             participant_id=participant_data.get('id'), appear_time=appear_time,
+#                             robot_state=robot_info.get('state'), robot_x=robot_info.get('x'), robot_y=robot_info.get('y')
+#                         )
+#                         new_all_message_logs.append(log_entry)
+                    
+#                     new_message_div = render_message_component(new_message_data, current_open_message_ids, is_new=True)
+#                     newly_generated_messages_for_feed.append(new_message_div)
+                    
+#                     updated_history = [new_message_data] + (new_robot_message_outputs[i-1] or [])
+#                     new_robot_message_outputs[i-1] = updated_history
+
+# # STRICT FIX: Only check for package events if we are in the framework condition.
+#     # If without_framework, these instant alerts are suppressed.
+#     if frame_idx > 0 and framework_mode == 'with_framework':
+#         current_packages = current_frame_data.get('packages', [])
+#         prev_packages_list = scenario_data[frame_idx - 1].get('packages', [])
+#         # ... (keep the indentation of the code below this line exactly as it was)
+#     # if frame_idx > 0:
+#     #     current_packages = current_frame_data.get('packages', [])
+#     #     prev_packages_list = scenario_data[frame_idx - 1].get('packages', [])
+#         prev_packages_dict = {p['id']: p for p in prev_packages_list}
+
+#         for pkg in current_packages:
+#             current_assigned = pkg.get('Assigned_to')
+#             prev_assigned = prev_packages_dict.get(pkg['id'], {}).get('Assigned_to')
+#             if (prev_assigned in ['Null', None] or prev_assigned == '') and current_assigned.startswith('robot') and pkg.get('carried_by') in ['Null', None]:
+#                 pkg_id = pkg['id']
+#                 assigned_to = current_assigned
+#                 message_text_list = ["Package ", html.Strong(pkg_id), f" has been assigned to ", html.Strong(assigned_to), " for collection."]
+#                 message_text_for_log = " ".join([str(item) for item in message_text_list])
+#                 msg_id = f"{pkg_id}-assigned-{sim_time:.2f}"
+#                 message_type = "assignment"
+#                 new_message_data = {
+#                     'message_id': msg_id, 'robot_id_title': "System", 'status_icon': '🔗', 'status_text': 'PACKAGE ASSIGNED',
+#                     'status_class_suffix': 'on-track', 'time_str': datetime.now().strftime('%I:%M:%S %p'), 'details_msg': message_text_list
+#                 }
+#                 if msg_id not in new_message_timestamps:
+#                     appear_time = time.time()
+#                     new_message_timestamps[msg_id] = appear_time
+#                     log_entry = create_message_log_entry(
+#                         message_id=msg_id, robot_id="System", scenario_num=scenario_num, condition_idx=condition_idx,
+#                         frame_idx=frame_idx, sim_time=sim_time, message_type=message_type, message_text=message_text_for_log,
+#                         participant_id=participant_data.get('id'), appear_time=appear_time, robot_state="N/A", robot_x=pkg.get('x'), robot_y=pkg.get('y')
+#                     )
+#                     new_all_message_logs.append(log_entry)
+#                     new_message_div = render_message_component(new_message_data, current_open_message_ids, is_new=True)
+#                     newly_generated_messages_for_feed.insert(0, new_message_div)
+#                     robot_index = int(assigned_to[-1]) - 1
+#                     if 0 <= robot_index < 3:
+#                         new_robot_message_outputs[robot_index].insert(0, new_message_data)
+
+#         for pkg in current_packages:
+#             if pkg['id'].startswith('d'):
+#                 prev_pkg = prev_packages_dict.get(pkg['id'])
+#                 current_discovered = pkg.get('Discovered', 0) == 1
+#                 prev_discovered = prev_pkg.get('Discovered', 0) == 1 if prev_pkg else False
+#                 if current_discovered and not prev_discovered:
+#                     pkg_id = pkg['id']
+#                     discovered_by = pkg.get('Discovered_by', 'N/A')
+#                     assigned_to = pkg.get('Assigned_to', 'N/A')
+#                     if discovered_by in ['Null', 'N/A', '', None]: continue 
+#                     message_text_list = []
+#                     if discovered_by != 'N/A' and discovered_by == assigned_to:
+#                          message_text_list = ["Package ", html.Strong(pkg_id), f" discovered by {discovered_by} and it is en route to collect it."]
+#                     elif discovered_by != assigned_to and assigned_to != 'N/A':
+#                         message_text_list = ["Package ", html.Strong(pkg_id), f" discovered by {discovered_by}.", f" Assigned to {assigned_to}."]
+#                     else:
+#                         message_text_list = ["Package ", html.Strong(pkg_id), f" discovered by {discovered_by}."]
+#                     message_text_for_log = " ".join([str(item) for item in message_text_list])
+#                     msg_id = f"{pkg_id}-discovered-{sim_time:.2f}"
+#                     message_type = "discovery"
+#                     new_message_data = {
+#                         'message_id': msg_id, 'robot_id_title': "System", 'status_icon': '📣', 'status_text': 'PACKAGE DISCOVERED',
+#                         'status_class_suffix': 'on-track', 'time_str': datetime.now().strftime('%I:%M:%S %p'), 'details_msg': message_text_list
+#                     }
+#                     if msg_id not in new_message_timestamps:
+#                         appear_time = time.time()
+#                         new_message_timestamps[msg_id] = appear_time
+#                         log_entry = create_message_log_entry(
+#                             message_id=msg_id, robot_id="System", scenario_num=scenario_num, condition_idx=condition_idx, 
+#                             frame_idx=frame_idx, sim_time=sim_time, message_type=message_type, message_text=message_text_for_log, 
+#                             participant_id=participant_data.get('id'), appear_time=appear_time, robot_state="N/A", robot_x=pkg.get('x'), robot_y=pkg.get('y')
+#                         )
+#                         new_all_message_logs.append(log_entry)
+#                         new_message_div = render_message_component(new_message_data, current_open_message_ids, is_new=True)
+#                         newly_generated_messages_for_feed.insert(0, new_message_div)
+#                         if discovered_by.startswith('robot'):
+#                             robot_index = int(discovered_by[-1]) - 1
+#                             if 0 <= robot_index < 3:
+#                                 new_robot_message_outputs[robot_index].insert(0, new_message_data)
+
+#     updated_all_messages = newly_generated_messages_for_feed + (all_messages_history or [])
+#     updated_all_messages = updated_all_messages[:100]
+#     new_interval = SLOW_INTERVAL_MS if any_sync_occurred_with_framework else UPDATE_INTERVAL_MS
+    
+#     return (fig, new_robot_message_outputs[0], new_robot_message_outputs[1], new_robot_message_outputs[2],
+#             frame_idx, frame_idx, frame_idx, current_hmms, updated_all_messages, updated_all_messages,
+#             new_interval, current_open_message_ids, new_message_timestamps, new_all_message_logs)
     
     
 
