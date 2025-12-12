@@ -827,9 +827,27 @@ def create_rich_status_message_data(robot_data, sim_time, all_packages, selected
     remaining_steps = len(plan_list) - plan_index
     eta_seconds = abs(int(remaining_steps * time_per_step))
     
+    
     # --- 2. Startup Filter: Skip 0s noise ---
-    if (eta_seconds == 0 and state != 'all_tasks_complete') or (sim_time < 2.0):
-        return None, None, None
+    # FIX: Only apply the strict ETA filter if we are using the intelligent framework.
+    # If without_framework, we want the "stupid" messages even if ETA is 0.
+    if framework_mode == 'with_framework':
+        if (eta_seconds == 0 and state != 'all_tasks_complete') or (sim_time < 2.0):
+            return None, None, None
+    else:
+        # For without_framework, only filter the very first second to avoid startup glitches
+        if sim_time < 2.0:
+            return None, None, None
+        
+        
+        
+    
+    # # --- 2. Startup Filter: Skip 0s noise ---
+    # if (eta_seconds == 0 and state != 'all_tasks_complete') or (sim_time < 2.0):
+    #     return None, None, None
+
+
+
 
     # --- 3. Detect Features & Build Context ---
     feature_alerts = []
@@ -3706,4 +3724,4 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 """)
 
     # Run the app using app.run instead of app.run_server
-    app.run(debug=False, host='0.0.0.0', port=8080)
+    app.run(debug=False, host='0.0.0.0', port=8081)
