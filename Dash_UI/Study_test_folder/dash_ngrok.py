@@ -269,7 +269,7 @@ SCENARIO_CONTENT = {
 
             {"text": "What type of obstacle(s) are robot 2 and robot 3 experiencing?", "options": ["Both robots are experiencing poor weather", "Both robots are experiencing rough terrain", "Robot 3 is experiencing poor weather, Robot 2 is experiencing rough terrain", "Robot 2 is experiencing poor weather, Robot 3 is experiencing rough terrain"]},
 
-            {"text": "What is robot 3 going to do now that it has cleared the NW quadrant?", "options": ["Robot 3 will end its mission", "Robot 3 will assist Robot 1 in the SE", "Robot 3 will assist Robot 2 in the NE", "Robot 3 will return to the SE"]}
+            {"text": "What is robot 3 going to do now that it has cleared the NW quadrant?", "options": ["Robot 3 will end its mission", "Robot 3 will assist Robot 1 in the SW", "Robot 3 will assist Robot 2 in the NE", "Robot 3 will return to the SE"]}
 
         ]
 
