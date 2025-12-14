@@ -189,7 +189,7 @@ SCENARIO_CONTENT = {
 
             {"text": "Which quadrant has most packages been discovered?", "options": ["SE", "SW", "NE", "NW"]},
 
-            {"text": "Which drop-off zone zone will robot 3 deliver its package to?", "options": ["Robot 3 will leave the SW quadrant and deliver its package in the NW", "Robot 3 will remain in the SW quadrant and deliver its package in the SW", "Robot 3 will remain in the NW quadrant and deliver its package in the NW", "Robot 3 will leave the NW quadrant and deliver its package in the SE"]}
+            {"text": "Which drop-off zone zone will robot 3 deliver its package to?", "options": ["Robot 3 will leave the SW quadrant and deliver its package in the NW", "Robot 3 will remain in the SW quadrant and deliver its package in the SW", "Robot 3 will remain in the NE quadrant and deliver its package in the NW", "Robot 3 will leave the SW quadrant and deliver its package in the SE"]}
 
         ]
 
@@ -235,7 +235,7 @@ SCENARIO_CONTENT = {
 
             {"text": "Which quadrant is Robot 3 in?", "options": ["SE", "NE", "NW", "SW"]},
 
-            {"text": "Why is Robot 3 in the NW quadrant?", "options": ["Robot 3 discovered a package in the NE and is delivering it to the NW", "Robot 3 discovered a package in the SE and is delivering it to the NW", "Robot 1 requested Robot 3 to pick-up and deliver a package in the NW", "Robot 2 requested Robot 3 to pick-up and deliver a package in the NW"]},
+            {"text": "Why is Robot 3 in the NW quadrant?", "options": ["Robot 3 discovered a package in the NE and is delivering it to the NW", "Robot 3 was assigned a package in the NW and is delivering it", "Robot 1 requested Robot 3 to pick-up and deliver a package in the NW", "Robot 2 requested Robot 3 to pick-up and deliver a package in the NW"]},
 
             {"text": "Which drop-off zone will robot 3 end its mission?", "options": ["SE", "SW", "NE", "NW"]}
 
@@ -253,7 +253,7 @@ SCENARIO_CONTENT = {
 
             {"text": "Given that robot 2 just delivered a package, what comes next?", "options": ["Robot 2 will head towards a different package in the NW quadrant", "Robot 2 will assist Robot 1 in the NW quadrant", "Robot 2 will head towards a different package in the SW quadrant", "Robot 2 will assist Robot 3 in the NE quadrant", "Robot 2 will search the NE and SE quadrants for remaining packages"]},
 
-            {"text": "There is one package remaining in the NE region, how will it be dealt with?", "options": ["Robot 1 will pick it up and deliver it in the NE.", "Robot 2 will pick it up and deliver it in the NE.", "Robot 3 will pick it up and deliver it in the NE.", "Robot 1 will pick it up and deliver it in the SW.", "Robot 2 will pick it up and deliver it in the SW."]}
+            {"text": "Which robot is likely to finish its mission next?", "options": ["Robot 1", "Robot 2.", "Robot 3.", "Robot 1 and 2 simultaneously.", "Robot 3 and 2 simultaneously."]}
 
         ]
 
@@ -269,7 +269,7 @@ SCENARIO_CONTENT = {
 
             {"text": "What type of obstacle(s) are robot 2 and robot 3 experiencing?", "options": ["Both robots are experiencing poor weather", "Both robots are experiencing rough terrain", "Robot 3 is experiencing poor weather, Robot 2 is experiencing rough terrain", "Robot 2 is experiencing poor weather, Robot 3 is experiencing rough terrain"]},
 
-            {"text": "What is robot 3 going to do now that it has cleared the NW quadrant?", "options": ["Robot 3 will end its mission", "Robot 3 will assist Robot 1 in the SE", "Robot 3 will assist Robot 2 in the NE", "Robot 3 will return to clear the SE"]}
+            {"text": "What is robot 3 going to do now that it has cleared the NW quadrant?", "options": ["Robot 3 will end its mission", "Robot 3 will assist Robot 1 in the SE", "Robot 3 will assist Robot 2 in the NE", "Robot 3 will return to the SE"]}
 
         ]
 

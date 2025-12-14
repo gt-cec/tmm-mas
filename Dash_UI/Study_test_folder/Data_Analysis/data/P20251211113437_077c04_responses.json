@@ -1,0 +1,101 @@
+[
+  {
+    "timestamp": "2025-12-11T11:41:52.137699",
+    "type": "pause_question",
+    "run_number": 1,
+    "scenario": 1,
+    "condition": 1,
+    "pause_point": 1,
+    "question": "Has more than one package been discovered?",
+    "answer": "Yes"
+  },
+  {
+    "timestamp": "2025-12-11T11:44:53.708254",
+    "type": "pause_question",
+    "run_number": 1,
+    "scenario": 1,
+    "condition": 1,
+    "pause_point": 2,
+    "question": "Which quadrant has most packages been discovered?",
+    "answer": "SW"
+  },
+  {
+    "timestamp": "2025-12-11T11:51:58.550013",
+    "type": "pause_question",
+    "run_number": 1,
+    "scenario": 1,
+    "condition": 1,
+    "pause_point": 3,
+    "question": "Which drop-off zone zone will robot 3 deliver its package to?",
+    "answer": "Robot 3 will leave the SW quadrant and deliver its package in the NW"
+  },
+  {
+    "timestamp": "2025-12-11T11:52:51.270687",
+    "type": "post_scenario",
+    "segment_start_time": "2025-12-11T11:51:58.550031",
+    "run_number": 1,
+    "scenario": 1,
+    "condition": 1,
+    "view_type": "map",
+    "framework": "without_framework",
+    "answers": {
+      "mental_demand": "3 - Moderate",
+      "physical_demand": "2 - Low",
+      "temporal_demand": "3 - Moderate",
+      "performance": "4 - Good",
+      "effort": "3 - Moderate",
+      "frustration": "2 - Low"
+    }
+  },
+  {
+    "timestamp": "2025-12-11T11:55:58.351190",
+    "type": "pause_question",
+    "run_number": 2,
+    "scenario": 2,
+    "condition": 0,
+    "pause_point": 1,
+    "question": "Which robot(s) are currently navigating around an obstacle?",
+    "answer": [
+      "Robot 1",
+      "Robot 2"
+    ]
+  },
+  {
+    "timestamp": "2025-12-11T11:59:46.055162",
+    "type": "pause_question",
+    "run_number": 2,
+    "scenario": 2,
+    "condition": 0,
+    "pause_point": 2,
+    "question": "What obstacle is Robot 3 facing?",
+    "answer": "Robot 3 is stuck in rough terrain"
+  },
+  {
+    "timestamp": "2025-12-11T12:14:05.712819",
+    "type": "pause_question",
+    "run_number": 2,
+    "scenario": 2,
+    "condition": 0,
+    "pause_point": 3,
+    "question": "Which robot do you expect will finish its task last?",
+    "answer": "Robot 2"
+  },
+  {
+    "timestamp": "2025-12-11T12:17:18.019373",
+    "type": "post_scenario",
+    "segment_start_time": "2025-12-11T12:14:05.712840",
+    "run_number": 2,
+    "scenario": 2,
+    "condition": 0,
+    "view_type": "map",
+    "framework": "with_framework",
+    "answers": {
+      "mental_demand": "3 - Moderate",
+      "physical_demand": "3 - Moderate",
+      "temporal_demand": "2 - Low",
+      "performance": "4 - Good",
+      "effort": "3 - Moderate",
+      "frustration": "3 - Moderate"
+    }
+  }
+]
