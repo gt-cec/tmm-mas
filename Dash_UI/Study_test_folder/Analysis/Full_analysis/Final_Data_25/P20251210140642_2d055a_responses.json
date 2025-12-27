@@ -1,0 +1,209 @@
+[
+  {
+    "timestamp": "2025-12-10T14:13:29.721648",
+    "type": "pause_question",
+    "run_number": 1,
+    "scenario": 1,
+    "condition": 0,
+    "pause_point": 1,
+    "question": "Has more than one package been discovered?",
+    "answer": "Yes"
+  },
+  {
+    "timestamp": "2025-12-10T14:14:45.203741",
+    "type": "pause_question",
+    "run_number": 1,
+    "scenario": 1,
+    "condition": 0,
+    "pause_point": 2,
+    "question": "Which quadrant has most packages been discovered?",
+    "answer": "NW"
+  },
+  {
+    "timestamp": "2025-12-10T14:16:49.456868",
+    "type": "pause_question",
+    "run_number": 1,
+    "scenario": 1,
+    "condition": 0,
+    "pause_point": 3,
+    "question": "Which drop-off zone zone will robot 3 deliver its package to?",
+    "answer": "Robot 3 will remain in the NW quadrant and deliver its package in the NW"
+  },
+  {
+    "timestamp": "2025-12-10T14:17:12.294689",
+    "type": "post_scenario",
+    "segment_start_time": "2025-12-10T14:16:49.456888",
+    "run_number": 1,
+    "scenario": 1,
+    "condition": 0,
+    "view_type": "map",
+    "framework": "with_framework",
+    "answers": {
+      "mental_demand": "5 - Very High",
+      "physical_demand": "5 - Very High",
+      "temporal_demand": "5 - Very High",
+      "performance": "2 - Poor",
+      "effort": "5 - Very High",
+      "frustration": "5 - Very High"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T14:18:41.271616",
+    "type": "pause_question",
+    "run_number": 2,
+    "scenario": 2,
+    "condition": 3,
+    "pause_point": 1,
+    "question": "Which robot(s) are currently navigating around an obstacle?",
+    "answer": [
+      "Robot 1",
+      "Robot 3"
+    ]
+  },
+  {
+    "timestamp": "2025-12-10T14:19:44.844387",
+    "type": "pause_question",
+    "run_number": 2,
+    "scenario": 2,
+    "condition": 3,
+    "pause_point": 2,
+    "question": "What obstacle is Robot 3 facing?",
+    "answer": "Robot 3 is encountering bad weather"
+  },
+  {
+    "timestamp": "2025-12-10T14:24:20.778281",
+    "type": "pause_question",
+    "run_number": 2,
+    "scenario": 2,
+    "condition": 3,
+    "pause_point": 3,
+    "question": "Which robot do you expect will finish its task last?",
+    "answer": "Robot 3"
+  },
+  {
+    "timestamp": "2025-12-10T14:25:35.841509",
+    "type": "post_scenario",
+    "segment_start_time": "2025-12-10T14:24:20.778299",
+    "run_number": 2,
+    "scenario": 2,
+    "condition": 3,
+    "view_type": "text",
+    "framework": "without_framework",
+    "answers": {
+      "mental_demand": "5 - Very High",
+      "physical_demand": "5 - Very High",
+      "temporal_demand": "5 - Very High",
+      "performance": "3 - Moderate",
+      "effort": "5 - Very High",
+      "frustration": "4 - High"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T14:32:18.723385",
+    "type": "pause_question",
+    "run_number": 3,
+    "scenario": 3,
+    "condition": 2,
+    "pause_point": 1,
+    "question": "What is the status of Robot 2?",
+    "answer": "Replanning due to rough terrain"
+  },
+  {
+    "timestamp": "2025-12-10T14:32:47.898245",
+    "type": "pause_question",
+    "run_number": 3,
+    "scenario": 3,
+    "condition": 2,
+    "pause_point": 2,
+    "question": "What are the implications of robot 2 being stuck in rough terrain?",
+    "answer": "Robot 2 will have to replan its route"
+  },
+  {
+    "timestamp": "2025-12-10T14:40:00.835952",
+    "type": "pause_question",
+    "run_number": 3,
+    "scenario": 3,
+    "condition": 2,
+    "pause_point": 3,
+    "question": "Which robot is likely to deliver a package next?",
+    "answer": "Robot 3"
+  },
+  {
+    "timestamp": "2025-12-10T14:41:07.301302",
+    "type": "post_scenario",
+    "segment_start_time": "2025-12-10T14:40:00.835977",
+    "run_number": 3,
+    "scenario": 3,
+    "condition": 2,
+    "view_type": "text",
+    "framework": "with_framework",
+    "answers": {
+      "mental_demand": "3 - Moderate",
+      "physical_demand": "2 - Low",
+      "temporal_demand": "3 - Moderate",
+      "performance": "4 - Good",
+      "effort": "4 - High",
+      "frustration": "2 - Low"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T14:42:37.676938",
+    "type": "pause_question",
+    "run_number": 4,
+    "scenario": 4,
+    "condition": 1,
+    "pause_point": 1,
+    "question": "Which quadrant is Robot 3 in?",
+    "answer": "SW"
+  },
+  {
+    "timestamp": "2025-12-10T14:45:55.223270",
+    "type": "pause_question",
+    "run_number": 4,
+    "scenario": 4,
+    "condition": 1,
+    "pause_point": 2,
+    "question": "Why is Robot 3 in the NW quadrant?",
+    "answer": "Robot 3 discovered a package in the NE and is delivering it to the NW"
+  },
+  {
+    "timestamp": "2025-12-10T14:53:52.619259",
+    "type": "pause_question",
+    "run_number": 4,
+    "scenario": 4,
+    "condition": 1,
+    "pause_point": 3,
+    "question": "Which drop-off zone will robot 3 end its mission?",
+    "answer": "SW"
+  },
+  {
+    "timestamp": "2025-12-10T14:55:39.953552",
+    "type": "post_scenario",
+    "segment_start_time": "2025-12-10T14:53:52.619280",
+    "run_number": 4,
+    "scenario": 4,
+    "condition": 1,
+    "view_type": "map",
+    "framework": "without_framework",
+    "answers": {
+      "mental_demand": "5 - Very High",
+      "physical_demand": "5 - Very High",
+      "temporal_demand": "5 - Very High",
+      "performance": "3 - Moderate",
+      "effort": "5 - Very High",
+      "frustration": "5 - Very High"
+    }
+  },
+  {
+    "timestamp": "2025-12-10T14:55:40.145383",
+    "type": "post_study",
+    "answers": {
+      "ranking": null,
+      "improved_map_effectiveness": null,
+      "improved_map_effectiveness_detail": null,
+      "replan_clarity": null,
+      "confusion_detail": null,
+      "final_feedback": null
+    }
+  }
+]
